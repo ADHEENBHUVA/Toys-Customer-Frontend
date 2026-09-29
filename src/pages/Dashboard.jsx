@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Truck, ShieldCheck, Undo2, MessageCircleHeart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const Dashboard = () => {
@@ -134,12 +136,12 @@ const Dashboard = () => {
         { name: '12+ years', icon: '🎧', bg: 'bg-gradient-to-br from-[#FFD6E8] to-[#FFBDE3]' }
     ];
 
-    // Features Section
+    // Features Section with Lucide Icons
     const features = [
-        { title: 'Free & Fast Shipping', desc: 'On orders over ₹500', icon: '🚚', color: 'text-emerald-500', bg: 'bg-emerald-50' },
-        { title: '100% Safe Materials', desc: 'Certified non-toxic toys', icon: '🛡️', color: 'text-blue-500', bg: 'bg-blue-50' },
-        { title: 'Easy 30-Day Returns', desc: 'No questions asked', icon: '↩️', color: 'text-blue-600', bg: 'bg-rose-50' },
-        { title: '24/7 Support', desc: 'Always here to help', icon: '💬', color: 'text-amber-500', bg: 'bg-amber-50' },
+        { title: 'Free & Fast Shipping', desc: 'On orders over ₹500', icon: <Truck className="w-8 h-8" />, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+        { title: '100% Safe Materials', desc: 'Certified non-toxic toys', icon: <ShieldCheck className="w-8 h-8" />, color: 'text-blue-500', bg: 'bg-blue-50' },
+        { title: 'Easy 30-Day Returns', desc: 'No questions asked', icon: <Undo2 className="w-8 h-8" />, color: 'text-blue-600', bg: 'bg-rose-50' },
+        { title: '24/7 Support', desc: 'Always here to help', icon: <MessageCircleHeart className="w-8 h-8" />, color: 'text-amber-500', bg: 'bg-amber-50' },
     ];
 
     return (
@@ -150,7 +152,7 @@ const Dashboard = () => {
                 <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-blue-50 to-slate-50 -z-10"></div>
                 <div className="absolute -top-20 -right-20 w-96 h-96 bg-sky-100 rounded-full opacity-40"></div>
                 <div className="absolute top-20 -left-20 w-96 h-96 bg-yellow-100 rounded-full opacity-40"></div>
-                
+
                 <div className="w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-[2rem] md:rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden relative border border-white/60 bg-white group/slider">
                     {loadingBanners ? (
                         <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 animate-pulse">
@@ -159,44 +161,61 @@ const Dashboard = () => {
                         </div>
                     ) : displayBanners.length > 0 ? (
                         <>
-                            <div className="relative w-full h-full">
-                                {displayBanners.map((banner, index) => (
-                                    <div 
-                                        key={index} 
-                                        className={`absolute inset-0 w-full h-full cursor-pointer transition-opacity duration-1000 ease-in-out ${currentSlide === index ? 'opacity-100 z-10' : 'opacity-0 z-0'}`} 
-                                        onClick={() => banner.buttonLink && (window.location.href = banner.buttonLink)}
-                                    >
-                                        <img
-                                            src={banner.image}
-                                            alt={banner.title || `Banner ${index + 1}`}
-                                            className="w-full h-full object-cover object-center transform group-hover/slider:scale-105 transition-transform duration-[2000ms] ease-out"
-                                            onError={(e) => { e.target.onerror = null; e.target.src = '/default-banner.jpg'; }}
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-transparent flex flex-col justify-center px-8 md:px-20 text-white">
-                                            {banner.title && (
-                                                <div className="p-8 md:p-12 lg:p-14 rounded-[2rem] max-w-2xl transform translate-y-4 hover:translate-y-0 transition-all duration-700 border border-white/30 shadow-[0_15px_40px_rgba(0,0,0,0.3)] bg-black/30 hover:bg-black/40">
-                                                    <h2 className="text-4xl md:text-6xl lg:text-7xl font-black drop-shadow-[0_5px_5px_rgba(0,0,0,0.4)] text-white tracking-tight mb-4 font-['Nunito'] leading-tight">{banner.title}</h2>
-                                                    {banner.subtitle && <p className="text-white/95 text-lg md:text-xl lg:text-2xl font-bold mb-8 drop-shadow-md">{banner.subtitle}</p>}
-                                                    <button className="bg-white text-blue-700 hover:bg-blue-600 hover:text-white px-8 md:px-10 py-3 md:py-4 rounded-full font-black shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-blue-500/30 active:scale-95 text-lg md:text-xl tracking-wide uppercase">
-                                                        Explore Now
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                            <AnimatePresence mode="wait">
+                                <div className="relative w-full h-full">
+                                    {displayBanners.map((banner, index) => (
+                                        <motion.div
+                                            key={index}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: currentSlide === index ? 1 : 0, zIndex: currentSlide === index ? 10 : 0 }}
+                                            transition={{ duration: 1 }}
+                                            className={`absolute inset-0 w-full h-full cursor-pointer pointer-events-${currentSlide === index ? 'auto' : 'none'}`}
+                                            onClick={() => banner.buttonLink && (window.location.href = banner.buttonLink)}
+                                        >
+                                            <motion.img
+                                                initial={{ scale: 1.1 }}
+                                                animate={{ scale: currentSlide === index ? 1 : 1.1 }}
+                                                transition={{ duration: 6, ease: "easeOut" }}
+                                                src={banner.image}
+                                                alt={banner.title || `Banner ${index + 1}`}
+                                                className="w-full h-full object-cover object-center"
+                                                onError={(e) => { e.target.onerror = null; e.target.src = '/default-banner.jpg'; }}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-transparent flex flex-col justify-center px-8 md:px-20 text-white">
+                                                {banner.title && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: 30 }}
+                                                        animate={{ opacity: currentSlide === index ? 1 : 0, y: currentSlide === index ? 0 : 30 }}
+                                                        transition={{ duration: 0.8, delay: 0.3 }}
+                                                        className="p-8 md:p-12 lg:p-14 rounded-[2rem] max-w-2xl border border-white/30 shadow-[0_15px_40px_rgba(0,0,0,0.3)] bg-black/30 backdrop-blur-sm"
+                                                    >
+                                                        <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black drop-shadow-[0_5px_5px_rgba(0,0,0,0.4)] text-white tracking-tight mb-4 font-['Nunito'] leading-tight">{banner.title}</h2>
+                                                        {banner.subtitle && <p className="text-white/95 text-lg md:text-xl lg:text-2xl font-bold mb-8 drop-shadow-md">{banner.subtitle}</p>}
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.05 }}
+                                                            whileTap={{ scale: 0.95 }}
+                                                            className="bg-white text-blue-700 hover:bg-blue-600 hover:text-white px-8 md:px-10 py-3 md:py-4 rounded-full font-black shadow-xl transition-colors duration-300 text-lg md:text-xl tracking-wide uppercase"
+                                                        >
+                                                            Explore Now
+                                                        </motion.button>
+                                                    </motion.div>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </AnimatePresence>
 
                             {/* Slider Controls */}
                             {displayBanners.length > 1 && (
                                 <>
-                                    <button onClick={(e) => { e.stopPropagation(); prevSlide(); }} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/90 text-white hover:text-slate-900 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 shadow-lg opacity-0 group-hover/slider:opacity-100 hover:scale-110 border border-white/20">
+                                    <button onClick={(e) => { e.stopPropagation(); prevSlide(); }} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/90 text-white hover:text-slate-900 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 shadow-lg opacity-0 group-hover/slider:opacity-100 hover:scale-110 border border-white/20 z-20">
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                                     </button>
-                                    <button onClick={(e) => { e.stopPropagation(); nextSlide(); }} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/90 text-white hover:text-slate-900 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 shadow-lg opacity-0 group-hover/slider:opacity-100 hover:scale-110 border border-white/20">
+                                    <button onClick={(e) => { e.stopPropagation(); nextSlide(); }} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/90 text-white hover:text-slate-900 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 shadow-lg opacity-0 group-hover/slider:opacity-100 hover:scale-110 border border-white/20 z-20">
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                                     </button>
-                                    
+
 
                                 </>
                             )}
@@ -212,7 +231,7 @@ const Dashboard = () => {
                             <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-transparent flex flex-col justify-center px-10 md:px-24 text-white">
                                 <div className="max-w-2xl">
                                     <span className="inline-block px-5 py-2 mb-4 rounded-full bg-white/20 border border-white/40 backdrop-blur-md text-white font-black text-sm md:text-base tracking-widest uppercase shadow-sm">Premium Collection</span>
-                                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-4 md:mb-6 tracking-tight drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)] font-['Nunito'] leading-[1.1]">
+                                    <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mb-4 md:mb-6 tracking-tight drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)] font-['Nunito'] leading-[1.1]">
                                         MAGIC<br />OF PLAY
                                     </h1>
                                     <p className="text-xl md:text-2xl font-bold text-slate-100 mb-10 drop-shadow-lg leading-relaxed">
@@ -246,7 +265,7 @@ const Dashboard = () => {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 md:px-6 mb-24">
-                
+
                 {/* 3. Upgraded Category Cards (Shop by Age) */}
                 <div className="mb-24">
                     <div className="flex items-end justify-between mb-12">
@@ -284,7 +303,7 @@ const Dashboard = () => {
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 z-0 opacity-95 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div className="absolute -top-20 -left-20 w-64 h-64 bg-white/30 rounded-full blur-3xl opacity-60"></div>
                     <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-yellow-300/30 rounded-full blur-3xl opacity-60"></div>
-                    
+
                     <div className="relative z-10 px-6 py-8 md:px-12 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10">
                         <div className="max-w-2xl text-center md:text-left flex-1">
                             <span className="inline-block px-3 py-1 mb-3 rounded-full bg-white/20 backdrop-blur-sm text-white font-black text-xs tracking-widest uppercase border border-white/40 shadow-sm">Limited Time Offer</span>
@@ -297,7 +316,7 @@ const Dashboard = () => {
                         <div className="w-full md:w-auto flex justify-center relative md:pr-10">
                             <div className="w-40 h-40 md:w-48 md:h-48 bg-white/20 rounded-full absolute mix-blend-overlay animate-pulse -z-10"></div>
                             {/* Placeholder for a hero toy image, using emoji for now */}
-                            <span className="text-[80px] md:text-[120px] drop-shadow-2xl group-hover:scale-110 transition-transform duration-500 transform group-hover:rotate-12 relative z-10">🚀</span>
+                            <span className="text-6xl sm:text-[80px] md:text-[120px] drop-shadow-2xl group-hover:scale-110 transition-transform duration-500 transform group-hover:rotate-12 relative z-10">🚀</span>
                         </div>
                     </div>
                 </div>
@@ -316,49 +335,49 @@ const Dashboard = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {trendingProducts.length > 0 ? trendingProducts.map((product) => (
-                            <div key={product._id} className="bg-white border border-slate-100 p-4 rounded-[2.5rem] shadow-sm hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] transition-all duration-500 group flex flex-col h-full hover:-translate-y-2 relative">
-                                <Link to={`/product/${product._id}`} className="block relative h-64 bg-slate-50 rounded-[2rem] mb-6 flex items-center justify-center overflow-hidden">
+                            <div key={product._id} className="bg-white border border-slate-100 p-3 md:p-4 rounded-[2rem] shadow-sm hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] transition-all duration-300 group flex flex-col h-full hover:-translate-y-1 relative">
+                                <Link to={`/product/${product._id}`} className="block relative aspect-[4/5] bg-slate-50 rounded-2xl mb-4 md:mb-5 overflow-hidden">
                                     {product.newArrival && (
-                                        <div className="absolute top-4 left-4 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white text-[10px] md:text-xs font-black px-3 py-1.5 rounded-full z-10 shadow-lg tracking-widest">
+                                        <div className="absolute top-3 left-3 bg-emerald-500 text-white text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-full z-10 shadow-sm tracking-wider uppercase">
                                             NEW
                                         </div>
                                     )}
                                     {product.featuredProduct && (
-                                        <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] md:text-xs font-black px-3 py-1.5 rounded-full z-10 shadow-lg tracking-widest">
+                                        <div className="absolute top-3 right-3 bg-orange-500 text-white text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-full z-10 shadow-sm tracking-wider uppercase">
                                             HOT
                                         </div>
                                     )}
                                     {product.thumbnailImage || (product.images && product.images.length > 0) ? (
-                                        <img src={product.thumbnailImage || product.images[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
+                                        <img src={product.thumbnailImage || product.images[0]} alt={product.name} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" />
                                     ) : (
-                                        <span className="text-6xl group-hover:scale-125 transition-transform duration-500 drop-shadow-md">
-                                            🧸
-                                        </span>
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <span className="text-5xl md:text-6xl text-slate-300">🧸</span>
+                                        </div>
                                     )}
-                                    <div className="absolute inset-0 bg-slate-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/5 transition-colors duration-300"></div>
                                 </Link>
-                                
-                                <div className="px-2 flex-1 flex flex-col">
-                                    <div className="mb-2 text-xs font-extrabold text-blue-400 uppercase tracking-widest truncate">
+
+                                <div className="px-1 flex-1 flex flex-col">
+                                    <div className="mb-1 text-[11px] md:text-xs font-semibold text-slate-400 uppercase tracking-widest truncate">
                                         {product.category || 'General'}
                                     </div>
                                     <Link to={`/product/${product._id}`}>
-                                        <h3 className="font-black text-xl text-slate-800 leading-tight mb-4 group-hover:text-blue-600 transition-colors line-clamp-2 font-['Nunito']">
+                                        <h3 className="font-bold text-base md:text-lg text-slate-800 leading-tight mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
                                             {product.name}
                                         </h3>
                                     </Link>
-                                    <div className="mt-auto flex items-end justify-between mb-4">
+                                    <div className="mt-auto flex items-end justify-between mb-4 md:mb-5">
                                         <div className="flex items-baseline gap-2">
-                                            <span className="text-2xl font-black text-slate-900">₹{product.price.toFixed(2)}</span>
+                                            <span className="text-lg md:text-xl font-black text-slate-900">₹{product.price.toFixed(2)}</span>
                                             {product.compareAtPrice > product.price && (
-                                                <span className="text-sm font-bold text-slate-400 line-through">
+                                                <span className="text-xs md:text-sm font-medium text-slate-400 line-through">
                                                     ₹{product.compareAtPrice.toFixed(2)}
                                                 </span>
                                             )}
                                         </div>
                                     </div>
-                                    <button className="w-full bg-slate-100 text-slate-700 hover:bg-blue-600 hover:text-white py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm hover:shadow-[0_10px_20px_rgba(79,70,229,0.3)] active:scale-95 flex items-center justify-center gap-2 group/btn" onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}>
-                                        <svg className="w-5 h-5 group-hover/btn:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                                    <button className="w-full bg-slate-900 text-white hover:bg-blue-600 py-3 md:py-3.5 rounded-xl md:rounded-2xl font-bold transition-all duration-300 shadow-sm active:scale-95 flex items-center justify-center gap-2 group/btn" onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}>
+                                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                                         Add to Cart
                                     </button>
                                 </div>
