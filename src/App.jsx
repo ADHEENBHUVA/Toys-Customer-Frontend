@@ -35,10 +35,10 @@ const ScrollToTop = () => {
 
 const Layout = () => {
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col relative overflow-hidden">
+        <div className="min-h-screen bg-transparent font-sans text-slate-800 flex flex-col relative overflow-hidden">
             <ScrollToTop />
             <Navbar />
-            <main className="flex-1 relative z-10">
+            <main className="flex-1 relative z-10 px-2 md:px-6">
                 <Outlet />
             </main>
             <Footer />
@@ -53,32 +53,24 @@ function App() {
     <CartProvider>
       <BrowserRouter>
         <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            color: '#073B4C',
-            fontWeight: 'bold',
-            borderRadius: '1rem',
-            boxShadow: '0 10px 40px -10px rgba(0,0,0,0.15)',
-            border: '2px solid rgba(255, 255, 255, 0.5)',
-            padding: '16px 24px',
-          },
-          success: {
-            iconTheme: {
-              primary: '#06D6A0',
-              secondary: '#fff',
+          position="top-center"
+          toastOptions={{
+            className: 'backdrop-blur-xl bg-white/90 border border-slate-100 shadow-2xl',
+            style: {
+              padding: '16px 24px',
+              color: '#1e293b',
+              borderRadius: '9999px',
+              fontWeight: '700',
+              fontSize: '15px',
             },
-          },
-          error: {
-            iconTheme: {
-              primary: '#EF476F',
-              secondary: '#fff',
+            success: {
+              iconTheme: { primary: '#10b981', secondary: '#fff' },
             },
-          },
-        }}
-      />
+            error: {
+              iconTheme: { primary: '#ef4444', secondary: '#fff' },
+            },
+          }}
+        />
       
       <Routes>
           {/* Routes with Navbar */}

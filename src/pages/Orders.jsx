@@ -22,6 +22,11 @@ const Orders = () => {
                 if (response.ok) {
                     const data = await response.json();
                     setOrders(data);
+                } else if (response.status === 401) {
+                    toast.error("Session expired. Please log in again.");
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/login';
                 } else {
                     toast.error("Failed to load your orders");
                 }
