@@ -29,6 +29,16 @@ const Navbar = () => {
         }
     };
 
+    const handleInputChange = (e) => {
+        const val = e.target.value;
+        setSearchQuery(val);
+        if (val.trim()) {
+            navigate(`/products?search=${encodeURIComponent(val)}`);
+        } else {
+            navigate('/products');
+        }
+    };
+
     return (
         <header className="w-full relative z-50 bg-white" style={{ fontFamily: '"Nunito", "Outfit", sans-serif' }}>
             {/* Top Bar - Solid Blue with Exact Downward Scallops */}
@@ -101,7 +111,7 @@ const Navbar = () => {
                             type="text"
                             placeholder="Search"
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={handleInputChange}
                             className="w-full border border-slate-300 rounded-full pl-5 pr-12 py-2.5 text-[14px] focus:outline-none focus:border-[#1282a2] transition-all text-[#2e4053] font-medium placeholder-slate-400"
                         />
                         <button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 bg-[#1282a2] hover:bg-[#0f6c87] text-white w-9 h-9 rounded-full flex items-center justify-center transition-colors">
@@ -159,7 +169,7 @@ const Navbar = () => {
                                 type="text"
                                 placeholder="Search products..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={handleInputChange}
                                 className="w-full border border-slate-300 rounded-full pl-5 pr-12 py-3 text-[15px] focus:outline-none focus:border-[#1282a2] transition-all text-[#2e4053] font-medium placeholder-slate-400"
                             />
                             <button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 bg-[#1282a2] hover:bg-[#0f6c87] text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors">

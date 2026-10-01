@@ -21,7 +21,7 @@ const Dashboard = () => {
 
     const nextTestimonial = () => setTestimonialIndex(prev => (prev + 1) % testimonialsData.length);
     const prevTestimonial = () => setTestimonialIndex(prev => (prev - 1 + testimonialsData.length) % testimonialsData.length);
-    
+
     useEffect(() => {
         const interval = setInterval(() => {
             nextTestimonial();
@@ -51,9 +51,9 @@ const Dashboard = () => {
         testimonialsData[(testimonialIndex + 1) % testimonialsData.length],
         testimonialsData[(testimonialIndex + 2) % testimonialsData.length]
     ];
-    
+
     const galleryImages = Array.from({ length: 20 }, (_, i) => `/gallery/img${i + 1}.jpg?v=2`);
-    
+
     useEffect(() => {
         const fetchTrendingProducts = async () => {
             try {
@@ -87,11 +87,11 @@ const Dashboard = () => {
     }, []);
 
     const categories = [
-        { name: 'Playsets', icon: '🪀', color: 'bg-[#bde8f5]' },
-        { name: 'Control Toys', icon: '🚙', color: 'bg-[#bde8f5]' },
-        { name: 'Educational Toys', icon: '🔠', color: 'bg-[#bde8f5]' },
-        { name: 'Eco- Friendly Toys', icon: '🎠', color: 'bg-[#bde8f5]' },
-        { name: 'Stuffed Toys', icon: '🧸', color: 'bg-[#bde8f5]' }
+        { name: 'Playsets', searchQuery: 'Playset', icon: '🪀', color: 'bg-[#bde8f5]' },
+        { name: 'Control Toys', searchQuery: 'Control', icon: '🚙', color: 'bg-[#bde8f5]' },
+        { name: 'Educational Toys', searchQuery: 'Educat', icon: '🔠', color: 'bg-[#bde8f5]' },
+        { name: 'Eco- Friendly Toys', searchQuery: 'Eco', icon: '🎠', color: 'bg-[#bde8f5]' },
+        { name: 'Stuffed Toys', searchQuery: 'Stuffed', icon: '🧸', color: 'bg-[#bde8f5]' }
     ];
 
     const CloudShape = ({ children }) => (
@@ -116,46 +116,78 @@ const Dashboard = () => {
         );
     };
 
-    const ProductCard = ({ product }) => (
-        <div className="flex flex-col group relative">
-            <div className="relative mb-3 bg-white border border-slate-200 rounded-xl p-4 overflow-hidden aspect-square flex items-center justify-center">
-                <span className="absolute top-3 left-3 bg-[#ff7b7b] text-white text-[10px] tracking-wide px-2.5 py-0.5 rounded-full z-10">
-                    SALE
-                </span>
-                <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
-                    <button 
-                        type="button"
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                        className={`transition-colors z-[9999] pointer-events-auto ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}`}
-                    >
-                        <Heart className="w-[18px] h-[18px] pointer-events-none" strokeWidth={2} fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} />
-                    </button>
-                    <button className="text-slate-400 hover:text-blue-500 transition-colors" onClick={(e) => { e.preventDefault(); addToCart(product, 1); }}>
-                        <ShoppingCart className="w-[18px] h-[18px]" strokeWidth={2} />
-                    </button>
+    const ProductCard = ({ product, badge }) => (
+        <div className="flex flex-col group bg-white border-2 border-slate-200 shadow-sm rounded-3xl p-4 hover:shadow-[0_20px_50px_-12px_rgba(17,138,178,0.2)] hover:border-[#118AB2]/40 transition-all duration-500 hover:-translate-y-1 relative">
+            {/* Image Container with Soft Background */}
+            <div className="relative bg-slate-50 rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-slate-100">
+                {/* Badges */}
+                <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
+                    {product.compareAtPrice > (product.price || 0) && (
+                        <span className="bg-[#ff6b6b] text-white text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm">
+                            SALE
+                        </span>
+                    )}
+                    {badge && (
+                        <span className="bg-gradient-to-r from-[#FF9800] to-[#F44336] text-white text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm">
+                            {badge}
+                        </span>
+                    )}
                 </div>
-                {product.thumbnailImage || (product.images && product.images.length > 0) ? (
-                    <img 
-                        src={product.thumbnailImage || product.images[0]} 
-                        alt={product.name} 
-                        className="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500" 
-                    />
-                ) : (
-                    <div className="text-6xl">🧸</div>
-                )}
+
+                {/* Product Image */}
+                <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center">
+                    {product.thumbnailImage || (product.images && product.images.length > 0) ? (
+                        <img
+                            src={product.thumbnailImage || product.images[0]}
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                        />
+                    ) : (
+                        <div className="text-6xl drop-shadow-sm opacity-50">🧸</div>
+                    )}
+                </Link>
             </div>
-            <Link to={`/product/${product._id}`} className="hover:text-blue-500">
-                <h3 className="font-semibold text-slate-700 text-[15px] mb-0.5 leading-tight line-clamp-1">
-                    {product.name}
-                </h3>
-            </Link>
-            <div className="flex items-center gap-2">
-                <span className="font-bold text-[#22c55e] text-[15px]">₹{product.price.toFixed(2)}</span>
-                {product.compareAtPrice > product.price && (
-                    <span className="text-[13px] text-slate-400 font-medium line-through">₹{product.compareAtPrice.toFixed(2)}</span>
-                )}
+
+            {/* Product Details */}
+            <div className="flex flex-col flex-1 px-1 pt-4 pb-1">
+                <Link to={`/product/${product._id}`} className="hover:text-[#118AB2] mb-1">
+                    <h3 className="font-extrabold text-[#2c3e50] text-[17px] leading-snug line-clamp-2" style={{ fontFamily: '"Nunito", sans-serif' }}>
+                        {product.name}
+                    </h3>
+                </Link>
+
+                <div className="flex items-center gap-2 mb-2 mt-1">
+                    <StarRating rating={product.rating || 5} />
+                    <span className="text-[12px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)}</span>
+                </div>
+
+                {/* Price and Action Buttons Row */}
+                <div className="flex items-center justify-between mt-auto pt-4">
+                    <div className="flex flex-col">
+                        {product.compareAtPrice > (product.price || 0) && (
+                            <span className="text-[12px] text-slate-400 font-bold line-through mb-[-4px]">₹{(product.compareAtPrice || 0).toFixed(2)}</span>
+                        )}
+                        <span className="font-black text-[#22c55e] text-[20px] leading-none">₹{(product.price || 0).toFixed(2)}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                        <button
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm border hover:scale-110 ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'bg-red-50 border-red-200 text-red-500' : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50'}`}
+                        >
+                            <Heart className="w-[18px] h-[18px]" strokeWidth={2.5} fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product, 1); }}
+                            className="w-10 h-10 bg-[#118AB2] hover:bg-[#0f7a9e] text-white rounded-full flex items-center justify-center transition-all duration-300 shadow-md shadow-[#118AB2]/30 hover:shadow-lg hover:shadow-[#118AB2]/40 hover:scale-110"
+                        >
+                            <ShoppingCart className="w-[18px] h-[18px]" strokeWidth={2.5} />
+                        </button>
+                    </div>
+                </div>
             </div>
-            <StarRating rating={product.rating || 5} />
         </div>
     );
 
@@ -166,15 +198,15 @@ const Dashboard = () => {
             {/* Hero Section */}
             <div className="w-full bg-[#dbe2e6] min-h-[550px] md:min-h-[600px] relative overflow-hidden" style={{ fontFamily: '"Nunito", sans-serif' }}>
                 {heroBanners.length > 0 ? heroBanners.map((banner, index) => (
-                    <div 
+                    <div
                         key={banner._id || index}
                         className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === currentBannerIndex ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}
                     >
                         {/* Full Width Background Image */}
-                        <div 
+                        <div
                             className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-                            style={{ 
-                                backgroundImage: `url('${banner.image || "/baby-hero.png"}')` 
+                            style={{
+                                backgroundImage: `url('${banner.image || "/baby-hero.png"}')`
                             }}
                         />
                         {/* Gradient overlay to ensure text is always readable */}
@@ -183,7 +215,7 @@ const Dashboard = () => {
                         {/* Content Overlay */}
                         <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 md:px-16 lg:px-32">
                             <div className="max-w-xl text-center md:text-left transform transition-all duration-1000 translate-y-0">
-                                <h1 
+                                <h1
                                     className="text-[44px] md:text-[56px] lg:text-[72px] font-black text-[#1282a2] leading-[1.15] mb-6 tracking-tight drop-shadow-sm"
                                     style={{ textShadow: '4px 4px 0 #ffffff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
                                 >
@@ -207,7 +239,7 @@ const Dashboard = () => {
                 )) : (
                     // Fallback static hero if no banners from API
                     <div className="absolute inset-0 w-full h-full opacity-100 z-20">
-                        <div 
+                        <div
                             className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
                             style={{ backgroundImage: `url('/baby-hero.png')` }}
                         />
@@ -215,7 +247,7 @@ const Dashboard = () => {
 
                         <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 md:px-16 lg:px-32">
                             <div className="max-w-xl text-center md:text-left">
-                                <h1 
+                                <h1
                                     className="text-[44px] md:text-[56px] lg:text-[72px] font-black text-[#1282a2] leading-[1.15] mb-6 tracking-tight drop-shadow-sm"
                                     style={{ textShadow: '4px 4px 0 #ffffff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
                                 >
@@ -240,7 +272,7 @@ const Dashboard = () => {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                
+
                 {/* Find the Perfect Toy */}
                 <div className="text-center mb-12 mt-8">
                     <h2 className="text-4xl font-bold text-[#2e2b2a] mb-2" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive', letterSpacing: '0.5px', wordSpacing: '4px' }}>
@@ -251,12 +283,12 @@ const Dashboard = () => {
 
                 <div className="flex flex-wrap justify-center gap-8 md:gap-16 mb-20">
                     {categories.map((cat, idx) => (
-                        <div key={idx} className="flex flex-col items-center cursor-pointer group">
+                        <Link to={`/products?search=${encodeURIComponent(cat.searchQuery)}`} key={idx} className="flex flex-col items-center cursor-pointer group">
                             <div className="mb-4 transform group-hover:-translate-y-2 transition-transform duration-300">
                                 <CloudShape>{cat.icon}</CloudShape>
                             </div>
                             <span className="font-bold text-slate-700 text-sm">{cat.name}</span>
-                        </div>
+                        </Link>
                     ))}
                 </div>
 
@@ -267,7 +299,7 @@ const Dashboard = () => {
                     </h2>
                     <div className="flex justify-center gap-2 md:gap-4">
                         {['Featured', 'Best seller', 'New arrivals'].map(tab => (
-                            <button 
+                            <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`px-5 py-2 rounded-full text-[15px] font-medium transition-colors ${activeTab === tab ? 'bg-[#f4ebf9] text-[#4b5563]' : 'bg-transparent text-[#4b5563] hover:bg-slate-50'}`}
@@ -291,11 +323,11 @@ const Dashboard = () => {
                         {/* Decorative Shapes */}
                         <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#fef08a] rounded-full mix-blend-multiply opacity-70 group-hover:scale-110 transition-transform duration-500"></div>
                         <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-[#bfdbfe] rounded-[40px] rotate-12 mix-blend-multiply opacity-70 group-hover:-rotate-12 transition-transform duration-500"></div>
-                        
+
                         <div className="relative z-10 max-w-[80%]">
                             <span className="inline-block py-1 px-3 rounded-full bg-pink-100 text-pink-600 font-bold text-xs uppercase tracking-wider mb-4">New Arrivals</span>
                             <h3 className="text-4xl md:text-5xl font-black text-[#831843] mb-4 leading-tight font-['Nunito']">
-                                Discover the <br/> Joy of Play
+                                Discover the <br /> Joy of Play
                             </h3>
                             <p className="text-pink-900/70 font-medium mb-8 text-[15px] max-w-[280px]">
                                 Explore our premium collection of interactive toys for kids of all ages.
@@ -310,12 +342,12 @@ const Dashboard = () => {
                     <div className="bg-[#f0fdfa] rounded-[32px] p-8 md:p-12 relative overflow-hidden flex flex-col justify-center min-h-[340px] shadow-sm hover:shadow-md transition-shadow group">
                         {/* Decorative Shapes */}
                         <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-l from-[#ccfbf1] to-transparent opacity-50 z-0"></div>
-                        
+
                         <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 h-full">
                             <div className="flex-1 text-center md:text-left order-2 md:order-1">
                                 <span className="inline-block py-1 px-3 rounded-full bg-teal-100 text-teal-700 font-bold text-xs uppercase tracking-wider mb-4">Save 30% Today</span>
                                 <h3 className="text-4xl md:text-5xl font-black text-[#134e4a] mb-4 leading-tight font-['Nunito']">
-                                    Eco-Friendly <br/> Toys
+                                    Eco-Friendly <br /> Toys
                                 </h3>
                                 <p className="text-teal-900/60 font-medium mb-8 text-[15px]">
                                     Safe, sustainable, and super fun! Extra discount for loyal customers.
@@ -324,13 +356,13 @@ const Dashboard = () => {
                                     Shop Now
                                 </button>
                             </div>
-                            
+
                             <div className="order-1 md:order-2 relative w-[200px] h-[200px] md:w-[240px] md:h-[240px] shrink-0">
                                 <div className="absolute inset-0 bg-[#99f6e4] rounded-full scale-105 group-hover:scale-110 transition-transform duration-500"></div>
                                 <div className="absolute inset-0 bg-white rounded-full p-2 shadow-xl">
-                                    <img 
-                                        src="/baby-hero.png" 
-                                        alt="Baby playing" 
+                                    <img
+                                        src="/baby-hero.png"
+                                        alt="Baby playing"
                                         className="w-full h-full object-cover rounded-full"
                                         onError={(e) => {
                                             e.target.onerror = null;
@@ -349,8 +381,8 @@ const Dashboard = () => {
                     <p className="text-slate-500 text-sm">Popular product</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-24">
-                    {trendingProducts.slice(0, 4).map(product => (
-                        <ProductCard key={`love-${product._id}`} product={product} />
+                    {trendingProducts.slice(0, 8).map((product, idx) => (
+                        <ProductCard key={`love-${product._id}`} product={product} badge={idx < 4 ? "Best Seller" : "Trending"} />
                     ))}
                 </div>
 
@@ -363,17 +395,17 @@ const Dashboard = () => {
                         Customer testimonials
                     </p>
                 </div>
-                
+
                 <div className="relative mb-24 flex items-center px-6">
                     <button onClick={prevTestimonial} className="absolute left-0 z-10 bg-white shadow-sm rounded-full w-9 h-9 flex items-center justify-center text-[#999999] hover:text-slate-800 border-[2px] border-[#e5e5e5] transition-colors">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
                     </button>
-                    
+
                     <div className="grid md:grid-cols-3 gap-6 w-full">
                         {visibleTestimonials.map((testimonial, idx) => (
                             <div key={`${testimonial.id}-${idx}`} className="bg-[#fcf5f5] p-8 rounded-2xl relative overflow-hidden text-left border border-transparent animate-slide-left">
                                 <div className="absolute top-6 right-6 text-[#d1d5db] text-[54px] font-serif leading-none rotate-180" style={{ transform: 'rotateY(180deg)' }}>"</div>
-                                
+
                                 {/* Decorations */}
                                 {testimonial.variant === 1 && (
                                     <>
@@ -445,9 +477,9 @@ const Dashboard = () => {
                             </div>
                         ))}
                     </div>
-                    
+
                     <button onClick={nextTestimonial} className="absolute right-0 z-10 bg-white shadow-sm rounded-full w-9 h-9 flex items-center justify-center text-[#999999] hover:text-slate-800 border-[2px] border-[#e5e5e5] transition-colors">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
                     </button>
                 </div>
 
@@ -462,9 +494,9 @@ const Dashboard = () => {
                     Check gallery
                 </p>
             </div>
-            
+
             <div className="w-full overflow-hidden mb-24 max-w-[1600px] mx-auto px-4">
-                <div 
+                <div
                     className="flex transition-transform duration-1000 ease-in-out"
                     style={{ transform: `translateX(-${galleryIndex * (window.innerWidth < 768 ? 50 : 25)}%)` }}
                 >

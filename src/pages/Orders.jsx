@@ -122,8 +122,19 @@ const Orders = () => {
                                                 <h4 className="text-base font-bold text-slate-800 truncate">{item.product?.name || 'Unknown Product'}</h4>
                                                 <p className="text-sm text-slate-500 mt-1 font-medium">Qty: {item.quantity}</p>
                                             </div>
-                                            <div className="text-right shrink-0">
-                                                <p className="text-base font-bold text-slate-900">₹{item.price * item.quantity}</p>
+                                            <div className="text-right shrink-0 flex flex-col items-end justify-center">
+                                                <p className="text-base font-bold text-slate-900 mb-2">₹{item.price * item.quantity}</p>
+                                                {item.product && (
+                                                    item.hasReviewed ? (
+                                                        <span className="text-[12px] font-bold text-green-600 bg-green-50 border border-green-200 px-3 py-1 rounded-lg flex items-center gap-1 cursor-default">
+                                                            <span className="text-sm leading-none mt-[-2px]">✓</span> Reviewed
+                                                        </span>
+                                                    ) : (
+                                                        <Link to={`/product/${item.product._id}#reviews`} className="text-[12px] font-bold text-[#fbdf14] hover:text-yellow-500 bg-yellow-50/50 border border-yellow-200 hover:bg-yellow-50 px-3 py-1 rounded-lg transition-colors flex items-center gap-1">
+                                                            <span className="text-lg leading-none mt-[-2px]">★</span> Rate Product
+                                                        </Link>
+                                                    )
+                                                )}
                                             </div>
                                         </li>
                                     ))}
@@ -135,9 +146,9 @@ const Orders = () => {
                                 <p className="text-sm font-medium text-slate-500">
                                     Paid via <span className="font-bold text-slate-700 capitalize">{order.paymentMethod}</span>
                                 </p>
-                                <button className="text-blue-600 hover:text-blue-800 text-sm font-bold transition-colors">
+                                <Link to="/contact" className="text-blue-600 hover:text-blue-800 text-sm font-bold transition-colors">
                                     Need Help?
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     ))}

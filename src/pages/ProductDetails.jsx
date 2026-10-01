@@ -9,39 +9,82 @@ const ProductDetails = () => {
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('description');
+    const [activeTab, setActiveTab] = useState(window.location.hash === '#reviews' ? 'reviews' : 'description');
     const [quantity, setQuantity] = useState(1);
     const [mainImage, setMainImage] = useState(null);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     
     const { addToCart, waitlistItems, toggleWaitlist } = useCart();
 
+    const token = localStorage.getItem('token');
+    const user = token ? true : false; 
 
-
+    const [reviewText, setReviewText] = useState('');
+    const [rating, setRating] = useState(5);
+    const [reviewMessage, setReviewMessage] = useState('');
+    const [reviewError, setReviewError] = useState('');
+    const [reviewEligibility, setReviewEligibility] = useState({ canReview: false, hasPurchased: false, hasReviewed: false });
+    
     useEffect(() => {
         const fetchProduct = async () => {
             try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/products/${id}`);
                 const data = await res.json();
-                setProduct(data);
-                if (data.images && data.images.length > 0) {
-                    setMainImage(data.images[0]);
-                } else if (data.thumbnailImage) {
-                    setMainImage(data.thumbnailImage);
+                
+                if (res.ok) {
+                    setProduct(data);
+                    if (data.images && data.images.length > 0) {
+                        setMainImage(data.images[0]);
+                    } else if (data.thumbnailImage) {
+                        setMainImage(data.thumbnailImage);
+                    }
+                } else {
+                    setProduct(null); // Ensure product is null if not found
                 }
 
                 // Fetch related products (trending products as a fallback)
-                const relatedRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/products/trending`);
-                const relatedData = await relatedRes.json();
-                setRelatedProducts(relatedData.filter(p => p._id !== id).slice(0, 4));
+                try {
+                    const relatedRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/products/trending`);
+                    const relatedData = await relatedRes.json();
+                    if (relatedRes.ok && Array.isArray(relatedData)) {
+                        setRelatedProducts(relatedData.filter(p => p._id !== id).slice(0, 4));
+                    }
+                } catch (relatedErr) {
+                    console.error('Error fetching related products:', relatedErr);
+                }
+
+                // Fetch review eligibility if logged in
+                if (token) {
+                    try {
+                        const eligRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/products/${id}/review-eligibility`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const eligData = await eligRes.json();
+                        if (eligRes.ok) {
+                            setReviewEligibility(eligData);
+                        }
+                    } catch (eligErr) {
+                        console.error('Error fetching review eligibility:', eligErr);
+                    }
+                }
             } catch (error) {
                 console.error('Error fetching product:', error);
+                setProduct(null);
             } finally {
                 setLoading(false);
             }
         };
         fetchProduct();
-        window.scrollTo(0, 0);
+        if (window.location.hash === '#reviews') {
+            setTimeout(() => {
+                const element = document.getElementById('reviews');
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+        } else {
+            window.scrollTo(0, 0);
+        }
     }, [id]);
 
     const handleAddToCart = () => {
@@ -170,22 +213,22 @@ const ProductDetails = () => {
                         <h1 className="text-3xl font-black text-slate-800 mb-4">{product.name}</h1>
                         
                         <div className="flex items-center gap-4 mb-4">
-                            <span className="text-2xl font-black text-slate-800">₹{product.price.toFixed(2)}</span>
-                            {product.compareAtPrice > product.price && (
-                                <span className="text-lg font-bold text-slate-400 line-through">₹{product.compareAtPrice.toFixed(2)}</span>
+                            <span className="text-2xl font-black text-slate-800">₹{(product.price || 0).toFixed(2)}</span>
+                            {product.compareAtPrice > (product.price || 0) && (
+                                <span className="text-lg font-bold text-slate-400 line-through">₹{(product.compareAtPrice || 0).toFixed(2)}</span>
                             )}
                         </div>
 
                         <div className="flex items-center gap-2 mb-6">
-                            <div className="flex text-[#fbdf14] text-[14px] tracking-widest">
-                                ★★★★★
+                            <div className="flex text-[#fbdf14] text-[16px] tracking-widest">
+                                {'★'.repeat(Math.round(product.rating || 5)) + '☆'.repeat(5 - Math.round(product.rating || 5))}
                             </div>
-                            <span className="text-[13px] font-bold text-slate-500">(14 Reviews)</span>
+                            <span className="text-[15px] font-black text-slate-700">{product.rating ? product.rating.toFixed(1) : "0.0"}</span>
+                            <span className="text-[13px] font-bold text-slate-500">({product.reviewCount || 0} Reviews)</span>
                         </div>
 
                         <p className="text-[14px] font-semibold text-slate-500 mb-8 leading-relaxed max-w-lg">
-                            {product.description || "Duis ultricies lacus sed turpis tincidunt id aliquet risus feugiat in ante metus dictum at tempor commodo ullamcorper a lacus. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
-                        </p>
+                            {product.description || <span className="text-slate-400 italic">No description available for this product.</span>}                        </p>
 
                         <div className="flex items-center gap-4 mb-8">
                             <span className="text-[14px] font-bold text-slate-800">Share this:</span>
@@ -238,25 +281,32 @@ const ProductDetails = () => {
                                 Add to cart
                             </button>
 
-                            <button className="w-12 h-12 flex-shrink-0 border border-slate-300 rounded-full flex items-center justify-center text-slate-400 hover:border-[#ff6b6b] hover:text-[#ff6b6b] hover:bg-red-50 transition-colors">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                            <button 
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                                title="Add to Waitlist"
+                                className={`w-12 h-12 flex-shrink-0 border rounded-full flex items-center justify-center transition-colors ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'bg-red-50 border-red-200 text-red-500 hover:border-red-300' : 'border-slate-300 text-slate-400 hover:border-[#ff6b6b] hover:text-[#ff6b6b] hover:bg-red-50'}`}
+                            >
+                                <svg width="20" height="20" fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                             </button>
 
-                            <button className="w-12 h-12 flex-shrink-0 border border-slate-300 rounded-full flex items-center justify-center text-slate-400 hover:border-[#118AB2] hover:text-[#118AB2] hover:bg-blue-50 transition-colors">
+                            <button 
+                                onClick={() => toast.success('Product added to Compare list!')}
+                                title="Compare Product"
+                                className="w-12 h-12 flex-shrink-0 border border-slate-300 rounded-full flex items-center justify-center text-slate-400 hover:border-[#118AB2] hover:text-[#118AB2] hover:bg-blue-50 transition-colors"
+                            >
                                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
                         </div>
 
-                        {/* Short description box */}
-                        <div className="border border-slate-200 rounded-2xl p-6 mb-6 bg-slate-50/50">
-                            <h4 className="font-black text-slate-800 mb-4 text-[15px]">Short description</h4>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 text-[13px]">
-                                <div className="flex gap-2"><span className="font-bold text-slate-800">SKU :</span><span className="text-slate-500 font-semibold">{product.sku || 'BG-1068'}</span></div>
-                                <div className="flex gap-2"><span className="font-bold text-slate-800">Category:</span><span className="text-slate-500 font-semibold">{product.category || 'Educational Toy'}</span></div>
-                                <div className="flex gap-2"><span className="font-bold text-slate-800">Tags :</span><span className="text-slate-500 font-semibold">2 - 5 years</span></div>
-                                <div className="flex gap-2"><span className="font-bold text-slate-800">EXP :</span><span className="text-slate-500 font-semibold">06/08/2026</span></div>
+                        {/* Additional Information box */}
+                        {product.category && (
+                            <div className="border border-slate-200 rounded-2xl p-6 mb-6 bg-slate-50/50">
+                                <h4 className="font-black text-slate-800 mb-4 text-[15px]">Additional Information</h4>
+                                <div className="grid grid-cols-1 gap-y-3 gap-x-4 text-[13px]">
+                                    <div className="flex gap-2"><span className="font-bold text-slate-800">Category:</span><span className="text-slate-500 font-semibold">{product.category}</span></div>
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Guaranteed Safe Checkout */}
                         <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50/50">
@@ -277,7 +327,7 @@ const ProductDetails = () => {
                 </div>
 
                 {/* Description & Reviews Tabs */}
-                <div className="border border-slate-200 rounded-[2rem] p-6 lg:p-12 mb-16">
+                <div id="reviews" className="border border-slate-200 rounded-[2rem] p-6 lg:p-12 mb-16 scroll-mt-24">
                     <div className="flex justify-center gap-4 sm:gap-10 mb-8 border-b border-slate-100 pb-0">
                         <button 
                             onClick={() => setActiveTab('description')}
@@ -289,7 +339,7 @@ const ProductDetails = () => {
                             onClick={() => setActiveTab('reviews')}
                             className={`text-lg font-black pb-3 border-b-2 transition-colors ${activeTab === 'reviews' ? 'border-slate-800 text-slate-800' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
                         >
-                            Reviews (14)
+                            Reviews ({product.reviewCount || 0})
                         </button>
                     </div>
                     <div className="max-w-3xl mx-auto">
@@ -299,8 +349,88 @@ const ProductDetails = () => {
                                 <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                             </div>
                         ) : (
-                            <div className="text-slate-500 font-semibold text-center text-[15px]">
-                                No reviews yet. Be the first to review this product!
+                            <div className="text-left space-y-8">
+                                {/* Reviews List */}
+                                {product.reviews && product.reviews.length > 0 ? (
+                                    <div className="space-y-6">
+                                        {product.reviews.map(review => (
+                                            <div key={review._id} className="border-b border-slate-100 pb-6">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-500">
+                                                        {review.customer?.firstName?.charAt(0) || 'U'}
+                                                    </div>
+                                                    <div>
+                                                        <h5 className="font-bold text-slate-800 text-[14px]">{review.customer?.firstName} {review.customer?.lastName}</h5>
+                                                        <div className="text-[#fbdf14] text-[12px] tracking-widest">
+                                                            {'★'.repeat(review.rating) + '☆'.repeat(5 - review.rating)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p className="text-slate-500 font-semibold text-[14px] leading-relaxed mt-3">
+                                                    {review.reviewText}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-slate-500 font-semibold text-center text-[15px] mb-8">
+                                        No reviews yet. Be the first to review this product!
+                                    </div>
+                                )}
+
+                                {/* Add Review Form */}
+                                <div className="mt-10 bg-slate-50 p-6 rounded-2xl">
+                                    <h4 className="font-black text-slate-800 mb-4 text-[16px]">Write a Review</h4>
+                                    {reviewMessage && <div className="p-3 mb-4 bg-green-100 text-green-700 rounded-xl text-sm font-bold">{reviewMessage}</div>}
+                                    {reviewError && <div className="p-3 mb-4 bg-red-100 text-red-600 rounded-xl text-sm font-bold">{reviewError}</div>}
+                                    
+                                    {(reviewEligibility.hasReviewed || reviewMessage === 'Review submitted successfully!') ? (
+                                        <div className="p-4 bg-green-50 text-green-700 rounded-xl text-sm font-bold text-center border border-green-200">
+                                            {reviewMessage || "You have already reviewed this product. Thank you for your feedback!"}
+                                        </div>
+                                    ) : (
+                                        <form onSubmit={async (e) => {
+                                            e.preventDefault();
+                                            setReviewError(''); setReviewMessage('');
+                                            if(!user) return setReviewError('Please login to submit a review.');
+                                            try {
+                                                const res = await fetch(`http://localhost:5001/api/products/${product._id}/reviews`, {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                                                    body: JSON.stringify({ rating, reviewText })
+                                                });
+                                                const data = await res.json();
+                                                if (res.ok) {
+                                                    setReviewMessage('Review submitted successfully!');
+                                                    setReviewText('');
+                                                    setRating(5);
+                                                } else {
+                                                    setReviewError(data.message || 'Failed to submit review');
+                                                }
+                                            } catch(err) {
+                                                setReviewError('An error occurred.');
+                                            }
+                                        }} className="flex flex-col gap-4">
+                                            <div>
+                                                <label className="block text-[13px] font-bold text-slate-700 mb-2">Rating</label>
+                                                <select value={rating} onChange={e => setRating(Number(e.target.value))} className="w-full md:w-32 border border-slate-200 rounded-xl p-3 bg-white text-sm focus:outline-none focus:border-[#118AB2]">
+                                                    <option value="5">5 Stars</option>
+                                                    <option value="4">4 Stars</option>
+                                                    <option value="3">3 Stars</option>
+                                                    <option value="2">2 Stars</option>
+                                                    <option value="1">1 Star</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-[13px] font-bold text-slate-700 mb-2">Review</label>
+                                                <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} rows="3" className="w-full border border-slate-200 rounded-xl p-3 bg-white text-sm focus:outline-none focus:border-[#118AB2]" placeholder="What do you think about this product?" required></textarea>
+                                            </div>
+                                            <button type="submit" className="bg-[#118AB2] hover:bg-[#0f7a9e] text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-sm self-start">
+                                                Submit Review
+                                            </button>
+                                        </form>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -311,50 +441,63 @@ const ProductDetails = () => {
                     <h2 className="text-3xl font-black text-slate-800 text-center mb-10 font-['Nunito']">Related products</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {relatedProducts.map(rp => (
-                            <div key={rp._id} className="bg-white border border-slate-200 rounded-3xl p-5 hover:shadow-xl transition-all duration-300 group flex flex-col relative">
-                                <div className="absolute top-5 left-5 z-10">
-                                    {rp.compareAtPrice > rp.price && (
-                                        <span className="bg-[#ff6b6b] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                            <div key={rp._id} className="flex flex-col group bg-white border border-slate-200 rounded-[1.25rem] p-3 hover:shadow-xl transition-all duration-300">
+                                {/* Image Container */}
+                                <div className="relative mb-3 bg-slate-50/70 rounded-xl overflow-hidden aspect-[4/3] flex items-center justify-center p-4 group-hover:bg-slate-100/70 transition-colors">
+                                    
+                                    {/* Sale Badge */}
+                                    {rp.compareAtPrice > (rp.price || 0) && (
+                                        <span className="absolute top-3 left-3 bg-[#ff6b6b] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider z-10 shadow-sm">
                                             SALE
                                         </span>
                                     )}
-                                </div>
-                                <div className="absolute top-5 right-2 md:right-5 z-50 flex flex-col gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                    <button 
-                                        type="button"
-                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(rp); }}
-                                        className={`w-9 h-9 shadow-md rounded-full flex items-center justify-center transition-colors border border-slate-100 cursor-pointer ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === rp._id)) ? 'bg-red-50 text-red-500' : 'bg-white text-slate-400 hover:text-red-500'}`}
-                                    >
-                                        <svg className="pointer-events-none" width="18" height="18" fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === rp._id)) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                    </button>
-                                    <button 
-                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(rp); }}
-                                        className="w-9 h-9 bg-white shadow-md rounded-full flex items-center justify-center text-slate-400 hover:text-[#118AB2] transition-colors border border-slate-100"
-                                    >
-                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
-                                    </button>
+
+                                    {/* Product Image */}
+                                    <Link to={`/product/${rp._id}`} className="absolute inset-0 z-10 flex items-center justify-center p-4">
+                                        <img 
+                                            src={rp.thumbnailImage || (rp.images && rp.images[0])} 
+                                            alt={rp.name} 
+                                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-sm" 
+                                        />
+                                    </Link>
                                 </div>
                                 
-                                <Link to={`/product/${rp._id}`} className="block h-48 mb-4 flex items-center justify-center relative z-0">
-                                    <img src={rp.thumbnailImage || (rp.images && rp.images[0])} alt={rp.name} className="w-[90%] h-[90%] object-contain group-hover:scale-110 transition-transform duration-500" />
-                                </Link>
-                                
-                                <div className="flex-1 flex flex-col text-center mt-2">
-                                    <Link to={`/product/${rp._id}`}>
-                                        <h3 className="font-bold text-[15px] text-slate-700 leading-tight mb-2 group-hover:text-[#118AB2] transition-colors line-clamp-1">
+                                {/* Product Details */}
+                                <div className="flex flex-col flex-1 px-2 pb-1 text-center">
+                                    <Link to={`/product/${rp._id}`} className="hover:text-[#118AB2] mb-1">
+                                        <h3 className="font-bold text-slate-800 text-[15px] leading-snug line-clamp-2">
                                             {rp.name}
                                         </h3>
                                     </Link>
                                     
-                                    <div className="mt-auto flex items-baseline justify-center gap-2 mb-2">
-                                        <span className="text-[15px] font-black text-[#22c55e]">₹{rp.price.toFixed(2)}</span>
-                                        {rp.compareAtPrice > rp.price && (
-                                            <span className="text-[13px] font-bold text-slate-400 line-through">₹{rp.compareAtPrice.toFixed(2)}</span>
-                                        )}
+                                    <div className="flex justify-center text-[#fbdf14] text-[12px] tracking-widest my-1">
+                                        ★★★★★
                                     </div>
                                     
-                                    <div className="flex justify-center text-[#fbdf14] text-[12px] tracking-widest">
-                                        ★★★★★
+                                    {/* Price and Action Buttons Row */}
+                                    <div className="flex items-center justify-between mt-auto pt-3">
+                                        <div className="flex flex-col text-left">
+                                            {rp.compareAtPrice > (rp.price || 0) && (
+                                                <span className="text-[12px] text-slate-400 font-bold line-through mb-[-4px]">₹{(rp.compareAtPrice || 0).toFixed(2)}</span>
+                                            )}
+                                            <span className="font-black text-[#22c55e] text-[20px] leading-none">₹{(rp.price || 0).toFixed(2)}</span>
+                                        </div>
+                                        
+                                        <div className="flex items-center gap-2.5">
+                                            <button 
+                                                type="button"
+                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(rp); }}
+                                                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm border hover:scale-110 ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === rp._id)) ? 'bg-red-50 border-red-200 text-red-500' : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50'}`}
+                                            >
+                                                <svg className="pointer-events-none" width="18" height="18" fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === rp._id)) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                            </button>
+                                            <button 
+                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(rp); }}
+                                                className="w-10 h-10 bg-[#118AB2] hover:bg-[#0f7a9e] text-white rounded-full flex items-center justify-center transition-all duration-300 shadow-md shadow-[#118AB2]/30 hover:shadow-lg hover:shadow-[#118AB2]/40 hover:scale-110"
+                                            >
+                                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
