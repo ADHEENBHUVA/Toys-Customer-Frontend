@@ -35,22 +35,46 @@ const Footer = () => {
     };
 
     return (
-        <footer className="w-full bg-[#d0dfcc] text-slate-800 font-['Outfit'] relative pt-16 pb-12 overflow-hidden">
-            {/* Wavy Top Border */}
-            <div 
-                className="absolute left-0 right-0 top-0 h-4 w-full"
-                style={{ 
-                    backgroundImage: 'radial-gradient(circle at 6px 14px, #d0dfcc 7px, #1BA4D9 8px, transparent 9px)', 
-                    backgroundSize: '12px 14px', 
-                    backgroundPosition: '0 0',
-                    backgroundRepeat: 'repeat-x',
-                    transform: 'translateY(-50%)'
-                }}
-            ></div>
+        <footer 
+            className="w-full text-slate-800 font-['Outfit'] relative pt-12 pb-6 overflow-hidden" 
+            style={{ 
+                background: 'linear-gradient(-45deg, #cde6de, #f6e9c4, #e8f3ef, #fbf5e1)',
+                backgroundSize: '400% 400%',
+                animation: 'gradientBg 12s ease infinite'
+            }}
+        >
+            {/* Subtle floating circles for extra animation */}
+            <div className="absolute top-10 left-10 w-32 h-32 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-10 right-20 w-48 h-48 bg-[#1BA4D9]/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
 
-            <div className="max-w-7xl mx-auto px-4 md:px-12 flex flex-col lg:flex-row justify-between gap-12 relative z-10">
+            {/* Newsletter inside Footer */}
+            <div className="pt-8 pb-8 relative z-10 mb-8">
+                <div className="max-w-7xl mx-auto px-4 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-8">
+                    <div className="text-left max-w-lg">
+                        <h2 className="text-[34px] font-bold text-[#2c3e50] mb-2" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Nunito", sans-serif' }}>Newsletter</h2>
+                        <p className="text-slate-600 text-sm md:text-base leading-relaxed font-medium" style={{ fontFamily: '"Nunito", sans-serif' }}>
+                            Get 15% off your first order! Plus, be the first to know about new arrivals, sales & exclusive offers!
+                        </p>
+                    </div>
+                    <div className="flex gap-3 w-full lg:w-auto flex-1 max-w-[500px] relative">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <input 
+                            type="email" 
+                            placeholder="Enter your email address..." 
+                            className="flex-1 pl-12 pr-5 py-3.5 rounded-full border-2 border-white bg-white/60 focus:bg-white focus:outline-none focus:border-[#1BA4D9] focus:ring-4 focus:ring-[#1BA4D9]/20 text-sm md:text-base text-slate-700 placeholder-slate-500 transition-all shadow-sm"
+                        />
+                        <button className="bg-[#1BA4D9] hover:bg-[#158ebf] hover:-translate-y-0.5 active:translate-y-0 text-white px-8 py-3.5 rounded-full font-bold text-sm md:text-base transition-all shadow-md whitespace-nowrap">
+                            Subscribe
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 md:px-12 flex flex-col lg:flex-row justify-between gap-10 relative z-10">
                 {/* Left Column - Brand & Social */}
-                <div className="flex flex-col gap-6 max-w-xs">
+                <div className="flex flex-col gap-5 max-w-sm">
                     <Link to="/" className="flex items-center gap-2 group">
                         <div className="w-10 h-10 flex items-center justify-center font-black text-[#f57c00] border-l-4 border-[#f57c00] text-3xl">R</div>
                         <div className="flex flex-col text-sm md:text-base font-black leading-none tracking-tight">
@@ -58,15 +82,15 @@ const Footer = () => {
                             <span className="text-slate-600">rattles</span>
                         </div>
                     </Link>
-                    <p className="text-sm font-medium text-slate-700 leading-relaxed">
-                        Free and standard shipping on all orders over $50
+                    <p className="text-[14px] font-medium text-slate-600 leading-relaxed">
+                        Free and standard shipping on all orders over ₹50. Discover the best toys for your little ones!
                     </p>
                     
-                    <div className="flex gap-3">
+                    <div className="flex gap-4 mt-2">
                         {socialLinks && Object.entries(socialLinks).map(([platform, url]) => {
                             if (!url) return null;
                             return (
-                                <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-[#ff7979] hover:bg-[#ff5e5e] flex items-center justify-center text-white transition-colors shadow-sm">
+                                <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white hover:bg-[#1BA4D9] text-[#1BA4D9] hover:text-white flex items-center justify-center transition-all shadow-sm hover:shadow-md hover:-translate-y-1">
                                     {socialIcons[platform]}
                                 </a>
                             );
@@ -74,41 +98,41 @@ const Footer = () => {
                         {/* Fallback icons if no DB links yet */}
                         {!socialLinks && (
                             <>
-                                <div className="w-8 h-8 rounded-full bg-[#ff7979] flex items-center justify-center text-white"><span className="font-bold text-xs">FB</span></div>
-                                <div className="w-8 h-8 rounded-full bg-[#ff7979] flex items-center justify-center text-white"><span className="font-bold text-xs">IG</span></div>
-                                <div className="w-8 h-8 rounded-full bg-[#ff7979] flex items-center justify-center text-white"><span className="font-bold text-xs">TW</span></div>
+                                <a href="#" className="w-10 h-10 rounded-full bg-white hover:bg-[#1BA4D9] text-[#1BA4D9] hover:text-white flex items-center justify-center transition-all shadow-sm hover:shadow-md hover:-translate-y-1"><span className="font-bold text-xs">FB</span></a>
+                                <a href="#" className="w-10 h-10 rounded-full bg-white hover:bg-[#1BA4D9] text-[#1BA4D9] hover:text-white flex items-center justify-center transition-all shadow-sm hover:shadow-md hover:-translate-y-1"><span className="font-bold text-xs">IG</span></a>
+                                <a href="#" className="w-10 h-10 rounded-full bg-white hover:bg-[#1BA4D9] text-[#1BA4D9] hover:text-white flex items-center justify-center transition-all shadow-sm hover:shadow-md hover:-translate-y-1"><span className="font-bold text-xs">TW</span></a>
                             </>
                         )}
                     </div>
                 </div>
 
                 {/* Center Columns - Links */}
-                <div className="flex gap-12 md:gap-24 flex-wrap">
+                <div className="flex gap-16 md:gap-24 flex-wrap">
                     <div className="flex flex-col gap-4">
-                        <h4 className="font-bold text-slate-800 uppercase tracking-wide text-sm mb-2">My account</h4>
-                        <Link to="/orders" className="text-sm font-medium text-slate-700 hover:text-[#1BA4D9]">Track my order</Link>
-                        <Link to="/terms" className="text-sm font-medium text-slate-700 hover:text-[#1BA4D9]">Terms of use</Link>
-                        <Link to="/privacy" className="text-sm font-medium text-slate-700 hover:text-[#1BA4D9]">Privacy</Link>
-                        <Link to="/contact" className="text-sm font-medium text-slate-700 hover:text-[#1BA4D9]">Submit feedback</Link>
+                        <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[13px] mb-1 opacity-60">My account</h4>
+                        <Link to="/orders" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Track my order</Link>
+                        <Link to="/terms" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Terms of use</Link>
+                        <Link to="/privacy" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Privacy</Link>
+                        <Link to="/contact" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Submit feedback</Link>
                     </div>
                     <div className="flex flex-col gap-4">
-                        <h4 className="font-bold text-slate-800 uppercase tracking-wide text-sm mb-2">Customer center</h4>
-                        <Link to="/delivery" className="text-sm font-medium text-slate-700 hover:text-[#1BA4D9]">Delivery & shipping</Link>
-                        <Link to="/faq" className="text-sm font-medium text-slate-700 hover:text-[#1BA4D9]">FAQs, guarantees, returns</Link>
-                        <Link to="/contact" className="text-sm font-medium text-slate-700 hover:text-[#1BA4D9]">Company, contact details</Link>
-                        <a href="mailto:hello@rainbowrattles.com" className="text-sm font-medium text-[#1BA4D9] hover:underline mt-2">Email: hello@rainbowrattles.com</a>
+                        <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[13px] mb-1 opacity-60">Customer center</h4>
+                        <Link to="/delivery" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Delivery & shipping</Link>
+                        <Link to="/faq" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>FAQs & Returns</Link>
+                        <Link to="/contact" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Company details</Link>
+                        <a href="mailto:hello@rainbowrattles.com" className="text-[15px] font-bold text-[#1BA4D9] hover:text-[#158ebf] mt-1 flex items-center gap-2 transition-colors">hello@rainbowrattles.com</a>
                     </div>
-                </div>
-
-                {/* Right Column - Illustration Placeholder */}
-                <div className="hidden lg:flex items-end justify-end absolute right-0 -bottom-12 opacity-80 pointer-events-none">
-                    <div className="text-[180px] leading-none drop-shadow-xl" style={{ filter: 'hue-rotate(180deg) sepia(0.5)' }}>🎠</div>
                 </div>
             </div>
-            
-            {/* Absolute illustration for smaller screens */}
-            <div className="lg:hidden flex items-end justify-end absolute right-0 -bottom-8 opacity-40 pointer-events-none">
-                <div className="text-[120px] leading-none drop-shadow-lg" style={{ filter: 'hue-rotate(180deg) sepia(0.5)' }}>🎠</div>
+
+            {/* Copyright Bar */}
+            <div className="relative z-10 mt-10 pt-6 px-4 flex flex-col md:flex-row justify-between items-center gap-4 max-w-7xl mx-auto opacity-70">
+                <p className="text-[13px] font-semibold text-slate-700">© 2026 Rainbow Rattles. All rights reserved.</p>
+                <div className="flex gap-6">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4 opacity-70" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-4 opacity-70" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 opacity-70" />
+                </div>
             </div>
         </footer>
     );

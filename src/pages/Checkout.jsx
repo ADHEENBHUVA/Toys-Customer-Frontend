@@ -7,27 +7,48 @@ const Checkout = () => {
     const { cartItems, getCartTotal, clearCart, calculateShipping } = useCart();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('razorpay');
 
     const isLoggedIn = !!localStorage.getItem('token');
 
+
+
     const [address, setAddress] = useState({
-        fullName: '',
-        addressLine1: '',
-        addressLine2: '',
+        firstName: '',
+        lastName: '',
+        streetAddress: '',
         city: '',
         state: '',
-        postalCode: '',
-        country: 'India',
-        phone: ''
+        zipCode: '',
+        phone: '',
+        email: '',
+        orderNotes: ''
     });
 
     const subTotal = getCartTotal();
     const shippingCharge = calculateShipping();
     const totalAmount = subTotal + shippingCharge;
 
-    const handleInputChange = (e) => {
+    const handleInputChange = async (e) => {
         const { name, value } = e.target;
         setAddress(prev => ({ ...prev, [name]: value }));
+
+        if (name === 'zipCode' && value.length === 6) {
+            try {
+                const res = await fetch(`https://api.postalpincode.in/pincode/${value}`);
+                const data = await res.json();
+                if (data && data[0] && data[0].Status === 'Success') {
+                    const postOffice = data[0].PostOffice[0];
+                    setAddress(prev => ({
+                        ...prev,
+                        city: postOffice.District,
+                        state: postOffice.State
+                    }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch pincode details", error);
+            }
+        }
     };
 
     const handlePayment = async () => {
@@ -42,17 +63,15 @@ const Checkout = () => {
             return;
         }
 
-        // Basic validation
-        if (!address.fullName || !address.addressLine1 || !address.city || !address.postalCode || !address.phone) {
-            toast.error("Please fill in all required address fields.");
+        if (!address.firstName || !address.lastName || !address.streetAddress || !address.city || !address.zipCode || !address.phone || !address.email) {
+            toast.error("Please fill in all required delivery fields.");
             return;
         }
 
         setLoading(true);
 
         try {
-            // 1. Create order on backend
-            const token = localStorage.getItem('token'); // Fixed to use 'token' as set in Login.jsx
+            const token = localStorage.getItem('token');
             const createOrderRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/payment/create-order`, {
                 method: 'POST',
                 headers: {
@@ -69,16 +88,14 @@ const Checkout = () => {
                 return;
             }
 
-            // 2. Open Razorpay Checkout
             const options = {
-                key: "rzp_test_TciOZDXIMiQnYr", // The API Key given by user
+                key: "rzp_test_TciOZDXIMiQnYr",
                 amount: orderData.order.amount,
                 currency: "INR",
-                name: "Toys Website",
-                description: "Purchase from Toys Website",
+                name: "Rainbow Rattles",
+                description: "Purchase from Rainbow Rattles",
                 order_id: orderData.order.id,
                 handler: async function (response) {
-                    // 3. Verify Payment on Backend
                     try {
                         const verifyRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/payment/verify`, {
                             method: 'POST',
@@ -92,7 +109,7 @@ const Checkout = () => {
                                 razorpay_signature: response.razorpay_signature,
                                 orderData: {
                                     items: cartItems.map(item => ({ productId: item._id, quantity: item.quantity, price: item.price })),
-                                    shippingAddress: address,
+                                    shippingAddress: { ...address, fullName: `${address.firstName} ${address.lastName}` },
                                     subTotal,
                                     shippingCharge,
                                     totalAmount
@@ -114,12 +131,12 @@ const Checkout = () => {
                     }
                 },
                 prefill: {
-                    name: address.fullName,
-                    email: '', // Not available locally
+                    name: `${address.firstName} ${address.lastName}`,
+                    email: address.email,
                     contact: address.phone
                 },
                 theme: {
-                    color: "#4F46E5" // blue-600
+                    color: "#1282a2"
                 }
             };
 
@@ -138,132 +155,163 @@ const Checkout = () => {
     };
 
     return (
-        <div className="bg-slate-50 min-h-screen py-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                
-                <div className="flex items-center gap-4 mb-8">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-sky-600 text-white rounded-2xl flex items-center justify-center font-black text-xl shadow-lg shadow-blue-200">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-black text-slate-800 tracking-tight">Secure Checkout</h1>
-                        <p className="text-slate-500 font-medium">Complete your order with Razorpay</p>
-                    </div>
-                </div>
+        <div className="max-w-[1200px] mx-auto px-4 py-10 font-['Outfit'] bg-white">
+            {/* Breadcrumb */}
+            <div className="text-[14px] mb-8 font-medium">
+                <span className="text-[#2e4053] font-bold">Home</span>
+                <span className="text-slate-400 mx-2">/</span>
+                <span className="text-[#1282a2]">Checkout</span>
+            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Title */}
+            <h1 className="text-3xl font-bold text-[#2e4053] mb-8" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                Check out
+            </h1>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Left Column (Forms) */}
+                <div className="lg:col-span-7">
                     
-                    {/* Left Column - Form */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-                            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                                <span className="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
-                                Shipping Address
-                            </h2>
+                    {/* Delivery Info */}
+                    <div className="border border-slate-200 rounded-2xl p-6 md:p-8 mb-8">
+                        <h2 className="text-xl font-bold text-[#2e4053] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                            Delivery info
+                        </h2>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label className="block text-sm font-bold text-[#2e4053] mb-2">First name *</label>
+                                <input type="text" name="firstName" value={address.firstName} onChange={handleInputChange} placeholder="Join" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-[#2e4053] mb-2">Last name *</label>
+                                <input type="text" name="lastName" value={address.lastName} onChange={handleInputChange} placeholder="Gray" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                            </div>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Full Name *</label>
-                                    <input type="text" name="fullName" value={address.fullName} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" placeholder="John Doe" />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Address Line 1 *</label>
-                                    <input type="text" name="addressLine1" value={address.addressLine1} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" placeholder="123 Street Name" />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Address Line 2</label>
-                                    <input type="text" name="addressLine2" value={address.addressLine2} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" placeholder="Apartment, suite, etc. (optional)" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">City *</label>
-                                    <input type="text" name="city" value={address.city} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" placeholder="City" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">State *</label>
-                                    <input type="text" name="state" value={address.state} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" placeholder="State" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Postal/Zip Code *</label>
-                                    <input type="text" name="postalCode" value={address.postalCode} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" placeholder="123456" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phone Number *</label>
-                                    <input type="text" name="phone" value={address.phone} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" placeholder="+91 9876543210" />
-                                </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold text-[#2e4053] mb-2">Street address *</label>
+                                <input type="text" name="streetAddress" value={address.streetAddress} onChange={handleInputChange} placeholder="Address" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-bold text-[#2e4053] mb-2">ZIP code *</label>
+                                <input type="text" name="zipCode" value={address.zipCode} onChange={handleInputChange} placeholder="e.g. 380015" maxLength="6" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-bold text-[#2e4053] mb-2">Town / City *</label>
+                                <input type="text" name="city" value={address.city} onChange={handleInputChange} placeholder="City" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053] bg-slate-50" />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-bold text-[#2e4053] mb-2">State *</label>
+                                <input type="text" name="state" value={address.state} onChange={handleInputChange} placeholder="State" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053] bg-slate-50" />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-bold text-[#2e4053] mb-2">Phone *</label>
+                                <input type="text" name="phone" value={address.phone} onChange={handleInputChange} placeholder="(1230) 456-7868" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                            </div>
+                            
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold text-[#2e4053] mb-2">Email address *</label>
+                                <input type="email" name="email" value={address.email} onChange={handleInputChange} placeholder="Example@youremail.com" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                            </div>
+                            
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold text-[#2e4053] mb-2">Order notes (optional)</label>
+                                <textarea name="orderNotes" value={address.orderNotes} onChange={handleInputChange} placeholder="Notes about your order, e.g. special notes for delivery." rows="3" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053] resize-none"></textarea>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column - Summary */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 sticky top-24">
-                            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                                <span className="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
-                                Order Summary
-                            </h2>
-                            
-                            <div className="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                                {cartItems.map(item => (
-                                    <div key={item._id} className="flex gap-4 items-center">
-                                        <div className="w-16 h-16 bg-slate-50 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100 flex items-center justify-center p-1">
-                                            {item.thumbnailImage || (item.images && item.images.length > 0) ? (
-                                                <img src={item.thumbnailImage || item.images[0]} alt={item.name} className="w-full h-full object-contain" />
-                                            ) : (
-                                                <span className="text-2xl">🧸</span>
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <h4 className="text-sm font-bold text-slate-800 line-clamp-2">{item.name}</h4>
-                                            <p className="text-xs font-medium text-slate-500">Qty: {item.quantity}</p>
-                                        </div>
-                                        <div className="text-sm font-black text-slate-800">
-                                            ₹{item.price * item.quantity}
+                    {/* Payment Info */}
+                    <div className="border border-slate-200 rounded-2xl p-6 md:p-8">
+                        <h2 className="text-xl font-bold text-[#2e4053] mb-2" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                            Payment
+                        </h2>
+                        <p className="text-sm text-slate-500 mb-6">All transactions are secure and encrypted via Razorpay.</p>
+                        
+                        <div className={`border rounded-lg p-5 mb-8 ${paymentMethod === 'razorpay' ? 'border-[#1282a2] bg-blue-50/30' : 'border-slate-200'}`}>
+                            <label className="flex items-center cursor-pointer">
+                                <div className="relative flex items-center justify-center w-5 h-5 rounded-full border border-[#1282a2] mr-3 shrink-0">
+                                    {paymentMethod === 'razorpay' && <div className="w-2.5 h-2.5 bg-[#1282a2] rounded-full"></div>}
+                                    <input type="radio" name="paymentMethod" value="razorpay" checked={paymentMethod === 'razorpay'} onChange={() => setPaymentMethod('razorpay')} className="absolute opacity-0 cursor-pointer" />
+                                </div>
+                                <div className="flex-1">
+                                    <span className="font-bold text-sm text-[#2e4053] block">Pay with Razorpay</span>
+                                    <span className="text-xs text-slate-500 mt-0.5 block">Cards, UPI, NetBanking, Wallets supported</span>
+                                </div>
+                                <div className="flex gap-2">
+                                    <div className="w-8 h-5 bg-blue-600 rounded flex items-center justify-center text-[8px] text-white font-bold italic">VISA</div>
+                                    <div className="w-8 h-5 bg-slate-800 rounded flex items-center justify-center">
+                                        <div className="flex -space-x-1">
+                                            <div className="w-3 h-3 rounded-full bg-red-500 opacity-90"></div>
+                                            <div className="w-3 h-3 rounded-full bg-yellow-500 opacity-90"></div>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-
-                            <div className="border-t border-slate-100 pt-4 space-y-3 mb-6">
-                                <div className="flex justify-between text-slate-500 font-medium text-sm">
-                                    <span>Subtotal</span>
-                                    <span className="text-slate-800 font-bold">₹{subTotal}</span>
+                                    <div className="w-8 h-5 bg-white border border-slate-200 rounded flex items-center justify-center text-[9px] text-[#003087] font-black italic">UPI</div>
                                 </div>
-                                <div className="flex justify-between text-slate-500 font-medium text-sm">
-                                    <span>Shipping</span>
-                                    <span className="text-slate-800 font-bold">{shippingCharge === 0 ? 'Free' : `₹${shippingCharge}`}</span>
-                                </div>
-                            </div>
-
-                            <div className="border-t border-slate-100 pt-4 mb-8">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-lg font-bold text-slate-800">Total</span>
-                                    <span className="text-2xl font-black text-blue-600">₹{totalAmount}</span>
-                                </div>
-                            </div>
-
-                            <button 
-                                onClick={handlePayment} 
-                                disabled={loading || cartItems.length === 0}
-                                className="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-lg hover:bg-blue-600 transition-colors shadow-xl shadow-slate-200 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
-                            >
-                                {loading ? (
-                                    <span className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                                ) : (
-                                    <>
-                                        Pay ₹{totalAmount} Now
-                                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                    </>
-                                )}
-                            </button>
-                            
-                            <p className="text-center text-xs font-bold text-slate-400 mt-4 flex items-center justify-center gap-1">
-                                <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                                Secured by Razorpay
-                            </p>
+                            </label>
                         </div>
+                        
+                        <button 
+                            onClick={handlePayment} 
+                            disabled={loading}
+                            className="w-full bg-[#1282a2] hover:bg-[#0f6c87] text-white py-3 rounded-xl font-bold transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-md"
+                        >
+                            {loading ? 'Processing...' : 'Place order'}
+                        </button>
                     </div>
 
                 </div>
+
+                {/* Right Column (Order Summary) */}
+                <div className="lg:col-span-5">
+                    <div className="border border-slate-200 rounded-2xl p-6 md:p-8">
+                        <h2 className="text-xl font-bold text-[#2e4053] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                            Your order
+                        </h2>
+                        
+                        <div className="flex flex-col gap-6 mb-6">
+                            {cartItems.map(item => (
+                                <div key={item._id} className="flex gap-4 items-center pb-6 border-b border-slate-100 last:border-b-0 last:pb-0">
+                                    <div className="w-16 h-16 rounded-xl border border-slate-200 p-1 bg-white shrink-0">
+                                        <img 
+                                            src={item.thumbnailImage || (item.images && item.images[0]) || '/placeholder.png'} 
+                                            alt={item.name} 
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="text-sm font-semibold text-[#2e4053] line-clamp-2">{item.name}</h4>
+                                        <p className="text-xs font-medium text-slate-500 mt-1">Amount : {item.quantity}</p>
+                                    </div>
+                                    <div className="text-[13px] font-bold text-[#2e4053]">
+                                        ₹{(item.price * item.quantity).toFixed(2)}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="pt-6 border-t border-slate-100 flex flex-col gap-4">
+                            <div className="flex justify-between text-[#4b5563] text-[13px] font-medium">
+                                <span>Subtotal</span>
+                                <span className="font-bold text-[#2e4053]">₹{subTotal.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-[#4b5563] text-[13px] font-medium">
+                                <span>Shipping</span>
+                                <span className="font-bold text-[#2e4053]">₹{shippingCharge.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-[#2e4053] text-[15px] font-bold mt-2">
+                                <span>Total</span>
+                                <span>₹{totalAmount.toFixed(2)}</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
             </div>
         </div>
     );

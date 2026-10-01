@@ -11,6 +11,15 @@ export const CartProvider = ({ children }) => {
         return savedCart ? JSON.parse(savedCart) : [];
     });
 
+    const [waitlistItems, setWaitlistItems] = useState(() => {
+        try {
+            const savedWaitlist = localStorage.getItem('magic_toys_waitlist');
+            return savedWaitlist ? JSON.parse(savedWaitlist) : [];
+        } catch (error) {
+            return [];
+        }
+    });
+
     const [shippingSettings, setShippingSettings] = useState({
         baseShippingCharge: 50,
         isFreeShippingActive: true,
@@ -21,6 +30,10 @@ export const CartProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('magic_toys_cart', JSON.stringify(cartItems));
     }, [cartItems]);
+
+    useEffect(() => {
+        localStorage.setItem('magic_toys_waitlist', JSON.stringify(waitlistItems));
+    }, [waitlistItems]);
 
     useEffect(() => {
         const fetchShippingSettings = async () => {
@@ -105,6 +118,22 @@ export const CartProvider = ({ children }) => {
         return cartItems.reduce((count, item) => count + item.quantity, 0);
     };
 
+    const toggleWaitlist = (product) => {
+        const currentWaitlist = Array.isArray(waitlistItems) ? waitlistItems : [];
+        const exists = currentWaitlist.find(item => item._id === product._id);
+        if (exists) {
+            setWaitlistItems(prev => Array.isArray(prev) ? prev.filter(item => item._id !== product._id) : []);
+            toast.success('Removed from waitlist!');
+        } else {
+            setWaitlistItems(prev => Array.isArray(prev) ? [...prev, product] : [product]);
+            toast.success('Added to waitlist!');
+        }
+    };
+
+    const getWaitlistCount = () => {
+        return Array.isArray(waitlistItems) ? waitlistItems.length : 0;
+    };
+
     return (
         <CartContext.Provider value={{
             cartItems,
@@ -115,7 +144,10 @@ export const CartProvider = ({ children }) => {
             getCartTotal,
             getCartCount,
             shippingSettings,
-            calculateShipping
+            calculateShipping,
+            waitlistItems,
+            toggleWaitlist,
+            getWaitlistCount
         }}>
             {children}
         </CartContext.Provider>

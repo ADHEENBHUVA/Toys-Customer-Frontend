@@ -4,9 +4,55 @@ import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-r
 import { useCart } from '../context/CartContext';
 
 const Dashboard = () => {
-    const { addToCart } = useCart();
+    const { addToCart, waitlistItems, toggleWaitlist } = useCart();
     const [trendingProducts, setTrendingProducts] = useState([]);
     const [activeTab, setActiveTab] = useState('Featured');
+    const [testimonialIndex, setTestimonialIndex] = useState(0);
+    const [heroBanners, setHeroBanners] = useState([]);
+    const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+
+    const testimonialsData = [
+        { id: 1, name: "Jessica", avatar: "https://i.pravatar.cc/150?u=jessica_toys", text: "Sagittis vitae et leo duis ut diam quam nulla porttitor massa id neque aliquam", variant: 1 },
+        { id: 2, name: "John Smith", avatar: "https://i.pravatar.cc/150?u=john_smith", text: "Sagittis vitae et leo duis ut diam quam nulla porttitor massa id neque aliquam vestibulum", variant: 2 },
+        { id: 3, name: "Andrea", avatar: "https://i.pravatar.cc/150?u=andrea_toys", text: "Sagittis vitae et leo duis ut diam quam nulla porttitor massa id neque", variant: 3 },
+        { id: 4, name: "Michael", avatar: "https://i.pravatar.cc/150?u=michael_toys", text: "Quisque egestas diam in arcu cursus euismod quis viverra. Purus in massa tempor nec.", variant: 1 },
+        { id: 5, name: "Emily", avatar: "https://i.pravatar.cc/150?u=emily_toys", text: "Tincidunt eget nullam non nisi est sit amet. Egestas purus viverra accumsan in nisl nisi.", variant: 2 }
+    ];
+
+    const nextTestimonial = () => setTestimonialIndex(prev => (prev + 1) % testimonialsData.length);
+    const prevTestimonial = () => setTestimonialIndex(prev => (prev - 1 + testimonialsData.length) % testimonialsData.length);
+    
+    useEffect(() => {
+        const interval = setInterval(() => {
+            nextTestimonial();
+        }, 10000);
+        return () => clearInterval(interval);
+    }, [testimonialIndex]);
+
+    const [galleryIndex, setGalleryIndex] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setGalleryIndex(prev => prev + 1);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Auto rotate hero banners
+    useEffect(() => {
+        if (heroBanners.length <= 1) return;
+        const interval = setInterval(() => {
+            setCurrentBannerIndex(prev => (prev + 1) % heroBanners.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [heroBanners.length]);
+
+    const visibleTestimonials = [
+        testimonialsData[(testimonialIndex) % testimonialsData.length],
+        testimonialsData[(testimonialIndex + 1) % testimonialsData.length],
+        testimonialsData[(testimonialIndex + 2) % testimonialsData.length]
+    ];
+    
+    const galleryImages = Array.from({ length: 20 }, (_, i) => `/gallery/img${i + 1}.jpg?v=2`);
     
     useEffect(() => {
         const fetchTrendingProducts = async () => {
@@ -23,107 +69,184 @@ const Dashboard = () => {
             }
         };
         fetchTrendingProducts();
+
+        const fetchHeroBanners = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/banners/active`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.length > 0) {
+                        setHeroBanners(data);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching hero banners:', error);
+            }
+        };
+        fetchHeroBanners();
     }, []);
 
     const categories = [
-        { name: 'Playmats', icon: '👶', color: 'bg-[#b6e4f4]' },
-        { name: 'Wooden Toys', icon: '🚂', color: 'bg-[#b6e4f4]' },
-        { name: 'Educational Toys', icon: '🧩', color: 'bg-[#b6e4f4]' },
-        { name: 'Eco-friendly Toys', icon: '🐎', color: 'bg-[#b6e4f4]' },
-        { name: 'Stuffed Toys', icon: '🧸', color: 'bg-[#b6e4f4]' }
+        { name: 'Playsets', icon: '🪀', color: 'bg-[#bde8f5]' },
+        { name: 'Control Toys', icon: '🚙', color: 'bg-[#bde8f5]' },
+        { name: 'Educational Toys', icon: '🔠', color: 'bg-[#bde8f5]' },
+        { name: 'Eco- Friendly Toys', icon: '🎠', color: 'bg-[#bde8f5]' },
+        { name: 'Stuffed Toys', icon: '🧸', color: 'bg-[#bde8f5]' }
     ];
 
     const CloudShape = ({ children }) => (
-        <div className="relative w-24 h-24 md:w-32 md:h-24 flex items-center justify-center">
-            {/* Simple cloud approximation using CSS */}
-            <div className="absolute inset-0 bg-[#b6e4f4] rounded-[50px] z-0"></div>
-            <div className="absolute top-[-10px] left-[15%] w-12 h-12 md:w-16 md:h-16 bg-[#b6e4f4] rounded-full z-0"></div>
-            <div className="absolute top-[-20px] right-[20%] w-16 h-16 md:w-20 md:h-20 bg-[#b6e4f4] rounded-full z-0"></div>
-            <div className="relative z-10 text-4xl">{children}</div>
+        <div className="relative w-28 h-20 md:w-36 md:h-28 flex items-center justify-center mt-4">
+            {/* Fluffy cloud approximation matching Image 2 */}
+            <div className="absolute bottom-2 left-2 right-2 h-10 md:h-12 bg-[#bde8f5] rounded-full z-0"></div>
+            <div className="absolute bottom-4 left-0 w-12 h-12 md:w-16 md:h-16 bg-[#bde8f5] rounded-full z-0"></div>
+            <div className="absolute bottom-6 left-6 w-14 h-14 md:w-20 md:h-20 bg-[#bde8f5] rounded-full z-0"></div>
+            <div className="absolute bottom-8 right-8 w-16 h-16 md:w-24 md:h-24 bg-[#bde8f5] rounded-full z-0"></div>
+            <div className="absolute bottom-4 right-0 w-14 h-14 md:w-20 md:h-20 bg-[#bde8f5] rounded-full z-0"></div>
+            <div className="relative z-10 text-4xl md:text-5xl mb-2">{children}</div>
         </div>
     );
 
-    const StarRating = () => (
-        <div className="flex text-[#ffdb2a] text-sm">
-            {'★★★★★'.split('').map((star, i) => <span key={i}>{star}</span>)}
-        </div>
-    );
+    const StarRating = ({ rating = 5 }) => {
+        return (
+            <div className="flex text-[#facc15] text-[15px] mt-1 gap-0.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star}>{star <= rating ? '★' : '☆'}</span>
+                ))}
+            </div>
+        );
+    };
 
     const ProductCard = ({ product }) => (
         <div className="flex flex-col group relative">
-            <div className="relative mb-3 bg-[#f8fafc] rounded-2xl p-4 overflow-hidden aspect-square flex items-center justify-center">
-                <span className="absolute top-3 left-3 bg-[#ff5e5e] text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10">
+            <div className="relative mb-3 bg-white border border-slate-200 rounded-xl p-4 overflow-hidden aspect-square flex items-center justify-center">
+                <span className="absolute top-3 left-3 bg-[#ff7b7b] text-white text-[10px] tracking-wide px-2.5 py-0.5 rounded-full z-10">
                     SALE
                 </span>
-                <button className="absolute top-3 right-3 text-slate-300 hover:text-[#ff5e5e] transition-colors z-10">
-                    <Heart className="w-5 h-5" />
-                </button>
+                <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                    <button 
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                        className={`transition-colors z-[9999] pointer-events-auto ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}`}
+                    >
+                        <Heart className="w-[18px] h-[18px] pointer-events-none" strokeWidth={2} fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} />
+                    </button>
+                    <button className="text-slate-400 hover:text-blue-500 transition-colors" onClick={(e) => { e.preventDefault(); addToCart(product, 1); }}>
+                        <ShoppingCart className="w-[18px] h-[18px]" strokeWidth={2} />
+                    </button>
+                </div>
                 {product.thumbnailImage || (product.images && product.images.length > 0) ? (
                     <img 
                         src={product.thumbnailImage || product.images[0]} 
                         alt={product.name} 
-                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" 
+                        className="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500" 
                     />
                 ) : (
                     <div className="text-6xl">🧸</div>
                 )}
             </div>
             <Link to={`/product/${product._id}`} className="hover:text-blue-500">
-                <h3 className="font-bold text-slate-800 text-sm mb-1 leading-tight line-clamp-2 font-['Nunito']">
+                <h3 className="font-semibold text-slate-700 text-[15px] mb-0.5 leading-tight line-clamp-1">
                     {product.name}
                 </h3>
             </Link>
-            <div className="flex items-center gap-2 mb-1">
-                <span className="font-black text-[#2e7d32] text-sm">₹{product.price.toFixed(2)}</span>
+            <div className="flex items-center gap-2">
+                <span className="font-bold text-[#22c55e] text-[15px]">₹{product.price.toFixed(2)}</span>
                 {product.compareAtPrice > product.price && (
-                    <span className="text-xs text-slate-400 line-through">₹{product.compareAtPrice.toFixed(2)}</span>
+                    <span className="text-[13px] text-slate-400 font-medium line-through">₹{product.compareAtPrice.toFixed(2)}</span>
                 )}
             </div>
-            <StarRating />
+            <StarRating rating={product.rating || 5} />
         </div>
     );
+
+    const activeBanner = heroBanners.length > 0 ? heroBanners[currentBannerIndex] : null;
 
     return (
         <div className="w-full min-h-screen bg-white font-['Outfit'] pb-20">
             {/* Hero Section */}
-            <div className="w-full bg-[#ced4d8] pt-12 md:pt-20 px-4 md:px-16 lg:px-32 flex flex-col-reverse md:flex-row items-center justify-between min-h-[550px] relative overflow-hidden" style={{ fontFamily: '"Nunito", sans-serif' }}>
-                <div className="flex-1 w-full flex justify-center md:justify-start items-end mt-8 md:mt-0 relative z-10 h-full">
-                    {/* Placeholder for the Baby image exported from Figma */}
-                    <div className="relative w-full max-w-[600px] h-[400px] md:h-[500px] flex items-end justify-center">
-                        <img 
-                            src="/baby-hero.png" 
-                            alt="Baby playing with toy" 
-                            className="object-contain object-bottom w-full h-full max-h-[500px]"
-                            onError={(e) => {
-                                e.target.onerror = null; 
-                                e.target.src = "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=600&q=80"; // Fallback image
-                                e.target.className = "object-cover rounded-[3rem] w-[80%] h-[80%] shadow-2xl mb-10";
+            <div className="w-full bg-[#dbe2e6] min-h-[550px] md:min-h-[600px] relative overflow-hidden" style={{ fontFamily: '"Nunito", sans-serif' }}>
+                {heroBanners.length > 0 ? heroBanners.map((banner, index) => (
+                    <div 
+                        key={banner._id || index}
+                        className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === currentBannerIndex ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}
+                    >
+                        {/* Full Width Background Image */}
+                        <div 
+                            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+                            style={{ 
+                                backgroundImage: `url('${banner.image || "/baby-hero.png"}')` 
                             }}
                         />
+                        {/* Gradient overlay to ensure text is always readable */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/50 to-transparent md:w-2/3"></div>
+
+                        {/* Content Overlay */}
+                        <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 md:px-16 lg:px-32">
+                            <div className="max-w-xl text-center md:text-left transform transition-all duration-1000 translate-y-0">
+                                <h1 
+                                    className="text-[44px] md:text-[56px] lg:text-[72px] font-black text-[#1282a2] leading-[1.15] mb-6 tracking-tight drop-shadow-sm"
+                                    style={{ textShadow: '4px 4px 0 #ffffff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
+                                >
+                                    {banner.title || "Play, learn, & grow!"}
+                                </h1>
+                                <div className="inline-block bg-white/60 backdrop-blur-md px-6 py-3 rounded-2xl mb-8 shadow-sm">
+                                    <p className="text-[#3a4d5c] text-[18px] md:text-[20px] font-bold leading-relaxed font-['Outfit']">
+                                        {banner.subtitle || "Crafting smiles with every toy, made for learning, fun, and growth"}
+                                    </p>
+                                </div>
+                                <div>
+                                    <Link to={banner.buttonLink || "/shop"}>
+                                        <button className="bg-[#fbdf14] hover:bg-[#ebd013] text-[#2e4053] font-bold text-[18px] px-10 py-3.5 rounded-full transition-transform hover:-translate-y-1 shadow-lg">
+                                            {banner.buttonText || "Shop now"}
+                                        </button>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div className="flex-1 text-center md:text-left z-20 md:pl-10">
-                    <h1 
-                        className="text-[48px] md:text-[64px] lg:text-[76px] font-black text-[#1282a2] leading-[1.1] mb-6 tracking-tight"
-                        style={{ textShadow: '4px 4px 0 #ffffff' }}
-                    >
-                        Play, learn, & grow!
-                    </h1>
-                    <p className="text-[#3b4e5f] text-[18px] md:text-[22px] font-medium mb-10 max-w-[450px] mx-auto md:mx-0 leading-relaxed font-['Outfit']">
-                        Crafting smiles with every toy, made for learning, fun, and growth
-                    </p>
-                    <button className="bg-[#fceb20] hover:bg-[#ebd915] text-[#2e4053] font-bold text-[18px] px-10 py-3.5 rounded-full transition-colors">
-                        Shop now
-                    </button>
-                </div>
+                )) : (
+                    // Fallback static hero if no banners from API
+                    <div className="absolute inset-0 w-full h-full opacity-100 z-20">
+                        <div 
+                            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+                            style={{ backgroundImage: `url('/baby-hero.png')` }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/50 to-transparent md:w-2/3"></div>
+
+                        <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 md:px-16 lg:px-32">
+                            <div className="max-w-xl text-center md:text-left">
+                                <h1 
+                                    className="text-[44px] md:text-[56px] lg:text-[72px] font-black text-[#1282a2] leading-[1.15] mb-6 tracking-tight drop-shadow-sm"
+                                    style={{ textShadow: '4px 4px 0 #ffffff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
+                                >
+                                    Play, learn, & grow!
+                                </h1>
+                                <div className="inline-block bg-white/60 backdrop-blur-md px-6 py-3 rounded-2xl mb-8 shadow-sm">
+                                    <p className="text-[#3a4d5c] text-[18px] md:text-[20px] font-bold leading-relaxed font-['Outfit']">
+                                        Crafting smiles with every toy, made for learning, fun, and growth
+                                    </p>
+                                </div>
+                                <div>
+                                    <Link to="/shop">
+                                        <button className="bg-[#fbdf14] hover:bg-[#ebd013] text-[#2e4053] font-bold text-[18px] px-10 py-3.5 rounded-full transition-transform hover:-translate-y-1 shadow-lg">
+                                            Shop now
+                                        </button>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 
                 {/* Find the Perfect Toy */}
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl font-black text-[#2c3e50] font-['Nunito'] mb-2">Find the Perfect Toy</h2>
-                    <p className="text-slate-500 text-sm">Your dream toy is here</p>
+                <div className="text-center mb-12 mt-8">
+                    <h2 className="text-4xl font-bold text-[#2e2b2a] mb-2" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive', letterSpacing: '0.5px', wordSpacing: '4px' }}>
+                        Find the Perfect Toy
+                    </h2>
+                    <p className="text-slate-500 text-[15px] font-medium">Our Collections</p>
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-8 md:gap-16 mb-20">
@@ -138,14 +261,16 @@ const Dashboard = () => {
                 </div>
 
                 {/* Top Picks */}
-                <div className="text-center mb-10">
-                    <h2 className="text-3xl font-black text-[#2c3e50] font-['Nunito'] mb-6">Top picks for your little ones</h2>
-                    <div className="flex justify-center gap-4">
-                        {['Featured', 'Best sellers', 'New arrivals'].map(tab => (
+                <div className="text-center mb-8">
+                    <h2 className="text-4xl font-bold text-[#2e2b2a] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive', letterSpacing: '0.5px' }}>
+                        Top picks for your little ones
+                    </h2>
+                    <div className="flex justify-center gap-2 md:gap-4">
+                        {['Featured', 'Best seller', 'New arrivals'].map(tab => (
                             <button 
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`px-6 py-2 rounded-full text-sm font-bold transition-colors ${activeTab === tab ? 'bg-[#f8d5e0] text-[#c2185b]' : 'bg-transparent text-slate-500 hover:bg-slate-100'}`}
+                                className={`px-5 py-2 rounded-full text-[15px] font-medium transition-colors ${activeTab === tab ? 'bg-[#f4ebf9] text-[#4b5563]' : 'bg-transparent text-[#4b5563] hover:bg-slate-50'}`}
                             >
                                 {tab}
                             </button>
@@ -160,24 +285,60 @@ const Dashboard = () => {
                 </div>
 
                 {/* Banners */}
-                <div className="grid md:grid-cols-2 gap-6 mb-20">
-                    <div className="bg-[#dcf4fa] rounded-3xl p-8 md:p-12 flex flex-col justify-center items-center text-center relative overflow-hidden min-h-[250px]">
-                        <div className="absolute top-4 left-4 text-4xl opacity-50">🦆</div>
-                        <div className="absolute bottom-4 right-4 text-4xl opacity-50">🪁</div>
-                        <div className="bg-white rounded-[40px] px-8 py-6 z-10 shadow-sm border border-white/50 relative">
-                            <h3 className="text-2xl font-black text-[#1BA4D9] font-['Nunito']">Discover the<br/>Joy of Play</h3>
-                        </div>
-                    </div>
-                    <div className="bg-[#e4f6eb] rounded-3xl p-8 md:p-12 flex flex-row items-center relative overflow-hidden min-h-[250px]">
-                        <div className="flex-1 z-10 pl-4">
-                            <h3 className="text-2xl font-black text-[#2c3e50] font-['Nunito'] mb-2">Eco - friendly Toys</h3>
-                            <p className="text-slate-600 text-sm font-medium mb-6">Made with safe materials for continuous playtime.</p>
-                            <button className="bg-[#ffdb2a] hover:bg-[#e6c627] text-slate-900 text-sm font-bold px-6 py-2 rounded-full shadow-sm hover:shadow transition-all hover:-translate-y-0.5">
-                                Shop Now
+                <div className="grid lg:grid-cols-2 gap-6 md:gap-8 mb-20">
+                    {/* Left Banner - Discover the Joy of Play */}
+                    <div className="bg-[#fff1f2] rounded-[32px] p-8 md:p-12 relative overflow-hidden flex flex-col justify-center min-h-[340px] shadow-sm hover:shadow-md transition-shadow group">
+                        {/* Decorative Shapes */}
+                        <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#fef08a] rounded-full mix-blend-multiply opacity-70 group-hover:scale-110 transition-transform duration-500"></div>
+                        <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-[#bfdbfe] rounded-[40px] rotate-12 mix-blend-multiply opacity-70 group-hover:-rotate-12 transition-transform duration-500"></div>
+                        
+                        <div className="relative z-10 max-w-[80%]">
+                            <span className="inline-block py-1 px-3 rounded-full bg-pink-100 text-pink-600 font-bold text-xs uppercase tracking-wider mb-4">New Arrivals</span>
+                            <h3 className="text-4xl md:text-5xl font-black text-[#831843] mb-4 leading-tight font-['Nunito']">
+                                Discover the <br/> Joy of Play
+                            </h3>
+                            <p className="text-pink-900/70 font-medium mb-8 text-[15px] max-w-[280px]">
+                                Explore our premium collection of interactive toys for kids of all ages.
+                            </p>
+                            <button className="bg-[#f43f5e] hover:bg-[#e11d48] text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-pink-200 transition-transform hover:-translate-y-1">
+                                Explore Collection
                             </button>
                         </div>
-                        <div className="flex-1 flex justify-end items-end relative h-full">
-                           <div className="text-[120px] absolute -bottom-10 right-0">👶🏽</div>
+                    </div>
+
+                    {/* Right Banner - Eco-Friendly Toys */}
+                    <div className="bg-[#f0fdfa] rounded-[32px] p-8 md:p-12 relative overflow-hidden flex flex-col justify-center min-h-[340px] shadow-sm hover:shadow-md transition-shadow group">
+                        {/* Decorative Shapes */}
+                        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-l from-[#ccfbf1] to-transparent opacity-50 z-0"></div>
+                        
+                        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 h-full">
+                            <div className="flex-1 text-center md:text-left order-2 md:order-1">
+                                <span className="inline-block py-1 px-3 rounded-full bg-teal-100 text-teal-700 font-bold text-xs uppercase tracking-wider mb-4">Save 30% Today</span>
+                                <h3 className="text-4xl md:text-5xl font-black text-[#134e4a] mb-4 leading-tight font-['Nunito']">
+                                    Eco-Friendly <br/> Toys
+                                </h3>
+                                <p className="text-teal-900/60 font-medium mb-8 text-[15px]">
+                                    Safe, sustainable, and super fun! Extra discount for loyal customers.
+                                </p>
+                                <button className="bg-[#14b8a6] hover:bg-[#0d9488] text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-teal-200 transition-transform hover:-translate-y-1">
+                                    Shop Now
+                                </button>
+                            </div>
+                            
+                            <div className="order-1 md:order-2 relative w-[200px] h-[200px] md:w-[240px] md:h-[240px] shrink-0">
+                                <div className="absolute inset-0 bg-[#99f6e4] rounded-full scale-105 group-hover:scale-110 transition-transform duration-500"></div>
+                                <div className="absolute inset-0 bg-white rounded-full p-2 shadow-xl">
+                                    <img 
+                                        src="/baby-hero.png" 
+                                        alt="Baby playing" 
+                                        className="w-full h-full object-cover rounded-full"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=400&q=80";
+                                        }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -195,94 +356,178 @@ const Dashboard = () => {
 
                 {/* Testimonials */}
                 <div className="text-center mb-10">
-                    <h2 className="text-3xl font-black text-[#2c3e50] font-['Nunito'] mb-2">Hear from Other Happy Parents</h2>
-                    <p className="text-slate-500 text-sm">Trusted by 10k+ parents worldwide</p>
+                    <h2 className="text-[34px] font-bold text-[#333333] mb-1" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Nunito", sans-serif' }}>
+                        Hear from Other Happy Parents
+                    </h2>
+                    <p className="text-[#666666] text-[17px] font-medium" style={{ fontFamily: '"Nunito", sans-serif' }}>
+                        Customer testimonials
+                    </p>
                 </div>
                 
-                <div className="relative mb-24 flex items-center">
-                    <button className="absolute -left-4 z-10 bg-white shadow-md rounded-full w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-800 border border-slate-100">
-                        <ChevronLeft />
+                <div className="relative mb-24 flex items-center px-6">
+                    <button onClick={prevTestimonial} className="absolute left-0 z-10 bg-white shadow-sm rounded-full w-9 h-9 flex items-center justify-center text-[#999999] hover:text-slate-800 border-[2px] border-[#e5e5e5] transition-colors">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
                     </button>
+                    
                     <div className="grid md:grid-cols-3 gap-6 w-full">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="bg-[#fff1f2] p-8 rounded-3xl relative">
-                                <div className="absolute top-4 right-4 text-[#ffccd5] text-4xl font-serif">"</div>
-                                <StarRating />
-                                <p className="text-slate-600 text-sm my-6 font-medium leading-relaxed">
-                                    "Appifly Toys has absolutely the best quality toys! My kids love them, and I feel safe knowing they are non-toxic."
+                        {visibleTestimonials.map((testimonial, idx) => (
+                            <div key={`${testimonial.id}-${idx}`} className="bg-[#fcf5f5] p-8 rounded-2xl relative overflow-hidden text-left border border-transparent animate-slide-left">
+                                <div className="absolute top-6 right-6 text-[#d1d5db] text-[54px] font-serif leading-none rotate-180" style={{ transform: 'rotateY(180deg)' }}>"</div>
+                                
+                                {/* Decorations */}
+                                {testimonial.variant === 1 && (
+                                    <>
+                                        <div className="absolute top-10 right-14 text-[#ffc1cc] text-lg flex gap-1 -rotate-12">
+                                            <span className="translate-y-2 text-sm">❤</span>
+                                            <span className="-translate-y-1 text-xs">❤</span>
+                                            <span className="translate-y-4 text-[10px]">❤</span>
+                                        </div>
+                                        <div className="absolute bottom-6 left-6 text-[#ffc1cc]">
+                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                                                <path d="M6 22L12 10M2 18L7 12M12 24L16 16" />
+                                            </svg>
+                                        </div>
+                                        <div className="absolute bottom-10 right-4 text-[#a3d9a5] opacity-80">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="absolute -bottom-4 right-4"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
+                                        </div>
+                                    </>
+                                )}
+                                {testimonial.variant === 2 && (
+                                    <>
+                                        <div className="absolute top-10 right-16 text-[#a3d9a5] opacity-80">
+                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="absolute top-2 -right-6"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
+                                        </div>
+                                        <div className="absolute bottom-6 left-6 text-[#ffc1cc]">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                                                <path d="M6 22L12 10M2 18L7 12M12 24L16 16" />
+                                            </svg>
+                                        </div>
+                                        <div className="absolute bottom-6 right-6 text-[#ffc1cc] text-lg flex gap-2 rotate-12">
+                                            <span className="-translate-y-3 text-[10px]">❤</span>
+                                            <span className="translate-y-1 text-sm">❤</span>
+                                            <span className="-translate-y-1 text-xs">❤</span>
+                                        </div>
+                                    </>
+                                )}
+                                {testimonial.variant === 3 && (
+                                    <>
+                                        <div className="absolute top-8 right-14 text-[#ffc1cc] text-lg flex gap-2 rotate-[25deg]">
+                                            <span className="-translate-y-2 text-[10px]">❤</span>
+                                            <span className="translate-y-1 text-sm">❤</span>
+                                            <span className="translate-y-3 text-xs">❤</span>
+                                        </div>
+                                        <div className="absolute bottom-6 left-6 text-[#ffc1cc]">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                                                <path d="M6 22L12 10M2 18L7 12M12 24L16 16" />
+                                            </svg>
+                                        </div>
+                                        <div className="absolute bottom-10 right-4 text-[#a3d9a5] opacity-80">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="absolute -bottom-4 right-6"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
+                                        </div>
+                                    </>
+                                )}
+
+                                <div className="flex gap-[2px] mb-5 text-[#ffd700] text-xl">
+                                    ★★★★★
+                                </div>
+
+                                <p className="text-[#7a7a7a] text-[15px] font-medium leading-relaxed mb-8 z-10 relative pr-4">
+                                    {testimonial.text}
                                 </p>
+
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-xl">👩</div>
-                                    <span className="font-bold text-slate-800 text-sm">Sarah {i}</span>
+                                    <img src={testimonial.avatar} alt={testimonial.name} className="w-10 h-10 rounded-full object-cover shadow-sm" />
+                                    <span className="font-semibold text-[#4a4a4a] text-[15px]">{testimonial.name}</span>
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <button className="absolute -right-4 z-10 bg-white shadow-md rounded-full w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-800 border border-slate-100">
-                        <ChevronRight />
+                    
+                    <button onClick={nextTestimonial} className="absolute right-0 z-10 bg-white shadow-sm rounded-full w-9 h-9 flex items-center justify-center text-[#999999] hover:text-slate-800 border-[2px] border-[#e5e5e5] transition-colors">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
                 </div>
 
-                {/* Recent Photoshoots */}
-                <div className="text-center mb-10">
-                    <h2 className="text-3xl font-black text-[#2c3e50] font-['Nunito'] mb-2">Recent photoshoots</h2>
-                    <p className="text-slate-500 text-sm">Check gallery</p>
-                </div>
             </div>
 
             {/* Edge to Edge Gallery */}
-            <div className="w-full flex overflow-hidden h-[250px] md:h-[350px] mb-20 bg-slate-100">
-                <div className="flex-1 flex items-center justify-center text-6xl bg-blue-50 border-r border-white">👶🧸</div>
-                <div className="flex-1 flex items-center justify-center text-6xl bg-pink-50 border-r border-white">👧🧩</div>
-                <div className="flex-1 flex items-center justify-center text-6xl bg-orange-50 border-r border-white">👦🚂</div>
-                <div className="flex-1 flex items-center justify-center text-6xl bg-green-50">🧒🎨</div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
-                {/* Features */}
-                <div className="grid md:grid-cols-3 gap-6">
-                    <div className="border-2 border-[#1BA4D9] rounded-2xl p-6 flex flex-col items-center text-center">
-                        <div className="w-14 h-14 bg-[#1BA4D9] rounded-full flex items-center justify-center text-white mb-4">
-                            <span className="text-2xl font-bold">24</span>
-                        </div>
-                        <h4 className="font-bold text-[#1BA4D9] mb-1">Customer care</h4>
-                        <p className="text-slate-500 text-xs font-medium">We're here to help.</p>
-                    </div>
-                    <div className="border-2 border-[#f57c00] rounded-2xl p-6 flex flex-col items-center text-center bg-[#fff8f3]">
-                        <div className="w-14 h-14 border-2 border-[#f57c00] rounded-full flex items-center justify-center text-[#f57c00] mb-4">
-                            <span className="text-2xl">🚚</span>
-                        </div>
-                        <h4 className="font-bold text-[#f57c00] mb-1">Free shipping</h4>
-                        <p className="text-slate-500 text-xs font-medium">For all orders over ₹500.</p>
-                    </div>
-                    <div className="border-2 border-[#4CAF50] rounded-2xl p-6 flex flex-col items-center text-center bg-[#f2fcf3]">
-                        <div className="w-14 h-14 border-2 border-[#4CAF50] rounded-full flex items-center justify-center text-[#4CAF50] mb-4">
-                            <span className="text-2xl">♻️</span>
-                        </div>
-                        <h4 className="font-bold text-[#4CAF50] mb-1">Return</h4>
-                        <p className="text-slate-500 text-xs font-medium">Within 30 days.</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Newsletter */}
-            <div className="text-center max-w-xl mx-auto mb-24 px-4">
-                <h2 className="text-2xl font-black text-[#2c3e50] font-['Nunito'] mb-3">Newsletter</h2>
-                <p className="text-slate-500 text-sm mb-6 leading-relaxed">
-                    Get 15% off your first order! Plus, be the first to know about new arrivals, sales & exclusive offers!
+            <div className="text-center mb-8">
+                <h2 className="text-[34px] font-bold text-[#333333] mb-1" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Nunito", sans-serif' }}>
+                    Recent photoshoots
+                </h2>
+                <p className="text-[#666666] text-[17px] font-medium" style={{ fontFamily: '"Nunito", sans-serif' }}>
+                    Check gallery
                 </p>
-                <div className="flex gap-2 justify-center max-w-md mx-auto">
-                    <input 
-                        type="email" 
-                        placeholder="Enter your email" 
-                        className="flex-1 px-4 py-2.5 rounded-full border border-slate-300 focus:outline-none focus:border-[#1BA4D9] text-sm"
-                    />
-                    <button className="bg-[#1BA4D9] hover:bg-[#158ebf] text-white px-6 py-2.5 rounded-full font-bold text-sm transition-colors">
-                        Join
-                    </button>
-                </div>
             </div>
             
+            <div className="w-full overflow-hidden mb-24 max-w-[1600px] mx-auto px-4">
+                <div 
+                    className="flex transition-transform duration-1000 ease-in-out"
+                    style={{ transform: `translateX(-${galleryIndex * (window.innerWidth < 768 ? 50 : 25)}%)` }}
+                >
+                    {Array(100).fill(galleryImages).flat().map((src, idx) => (
+                        <div key={`gallery-item-${idx}`} className="w-1/2 md:w-1/4 shrink-0 px-2 aspect-square">
+                            <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+                                <img src={src} className="w-full h-full object-cover" alt={`Photoshoot ${idx + 1}`} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+                {/* Features */}
+                <div className="grid md:grid-cols-3 gap-6">
+                    {/* Customer Care */}
+                    <div className="rounded-[24px] bg-[#f4f9fd] py-8 px-4 flex flex-col items-center text-center transition-transform hover:-translate-y-1">
+                        <div className="mb-4">
+                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#2bb0e3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                <path d="M3 3v5h5" />
+                                <circle cx="12" cy="12" r="6" stroke="none" fill="#f4f9fd" />
+                                <text x="12" y="14.5" fontSize="6.5" fontWeight="bold" textAnchor="middle" stroke="none" fill="#2bb0e3">24</text>
+                            </svg>
+                        </div>
+                        <h4 className="font-semibold text-[#2bb0e3] text-[18px] mb-1">Customer care</h4>
+                        <p className="text-[#666666] text-[14px]">24h hour follow up</p>
+                    </div>
+
+                    {/* Free Ship */}
+                    <div className="rounded-[24px] bg-[#fffaf5] py-8 px-4 flex flex-col items-center text-center transition-transform hover:-translate-y-1">
+                        <div className="mb-4 relative">
+                            <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#f48624" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11" />
+                                <path d="M14 9h4l4 4v5c0 .6-.4 1-1 1h-2" />
+                                <circle cx="7" cy="18" r="2" />
+                                <circle cx="17" cy="18" r="2" />
+                                <text x="8.5" y="12" fontSize="3.5" fontWeight="bold" textAnchor="middle" stroke="none" fill="#f48624">FREE</text>
+                            </svg>
+                        </div>
+                        <h4 className="font-semibold text-[#f48624] text-[18px] mb-1">Free ship</h4>
+                        <p className="text-[#666666] text-[14px]">Free shipping for ₹150 and up</p>
+                    </div>
+
+                    {/* Return */}
+                    <div className="rounded-[24px] bg-[#f4fcf6] py-8 px-4 flex flex-col items-center text-center transition-transform hover:-translate-y-1">
+                        <div className="mb-4">
+                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#1abf52" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="7" r="4" />
+                                <path d="M12 4.5v5" />
+                                <path d="M10.5 5.5c0-1 3-1 3 0s-3 1-3 0" />
+                                <path d="M10.5 7.5c0 1 3 1 3 0" />
+                                <path d="M4 14c2-1 4-1 6 0l2 1c2 1 4 1 6 0l2-1" />
+                                <path d="M4 17c2-1 4-1 6 0l2 1c2 1 4 1 6 0l2-1" />
+                            </svg>
+                        </div>
+                        <h4 className="font-semibold text-[#1abf52] text-[18px] mb-1">Return</h4>
+                        <p className="text-[#666666] text-[14px]">Within 7 days</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     );
 };

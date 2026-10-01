@@ -1,85 +1,109 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Phone, Mail, MapPin } from 'lucide-react';
 
 const Contact = () => {
-    const navigate = useNavigate();
-
     return (
-        <div className="bg-slate-50 min-h-screen py-20 px-6">
-            <div className="max-w-6xl mx-auto">
-                <button onClick={() => navigate(-1)} className="mb-8 flex items-center text-blue-600 font-bold hover:text-blue-800 transition-colors">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                    Back
-                </button>
-                <div className="text-center mb-16">
-                    <span className="text-blue-600 font-bold uppercase tracking-widest text-sm mb-2 block">We'd love to hear from you</span>
-                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight font-['Nunito'] mb-6">Contact Us</h1>
-                    <p className="text-slate-500 text-lg max-w-2xl mx-auto">Have a question about a product, your order, or just want to say hi? Fill out the form below and our team will get back to you as soon as possible.</p>
+        <div className="max-w-[1200px] mx-auto px-4 py-10 font-['Outfit'] bg-white">
+            {/* Breadcrumb */}
+            <div className="text-[14px] mb-8 font-medium">
+                <span className="text-[#2e4053] font-bold">Home</span>
+                <span className="text-slate-400 mx-2">/</span>
+                <span className="text-[#1282a2]">Contact</span>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-3xl font-bold text-[#2e4053] mb-8" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                Contact
+            </h1>
+
+            {/* Three Info Boxes */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                <div className="border border-slate-200 rounded-xl p-8 flex flex-col items-center text-center justify-center min-h-[160px]">
+                    <Phone className="w-6 h-6 text-[#1282a2] mb-4" strokeWidth={1.5} />
+                    <h3 className="font-bold text-[#2e4053] text-[15px] mb-1">Phone number</h3>
+                    <p className="text-slate-600 text-[14px]">123-456-7868</p>
+                </div>
+                
+                <div className="border border-slate-200 rounded-xl p-8 flex flex-col items-center text-center justify-center min-h-[160px]">
+                    <Mail className="w-6 h-6 text-[#1282a2] mb-4" strokeWidth={1.5} />
+                    <h3 className="font-bold text-[#2e4053] text-[15px] mb-1">Email</h3>
+                    <p className="text-slate-600 text-[14px]">info@example.com</p>
+                </div>
+                
+                <div className="border border-slate-200 rounded-xl p-8 flex flex-col items-center text-center justify-center min-h-[160px]">
+                    <MapPin className="w-6 h-6 text-[#1282a2] mb-4" strokeWidth={1.5} />
+                    <h3 className="font-bold text-[#2e4053] text-[15px] mb-1">Address place</h3>
+                    <p className="text-slate-600 text-[14px]">1930 marigold lane, way<br/>Miami, Florida USA</p>
+                </div>
+            </div>
+
+            {/* Bottom Section: Map and Form */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+                
+                {/* Left: Map */}
+                <div className="h-[450px] rounded-lg overflow-hidden border border-slate-200 relative bg-slate-100">
+                    <iframe 
+                        title="Miami Location"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d114964.53925916665!2d-80.2994992026862!3d25.782390733064336!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9b0a20ec8c111%3A0xff96f271ddad4f65!2sMiami%2C%20FL!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" 
+                        width="100%" 
+                        height="100%" 
+                        style={{ border: 0 }} 
+                        allowFullScreen="" 
+                        loading="lazy" 
+                        referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-12 bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] p-4 md:p-8 border border-slate-100 overflow-hidden">
+                {/* Right: Contact Form */}
+                <div className="pt-4 lg:pt-0">
+                    <h2 className="text-2xl font-bold text-[#2e4053] mb-8" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                        Contact Us
+                    </h2>
                     
-                    {/* Contact Info */}
-                    <div className="bg-slate-900 text-white p-10 md:p-12 rounded-[2rem] lg:w-1/3 relative overflow-hidden flex flex-col">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-                        
-                        <div className="relative z-10 flex-1">
-                            <h3 className="text-2xl font-black mb-8 font-['Nunito']">Get in Touch</h3>
-                            
-                            <div className="space-y-8">
-                                <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center shrink-0">📍</div>
-                                    <div>
-                                        <h4 className="font-bold mb-1">Our Headquarters</h4>
-                                        <p className="text-slate-300 text-sm leading-relaxed">123 Toyland Avenue, Suite 400<br/>New York, NY 10001<br/>United States</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center shrink-0">📞</div>
-                                    <div>
-                                        <h4 className="font-bold mb-1">Phone Number</h4>
-                                        <p className="text-slate-300 text-sm leading-relaxed">+1 (555) 123-4567<br/>Mon-Fri, 9am - 6pm EST</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center shrink-0">✉️</div>
-                                    <div>
-                                        <h4 className="font-bold mb-1">Email Address</h4>
-                                        <p className="text-slate-300 text-sm leading-relaxed">support@appiflytoys.com<br/>We reply within 24 hours</p>
-                                    </div>
-                                </div>
-                            </div>
+                    <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                        <div>
+                            <input 
+                                type="text" 
+                                placeholder="Your name" 
+                                className="w-full border border-slate-300 rounded-xl px-5 py-3 text-[14px] text-[#2e4053] focus:outline-none focus:border-[#1282a2] placeholder-slate-400"
+                            />
                         </div>
-                    </div>
-
-                    {/* Contact Form */}
-                    <div className="p-4 md:p-8 lg:w-2/3">
-                        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-700">First Name</label>
-                                    <input type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="John" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-700">Last Name</label>
-                                    <input type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Doe" />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-slate-700">Email Address</label>
-                                <input type="email" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="john@example.com" />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-slate-700">Message</label>
-                                <textarea rows="5" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="How can we help you?"></textarea>
-                            </div>
-                            <button type="submit" className="bg-[#1D4ED8] hover:bg-[#a31521] text-white px-8 py-4 rounded-xl font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 w-full md:w-auto">
-                                Send Message
+                        
+                        <div>
+                            <input 
+                                type="text" 
+                                placeholder="Phone number" 
+                                className="w-full border border-slate-300 rounded-xl px-5 py-3 text-[14px] text-[#2e4053] focus:outline-none focus:border-[#1282a2] placeholder-slate-400"
+                            />
+                        </div>
+                        
+                        <div>
+                            <input 
+                                type="email" 
+                                placeholder="Email address" 
+                                className="w-full border border-slate-300 rounded-xl px-5 py-3 text-[14px] text-[#2e4053] focus:outline-none focus:border-[#1282a2] placeholder-slate-400"
+                            />
+                        </div>
+                        
+                        <div>
+                            <textarea 
+                                placeholder="Write your comment here..." 
+                                rows="5"
+                                className="w-full border border-slate-300 rounded-xl px-5 py-3 text-[14px] text-[#2e4053] focus:outline-none focus:border-[#1282a2] placeholder-slate-400 resize-none"
+                            ></textarea>
+                        </div>
+                        
+                        <div>
+                            <button 
+                                type="submit" 
+                                className="bg-[#1282a2] hover:bg-[#0f6c87] text-white font-medium text-[15px] px-8 py-2.5 rounded-xl transition-colors"
+                            >
+                                Send
                             </button>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
+
             </div>
         </div>
     );

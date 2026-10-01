@@ -12,7 +12,10 @@ import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import Login from './pages/Login';
 import Products from './pages/Products';
+import ProductDetails from './pages/ProductDetails';
 import Orders from './pages/Orders';
+import Waitlist from './pages/Waitlist';
+import Blog from './pages/Blog';
 
 // Footer Pages
 import Contact from './pages/Contact';
@@ -77,7 +80,10 @@ function App() {
           <Route element={<Layout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/waitlist" element={<Waitlist />} />
               <Route path="/products" element={<Products />} />
+              <Route path="/product/:id" element={<ProductDetails />} />
+              <Route path="/blog" element={<Blog />} />
               
               {/* Footer Links */}
               <Route path="/contact" element={<Contact />} />

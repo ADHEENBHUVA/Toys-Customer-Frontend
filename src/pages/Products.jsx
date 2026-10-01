@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import toast from 'react-hot-toast';
 
 const categoriesList = ['Action Figures', 'Dolls & Playsets', 'Educational', 'Puzzles', 'Board Games'];
 const ageList = ['0-18 months', '18-36 months', '3-5 years', '5-7 years', '7-9 years', '9-12 years', '12+ years'];
 
 const Products = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const { addToCart } = useCart();
+    const { addToCart, waitlistItems, toggleWaitlist } = useCart();
     
     // Read from URL
     const selectedCategories = searchParams.getAll('category');
@@ -20,6 +21,7 @@ const Products = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+    const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -127,184 +129,284 @@ const Products = () => {
     }
 
     return (
-        <div className="bg-slate-50/50 min-h-screen pt-10 pb-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white min-h-screen pt-6 pb-20 font-['Nunito']">
+            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
                 
-                {/* Page Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 md:mb-10 gap-4">
-                    <div>
-                        <h1 className="text-3xl md:text-5xl font-black text-slate-800 tracking-tight font-['Nunito'] mb-2 md:mb-3">
-                            {displayTitle}
-                        </h1>
-                        <p className="text-slate-500 font-medium text-sm md:text-lg">
-                            Explore our magical collection of premium toys.
-                        </p>
-                    </div>
-                    <div className="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto">
-                        <button 
-                            onClick={() => setIsMobileFilterOpen(true)}
-                            className="lg:hidden flex items-center gap-2 bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-4 py-2 hover:bg-slate-50 transition-colors shadow-sm"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12v2m0 4v2m0 4v2m-6-8v2m0 4v2m12-8v2m0 4v2M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-                            Filters
-                        </button>
-                        <div className="flex items-center gap-2 md:gap-3">
-                            <span className="hidden md:inline text-sm font-bold text-slate-400 uppercase tracking-wider">Sort By</span>
-                            <select 
-                                value={sortOrder}
-                                onChange={handleSortChange}
-                                className="bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-3 md:px-4 py-2 focus:ring-4 focus:ring-blue-100 focus:border-blue-300 outline-none transition-all shadow-sm"
-                            >
-                                <option value="recommended">Recommended</option>
-                                <option value="price-low">Price: Low to High</option>
-                                <option value="price-high">Price: High to Low</option>
-                                <option value="newest">Newest Arrivals</option>
-                            </select>
-                        </div>
-                    </div>
+                {/* Breadcrumbs */}
+                <div className="text-sm font-bold text-slate-800 mb-8 mt-4 flex items-center gap-2">
+                    <Link to="/" className="hover:text-[#118AB2]">Home</Link>
+                    <span className="text-slate-400">/</span>
+                    <span className="text-[#118AB2]">Products</span>
                 </div>
-
-                <div className="flex flex-col lg:flex-row gap-10">
+                <div className="flex flex-col lg:flex-row gap-8">
                     
-                    {/* Filters Sidebar (Desktop) */}
-                    <div className="hidden lg:block w-full lg:w-64 flex-shrink-0">
-                        <div className="bg-white p-6 rounded-[2rem] shadow-[0_15px_35px_rgba(0,0,0,0.03)] border border-slate-100 sticky top-28">
-                            <h3 className="text-xl font-black text-slate-800 font-['Nunito'] mb-6">Filters</h3>
-                            
-                            <div className="mb-8">
-                                <h4 className="font-bold text-slate-700 mb-4 uppercase tracking-wider text-xs">Categories</h4>
-                                <ul className="space-y-3">
-                                    {categoriesList.map(cat => {
-                                        const isSelected = selectedCategories.includes(cat);
-                                        return (
-                                            <li 
-                                                key={cat} 
-                                                onClick={() => handleCategoryClick(cat)}
-                                                className="flex items-center gap-3 group cursor-pointer"
-                                            >
-                                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${isSelected ? 'border-[#1D4ED8] bg-[#1D4ED8]' : 'border-slate-200 group-hover:border-[#1D4ED8]'}`}>
-                                                    {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>}
-                                                </div>
-                                                <span className={`font-semibold transition-colors text-sm ${isSelected ? 'text-slate-800' : 'text-slate-500 group-hover:text-slate-800'}`}>
-                                                    {cat}
-                                                </span>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </div>
+                    {/* Sidebar */}
+                    <div className="hidden lg:flex flex-col w-[280px] flex-shrink-0 gap-6">
+                        
+                        {/* Box 1: Product categories */}
+                        <div className="bg-white p-6 rounded-2xl border border-slate-200">
+                            <h3 className="text-[17px] font-black text-slate-800 font-['Nunito'] mb-4">Product categories</h3>
+                            <ul className="space-y-3">
+                                {categoriesList.map(cat => {
+                                    const isSelected = selectedCategories.includes(cat);
+                                    return (
+                                        <li 
+                                            key={cat} 
+                                            onClick={() => handleCategoryClick(cat)}
+                                            className="flex items-center gap-2 group cursor-pointer"
+                                        >
+                                            <span className={`text-slate-400 font-bold transition-colors ${isSelected ? 'text-[#118AB2]' : 'group-hover:text-[#118AB2]'}`}>+</span>
+                                            <span className={`font-bold transition-colors text-[14px] ${isSelected ? 'text-[#118AB2]' : 'text-slate-500 group-hover:text-slate-800'}`}>
+                                                {cat}
+                                            </span>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
 
-                            <div className="mb-8">
-                                <h4 className="font-bold text-slate-700 mb-4 uppercase tracking-wider text-xs">Age Groups</h4>
-                                <ul className="space-y-3">
-                                    {ageList.map(age => {
-                                        const isSelected = selectedAges.includes(age);
-                                        return (
-                                            <li 
-                                                key={age} 
-                                                onClick={() => handleAgeClick(age)}
-                                                className="flex items-center gap-3 group cursor-pointer"
-                                            >
-                                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${isSelected ? 'border-[#1D4ED8] bg-[#1D4ED8]' : 'border-slate-200 group-hover:border-[#1D4ED8]'}`}>
-                                                    {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>}
-                                                </div>
-                                                <span className={`font-semibold transition-colors text-sm ${isSelected ? 'text-slate-800' : 'text-slate-500 group-hover:text-slate-800'}`}>
-                                                    {age}
-                                                </span>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
+                        {/* Box 2: Filter by price */}
+                        <div className="bg-white p-6 rounded-2xl border border-slate-200">
+                            <h3 className="text-[17px] font-black text-slate-800 font-['Nunito'] mb-6">Filter by price</h3>
+                            <input 
+                                type="range" 
+                                min="0" 
+                                max="5000" 
+                                step="100"
+                                value={selectedMaxPrice}
+                                onChange={handlePriceChange}
+                                className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#118AB2]" 
+                            />
+                            <div className="flex justify-between mt-4 text-[13px] font-bold text-slate-500">
+                                <span>₹0</span>
+                                <span>₹{selectedMaxPrice === 5000 ? '5000+' : selectedMaxPrice}</span>
                             </div>
-
-                            <div className="mb-8">
-                                <h4 className="font-bold text-slate-700 mb-4 uppercase tracking-wider text-xs">Price Range</h4>
-                                <input 
-                                    type="range" 
-                                    min="0" 
-                                    max="5000" 
-                                    step="100"
-                                    value={selectedMaxPrice}
-                                    onChange={handlePriceChange}
-                                    className="w-full accent-[#1D4ED8]" 
-                                />
-                                <div className="flex justify-between mt-2 text-xs font-bold text-slate-400">
-                                    <span>₹0</span>
-                                    <span className="text-[#1D4ED8]">Up to ₹{selectedMaxPrice === 5000 ? '5000+' : selectedMaxPrice}</span>
-                                </div>
-                            </div>
-                            
                             <button 
-                                onClick={clearFilters}
-                                className="w-full bg-slate-100 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-200 transition-colors"
+                                className="mt-6 bg-[#118AB2] hover:bg-[#0b6b8a] text-white px-6 py-2 rounded-xl text-[14px] font-bold w-full transition-colors"
                             >
-                                Clear Filters
+                                Apply
                             </button>
                         </div>
-                    </div>
 
-                    {/* Products Grid */}
-                    <div className="flex-1">
-                        {loading ? (
-                            <div className="flex items-center justify-center h-64 w-full">
-                                <div className="w-16 h-16 border-4 border-slate-200 border-t-[#1D4ED8] rounded-full animate-spin"></div>
-                            </div>
-                        ) : filteredProducts.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
-                                {filteredProducts.map((product) => (
-                                    <div key={product._id} className="relative bg-white border border-slate-100/50 p-5 rounded-[2.5rem] shadow-sm hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] transition-all duration-500 group flex flex-col h-full hover:-translate-y-2 cursor-pointer">
-                                        <Link to={`/product/${product._id}`} className="block h-56 bg-gradient-to-br from-slate-50 to-slate-100 rounded-[2rem] mb-5 flex items-center justify-center relative overflow-hidden">
-                                            {product.newArrival && (
-                                                <div className="absolute top-4 left-4 bg-gradient-to-r from-[#1D4ED8] to-[#3B82F6] text-white text-[10px] font-black px-3 py-1.5 rounded-full z-10 shadow-lg tracking-widest">
-                                                    NEW
-                                                </div>
-                                            )}
-                                            {product.thumbnailImage || (product.images && product.images.length > 0) ? (
-                                                <img src={product.thumbnailImage || product.images[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
-                                            ) : (
-                                                <span className="text-6xl group-hover:scale-125 transition-transform duration-500 drop-shadow-md">
-                                                    🧸
-                                                </span>
-                                            )}
-                                            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                        </Link>
-                                        <div className="px-2 flex-1 flex flex-col">
-                                            <div className="mb-2 text-xs font-extrabold text-blue-400 uppercase tracking-widest truncate">
-                                                {product.category}
+                        {/* Box 3: Popular products */}
+                        <div className="bg-white p-6 rounded-2xl border border-slate-200">
+                            <h3 className="text-[17px] font-black text-slate-800 font-['Nunito'] mb-5">Popular products</h3>
+                            <div className="space-y-5">
+                                {allProducts.slice(0, 3).map((prod) => (
+                                    <div key={prod._id} className="flex gap-4">
+                                        <div className="w-16 h-16 bg-slate-50 rounded-lg flex-shrink-0 flex items-center justify-center p-2">
+                                            <img src={prod.thumbnailImage || (prod.images && prod.images[0])} alt={prod.name} className="w-full h-full object-contain" />
+                                        </div>
+                                        <div className="flex flex-col justify-center">
+                                            <h4 className="text-[14px] font-bold text-slate-700 leading-tight mb-1 line-clamp-2">{prod.name}</h4>
+                                            <span className="text-[14px] font-black text-slate-900">₹{prod.price.toFixed(2)}</span>
+                                            <div className="flex text-[#fbdf14] text-[10px] mt-0.5">
+                                                ★★★★★
                                             </div>
-                                            <Link to={`/product/${product._id}`}>
-                                                <h3 className="font-extrabold text-xl text-slate-800 leading-tight mb-3 group-hover:text-[#1D4ED8] transition-colors line-clamp-2 font-['Nunito']">
-                                                    {product.name}
-                                                </h3>
-                                            </Link>
-                                            <div className="mt-auto flex items-end justify-between mb-4">
-                                                <div className="flex items-baseline gap-2">
-                                                    <span className="text-2xl font-black text-slate-900">₹{product.price.toFixed(2)}</span>
-                                                    {product.compareAtPrice > product.price && (
-                                                        <span className="text-sm font-bold text-slate-400 line-through">₹{product.compareAtPrice.toFixed(2)}</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <button 
-                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
-                                                className="w-full bg-[#118AB2] text-white py-3 rounded-xl font-bold hover:bg-[#0b6b8a] transition-colors shadow-sm active:translate-y-1"
-                                            >
-                                                Add to Cart
-                                            </button>
                                         </div>
                                     </div>
                                 ))}
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content Area */}
+                    <div className="flex-1">
+                        
+                        {/* Top Bar */}
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+                            <h1 className="text-3xl font-black text-slate-800 tracking-tight font-['Nunito']">
+                                {displayTitle}
+                            </h1>
+                            <button 
+                                onClick={() => setIsMobileFilterOpen(true)}
+                                className="lg:hidden w-full md:w-auto bg-slate-100 text-slate-700 py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors"
+                            >
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                                Filters
+                            </button>
+                        </div>
+                        
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-slate-100 gap-4">
+                            <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+                                <div className="flex gap-2">
+                                    <button 
+                                        onClick={() => setViewMode('grid')}
+                                        className={`${viewMode === 'grid' ? 'text-[#118AB2]' : 'text-slate-300 hover:text-slate-500'} transition-colors`}
+                                    >
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+                                    </button>
+                                    <button 
+                                        onClick={() => setViewMode('list')}
+                                        className={`${viewMode === 'list' ? 'text-[#118AB2]' : 'text-slate-300 hover:text-slate-500'} transition-colors`}
+                                    >
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></svg>
+                                    </button>
+                                </div>
+                                <select 
+                                    value={sortOrder}
+                                    onChange={handleSortChange}
+                                    className="bg-transparent text-slate-600 text-sm font-bold outline-none cursor-pointer"
+                                >
+                                    <option value="recommended">Default sorting</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="newest">Newest</option>
+                                </select>
+                            </div>
+                            <div className="text-[13px] font-bold text-slate-500 text-center w-full sm:w-auto">
+                                Showing {filteredProducts.length} results
+                            </div>
+                        </div>
+
+                    {/* Products Grid */}
+                    <div>
+                        {loading ? (
+                            <div className="flex items-center justify-center h-64 w-full">
+                                <div className="w-16 h-16 border-4 border-slate-200 border-t-[#118AB2] rounded-full animate-spin"></div>
+                            </div>
+                        ) : filteredProducts.length > 0 ? (
+                            <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
+                                {filteredProducts.map((product) => (
+                                    viewMode === 'grid' ? (
+                                        // Grid View Card
+                                        <div key={product._id} className="bg-white border border-slate-200 rounded-3xl p-5 hover:shadow-xl transition-all duration-300 group flex flex-col relative">
+                                            <div className="absolute top-5 left-5 z-10">
+                                                {product.compareAtPrice > product.price && (
+                                                    <span className="bg-[#ff6b6b] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                                        SALE
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="absolute top-5 right-2 md:right-5 z-[9999] flex flex-col gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity pointer-events-auto">
+                                                <button 
+                                                    type="button"
+                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                                                    className={`w-9 h-9 shadow-md rounded-full flex items-center justify-center transition-colors border border-slate-100 cursor-pointer pointer-events-auto ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'bg-red-50 text-red-500' : 'bg-white text-slate-400 hover:text-red-500'}`}
+                                                >
+                                                    <svg className="pointer-events-none" width="18" height="18" fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                                </button>
+                                                <button 
+                                                    type="button"
+                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
+                                                    className="w-9 h-9 bg-white shadow-md rounded-full flex items-center justify-center text-slate-400 hover:text-[#118AB2] transition-colors border border-slate-100 cursor-pointer pointer-events-auto"
+                                                >
+                                                    <svg className="pointer-events-none" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                                </button>
+                                            </div>
+                                            
+                                            <Link to={`/product/${product._id}`} className="block h-52 mb-4 flex items-center justify-center relative z-0">
+                                                <img src={product.thumbnailImage || (product.images && product.images[0])} alt={product.name} className="w-[90%] h-[90%] object-contain group-hover:scale-110 transition-transform duration-500" />
+                                            </Link>
+                                            
+                                            <div className="flex-1 flex flex-col">
+                                                <Link to={`/product/${product._id}`}>
+                                                    <h3 className="font-bold text-[15px] text-slate-700 leading-tight mb-2 group-hover:text-[#118AB2] transition-colors">
+                                                        {product.name}
+                                                    </h3>
+                                                </Link>
+                                                
+                                                <div className="mt-auto flex items-baseline gap-2 mb-2">
+                                                    <span className="text-[15px] font-black text-[#22c55e]">₹{product.price.toFixed(2)}</span>
+                                                    {product.compareAtPrice > product.price && (
+                                                        <span className="text-[13px] font-bold text-slate-400 line-through">₹{product.compareAtPrice.toFixed(2)}</span>
+                                                    )}
+                                                </div>
+                                                
+                                                <div className="flex text-[#fbdf14] text-[12px] tracking-widest">
+                                                    ★★★★★
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // List View Card
+                                        <div key={product._id} className="flex flex-col sm:flex-row gap-8 bg-transparent">
+                                            {/* Image side */}
+                                            <div className="relative w-full sm:w-[280px] h-[280px] border border-slate-200 rounded-3xl bg-white p-4 flex items-center justify-center flex-shrink-0 group">
+                                                <div className="absolute top-4 left-4 z-10">
+                                                    {product.compareAtPrice > product.price && (
+                                                        <span className="bg-[#ff6b6b] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                                            SALE
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <Link to={`/product/${product._id}`} className="block w-full h-full flex items-center justify-center">
+                                                    <img src={product.thumbnailImage || (product.images && product.images[0])} alt={product.name} className="w-[90%] h-[90%] object-contain group-hover:scale-105 transition-transform duration-500" />
+                                                </Link>
+                                            </div>
+                                            
+                                            {/* Content side */}
+                                            <div className="flex-1 flex flex-col justify-center py-2">
+                                                <Link to={`/product/${product._id}`}>
+                                                    <h3 className="font-black text-[18px] text-slate-800 leading-tight mb-3 hover:text-[#118AB2] transition-colors font-['Nunito']">
+                                                        {product.name}
+                                                    </h3>
+                                                </Link>
+                                                
+                                                <p className="text-[14px] text-slate-500 leading-relaxed mb-4 max-w-2xl font-semibold">
+                                                    {product.description ? (product.description.length > 150 ? product.description.substring(0, 150) + '...' : product.description) : "Duis ultricies lacus sed turpis tincidunt id aliquet risus feugiat in ante metus dictum at tempor commodo ullamcorper a lacus"}
+                                                </p>
+                                                
+                                                <div className="flex items-baseline gap-2 mb-2">
+                                                    <span className="text-[16px] font-black text-[#22c55e]">₹{product.price.toFixed(2)}</span>
+                                                    {product.compareAtPrice > product.price && (
+                                                        <span className="text-[14px] font-bold text-slate-400 line-through">₹{product.compareAtPrice.toFixed(2)}</span>
+                                                    )}
+                                                </div>
+                                                
+                                                <div className="flex text-[#fbdf14] text-[13px] tracking-widest mb-6">
+                                                    ★★★★★
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-3">
+                                                    <button 
+                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
+                                                        className="flex items-center gap-2 bg-[#118AB2] hover:bg-[#0b6b8a] text-white px-6 py-2.5 rounded-full text-[14px] font-bold transition-colors"
+                                                    >
+                                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                                        Add to cart
+                                                    </button>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                                                        className={`w-[42px] h-[42px] rounded-full border border-slate-200 flex items-center justify-center transition-colors cursor-pointer ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'bg-red-50 text-red-500 border-red-500' : 'bg-white text-slate-400 hover:border-red-500 hover:text-red-500'}`}
+                                                    >
+                                                        <svg className="pointer-events-none" width="18" height="18" fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                                    </button>
+                                                    <button className="w-[42px] h-[42px] rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:border-[#118AB2] hover:text-[#118AB2] transition-colors">
+                                                        <svg className="pointer-events-none" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                ))}
+                            </div>
                         ) : (
-                            <div className="w-full h-64 bg-white rounded-[2.5rem] border border-dashed border-slate-300 flex flex-col items-center justify-center text-center p-8">
+                            <div className="w-full h-64 bg-white rounded-3xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-center p-8">
                                 <span className="text-6xl mb-4 grayscale opacity-50">😢</span>
                                 <h3 className="text-2xl font-black text-slate-700 mb-2 font-['Nunito']">No Toys Found</h3>
                                 <p className="text-slate-500 font-medium">Try adjusting your filters to find the perfect toy.</p>
-                                <button onClick={clearFilters} className="mt-6 text-[#1D4ED8] font-bold hover:underline">Clear all filters</button>
+                                <button onClick={clearFilters} className="mt-6 text-[#118AB2] font-bold hover:underline">Clear all filters</button>
+                            </div>
+                        )}
+                        {/* Pagination */}
+                        {filteredProducts.length > 0 && (
+                            <div className="flex justify-center items-center gap-2 mt-12">
+                                <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#118AB2] transition-colors">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
+                                </button>
+                                <button className="w-10 h-10 rounded-full bg-[#118AB2] text-white font-bold flex items-center justify-center">1</button>
+                                <button className="w-10 h-10 rounded-full border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors flex items-center justify-center">2</button>
+                                <button className="w-10 h-10 rounded-full border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors flex items-center justify-center">3</button>
+                                <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#118AB2] transition-colors">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
                             </div>
                         )}
                     </div>
                 </div>
+            </div>
             </div>
 
             {/* Mobile Filters Drawer */}

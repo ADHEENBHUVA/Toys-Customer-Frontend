@@ -4,6 +4,15 @@ import confetti from 'canvas-confetti';
 
 const OrderSuccess = () => {
     useEffect(() => {
+        // Play success sound
+        try {
+            const audio = new Audio('/success.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log('Audio autoplay blocked', e));
+        } catch (e) {
+            console.log('Audio playback error', e);
+        }
+
         // Trigger confetti on mount
         const duration = 3 * 1000;
         const end = Date.now() + duration;
