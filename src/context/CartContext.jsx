@@ -27,6 +27,10 @@ export const CartProvider = ({ children }) => {
         freeShippingMinItems: 0
     });
 
+    const [websiteSettings, setWebsiteSettings] = useState({
+        discountDisplayType: 'amount'
+    });
+
     useEffect(() => {
         localStorage.setItem('magic_toys_cart', JSON.stringify(cartItems));
     }, [cartItems]);
@@ -47,7 +51,19 @@ export const CartProvider = ({ children }) => {
                 console.error("Error fetching shipping settings:", err);
             }
         };
+        const fetchWebsiteSettings = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/settings`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if(data) setWebsiteSettings(data);
+                }
+            } catch (err) {
+                console.error("Error fetching website settings:", err);
+            }
+        };
         fetchShippingSettings();
+        fetchWebsiteSettings();
     }, []);
 
     const calculateShipping = () => {
@@ -147,7 +163,8 @@ export const CartProvider = ({ children }) => {
             calculateShipping,
             waitlistItems,
             toggleWaitlist,
-            getWaitlistCount
+            getWaitlistCount,
+            websiteSettings
         }}>
             {children}
         </CartContext.Provider>

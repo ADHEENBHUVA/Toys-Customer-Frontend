@@ -13,7 +13,7 @@ const Terms = () => {
                 </button>
                 <div className="mb-12 text-center">
                     <span className="text-blue-600 font-bold uppercase tracking-widest text-sm mb-2 block">Legal Information</span>
-                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight font-['Nunito']">Terms of Service</h1>
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight font-['Nunito'] font-serif">Terms of Service</h1>
                 </div>
                 <div className="prose prose-slate max-w-none prose-headings:font-black prose-headings:font-['Nunito'] prose-a:text-blue-600 hover:prose-a:text-blue-500">
                     <p className="text-lg text-slate-500 mb-8 font-medium">Last updated: {new Date().toLocaleDateString()}</p>

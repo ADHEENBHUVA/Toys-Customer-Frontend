@@ -13,7 +13,7 @@ const Shipping = () => {
                 </button>
                 <div className="mb-12 text-center">
                     <span className="text-blue-600 font-bold uppercase tracking-widest text-sm mb-2 block">Customer Support</span>
-                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight font-['Nunito']">Shipping & Delivery</h1>
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight font-['Nunito'] font-serif">Shipping & Delivery</h1>
                 </div>
                 <div className="prose prose-slate max-w-none prose-headings:font-black prose-headings:font-['Nunito']">
                     <h3>Free Shipping Eligibility</h3>

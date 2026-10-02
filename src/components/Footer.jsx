@@ -1,137 +1,211 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const Footer = () => {
-    const [socialLinks, setSocialLinks] = useState(null);
+    const [email, setEmail] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [topCategories, setTopCategories] = useState([]);
 
     useEffect(() => {
-        const fetchSettings = async () => {
+        const fetchTopCategories = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/settings`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setSocialLinks(data.socialLinks);
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+                const response = await fetch(`${apiUrl}/categories/top`);
+                const result = await response.json();
+                if (result.success && result.data) {
+                    setTopCategories(result.data);
                 }
-            } catch (err) {
-                console.error('Failed to fetch settings', err);
+            } catch (error) {
+                console.error('Error fetching top categories:', error);
             }
         };
-        fetchSettings();
+        fetchTopCategories();
     }, []);
 
-    const socialIcons = {
-        twitter: (
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg>
-        ),
-        facebook: (
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" /></svg>
-        ),
-        instagram: (
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" /></svg>
-        ),
-        youtube: (
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 01-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 01-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 011.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418zM15.194 12L10 15V9l5.194 3z" clipRule="evenodd" /></svg>
-        ),
+    const handleSubscribe = async (e) => {
+        e.preventDefault();
+        if (!email) {
+            toast.error('Please enter your email address');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+            const response = await fetch(`${apiUrl}/subscribers`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                toast.success('Successfully subscribed to newsletter!');
+                setEmail('');
+            } else {
+                toast.error(data.message || 'Subscription failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error subscribing:', error);
+            toast.error('An error occurred. Please try again later.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <footer 
-            className="w-full text-slate-800 font-['Outfit'] relative pt-12 pb-6 overflow-hidden" 
-            style={{ 
-                background: 'linear-gradient(-45deg, #cde6de, #f6e9c4, #e8f3ef, #fbf5e1)',
-                backgroundSize: '400% 400%',
-                animation: 'gradientBg 12s ease infinite'
-            }}
-        >
-            {/* Subtle floating circles for extra animation */}
-            <div className="absolute top-10 left-10 w-32 h-32 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-10 right-20 w-48 h-48 bg-[#1BA4D9]/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <footer className="w-full bg-[#fcfaf7] border-t border-[#f3eee7] font-sans text-[#5e504f]">
+            {/* Integrated Full-Width Newsletter Section */}
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-12 pb-8">
+                <div className="bg-[#fef4ea] rounded-[2rem] p-8 md:p-12 lg:p-16 relative overflow-hidden flex flex-col md:flex-row items-center justify-between border border-[#fae5d3] shadow-sm">
+                    {/* Decorative Background Elements */}
+                    <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                        <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full opacity-40 blur-2xl"></div>
+                        <div className="absolute -bottom-10 -right-10 w-60 h-60 bg-[#e6a27a] rounded-full opacity-10 blur-3xl"></div>
 
-            {/* Newsletter inside Footer */}
-            <div className="pt-8 pb-8 relative z-10 mb-8">
-                <div className="max-w-7xl mx-auto px-4 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-8">
-                    <div className="text-left max-w-lg">
-                        <h2 className="text-[34px] font-bold text-[#2c3e50] mb-2" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Nunito", sans-serif' }}>Newsletter</h2>
-                        <p className="text-slate-600 text-sm md:text-base leading-relaxed font-medium" style={{ fontFamily: '"Nunito", sans-serif' }}>
-                            Get 15% off your first order! Plus, be the first to know about new arrivals, sales & exclusive offers!
+                        {/* Cute aesthetic clouds positioned dynamically */}
+                        <div className="absolute top-10 right-20 w-16 h-8 bg-white/60 rounded-full hidden md:block"></div>
+                        <div className="absolute top-6 right-28 w-10 h-10 bg-white/60 rounded-full hidden md:block"></div>
+
+                        <div className="absolute bottom-10 right-40 w-24 h-10 bg-white/60 rounded-full hidden md:block"></div>
+                        <div className="absolute bottom-6 right-48 w-12 h-12 bg-white/60 rounded-full hidden md:block"></div>
+                        <div className="absolute bottom-12 right-36 w-12 h-12 bg-[#f8d070]/40 rounded-full hidden md:block"></div>
+                    </div>
+
+                    <div className="relative z-10 w-full md:w-1/2 mb-8 md:mb-0">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#e6a27a] shadow-sm">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                            </div>
+                            <h3 className="text-[26px] md:text-[30px] font-serif text-[#3d3130]">Join Our Little Joys Family</h3>
+                        </div>
+                        <p className="text-[#8b7e7c] text-[15px] max-w-[400px]">
+                            Get special offers, new arrivals, and parenting tips straight to your inbox.
                         </p>
                     </div>
-                    <div className="flex gap-3 w-full lg:w-auto flex-1 max-w-[500px] relative">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                        </div>
-                        <input 
-                            type="email" 
-                            placeholder="Enter your email address..." 
-                            className="flex-1 pl-12 pr-5 py-3.5 rounded-full border-2 border-white bg-white/60 focus:bg-white focus:outline-none focus:border-[#1BA4D9] focus:ring-4 focus:ring-[#1BA4D9]/20 text-sm md:text-base text-slate-700 placeholder-slate-500 transition-all shadow-sm"
-                        />
-                        <button className="bg-[#1BA4D9] hover:bg-[#158ebf] hover:-translate-y-0.5 active:translate-y-0 text-white px-8 py-3.5 rounded-full font-bold text-sm md:text-base transition-all shadow-md whitespace-nowrap">
-                            Subscribe
-                        </button>
+
+                    <div className="relative z-10 w-full md:w-1/2 flex md:justify-end">
+                        <form onSubmit={handleSubscribe} className="flex w-full max-w-[450px] bg-white rounded-full p-1.5 shadow-sm border border-[#f3eee7] focus-within:border-[#e6a27a] focus-within:ring-2 focus-within:ring-[#e6a27a]/20 transition-all overflow-hidden">
+                            <input 
+                                type="email" 
+                                placeholder="Enter your email address" 
+                                className="flex-1 bg-transparent px-5 py-3 text-[15px] text-[#3d3130] outline-none rounded-l-full" 
+                                style={{ WebkitBoxShadow: '0 0 0 50px white inset' }}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={isLoading}
+                                required
+                            />
+                            <button 
+                                type="submit" 
+                                disabled={isLoading}
+                                className="bg-[#93b38c] hover:bg-[#7a9a73] text-white font-semibold text-[15px] px-8 py-3 rounded-full transition-colors whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? 'Subscribing...' : 'Subscribe'}
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 md:px-12 flex flex-col lg:flex-row justify-between gap-10 relative z-10">
-                {/* Left Column - Brand & Social */}
-                <div className="flex flex-col gap-5 max-w-sm">
-                    <Link to="/" className="flex items-center gap-2 group">
-                        <div className="w-10 h-10 flex items-center justify-center font-black text-[#f57c00] border-l-4 border-[#f57c00] text-3xl">R</div>
-                        <div className="flex flex-col text-sm md:text-base font-black leading-none tracking-tight">
-                            <span className="text-[#1BA4D9]">rainbow</span>
-                            <span className="text-slate-600">rattles</span>
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6 pb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12 pt-8 border-t border-[#f3eee7]">
+
+                    {/* Brand Col */}
+                    <div className="lg:col-span-1">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 rounded-full border-2 border-[#e6a27a] flex items-center justify-center text-[#e6a27a]">
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>
+                            </div>
+                            <div className="flex flex-col leading-none">
+                                <span className="text-[18px] font-serif font-bold text-[#3d3130]">Little Joys</span>
+                                <span className="text-[9px] text-[#8b7e7c] tracking-wider">KIDS & BABY STORE</span>
+                            </div>
                         </div>
-                    </Link>
-                    <p className="text-[14px] font-medium text-slate-600 leading-relaxed">
-                        Free and standard shipping on all orders over ₹50. Discover the best toys for your little ones!
-                    </p>
-                    
-                    <div className="flex gap-4 mt-2">
-                        {socialLinks && Object.entries(socialLinks).map(([platform, url]) => {
-                            if (!url) return null;
-                            return (
-                                <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white hover:bg-[#1BA4D9] text-[#1BA4D9] hover:text-white flex items-center justify-center transition-all shadow-sm hover:shadow-md hover:-translate-y-1">
-                                    {socialIcons[platform]}
-                                </a>
-                            );
-                        })}
-                        {/* Fallback icons if no DB links yet */}
-                        {!socialLinks && (
-                            <>
-                                <a href="#" className="w-10 h-10 rounded-full bg-white hover:bg-[#1BA4D9] text-[#1BA4D9] hover:text-white flex items-center justify-center transition-all shadow-sm hover:shadow-md hover:-translate-y-1"><span className="font-bold text-xs">FB</span></a>
-                                <a href="#" className="w-10 h-10 rounded-full bg-white hover:bg-[#1BA4D9] text-[#1BA4D9] hover:text-white flex items-center justify-center transition-all shadow-sm hover:shadow-md hover:-translate-y-1"><span className="font-bold text-xs">IG</span></a>
-                                <a href="#" className="w-10 h-10 rounded-full bg-white hover:bg-[#1BA4D9] text-[#1BA4D9] hover:text-white flex items-center justify-center transition-all shadow-sm hover:shadow-md hover:-translate-y-1"><span className="font-bold text-xs">TW</span></a>
-                            </>
-                        )}
+                        <p className="text-[13px] leading-relaxed mb-6">
+                            Thoughtfully chosen baby and kids products for every little adventure.
+                        </p>
+                        <div className="flex gap-4 text-[#3d3130]">
+                            <a href="#" className="hover:text-[#e6a27a] transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg></a>
+                            <a href="#" className="hover:text-[#e6a27a] transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg></a>
+                            <a href="#" className="hover:text-[#e6a27a] transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" /></svg></a>
+                        </div>
+                    </div>
+
+                    {/* Links Cols */}
+                    <div>
+                        <h4 className="font-bold text-[#3d3130] text-[15px] mb-5">Shop</h4>
+                        <ul className="space-y-3 text-[13px]">
+                            <li><Link to="/products" className="hover:text-[#e6a27a] transition-colors">All Products</Link></li>
+                            <li><Link to="/products?filter=new-arrivals" className="hover:text-[#e6a27a] transition-colors">New Arrivals</Link></li>
+                            <li><Link to="/products?search=best" className="hover:text-[#e6a27a] transition-colors">Best Sellers</Link></li>
+                            <li><Link to="/products?search=sale" className="hover:text-[#e6a27a] transition-colors">Sale</Link></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="font-bold text-[#3d3130] text-[15px] mb-5">Categories</h4>
+                        <ul className="space-y-3 text-[13px]">
+                            {topCategories.length > 0 ? (
+                                topCategories.map((category) => (
+                                    <li key={category._id}>
+                                        <Link to={`/products?category=${encodeURIComponent(category.name)}`} className="hover:text-[#e6a27a] transition-colors">
+                                            {category.name}
+                                        </Link>
+                                    </li>
+                                ))
+                            ) : (
+                                <>
+                                    <li><Link to="/products" className="hover:text-[#e6a27a] transition-colors">Nursery</Link></li>
+                                    <li><Link to="/products" className="hover:text-[#e6a27a] transition-colors">Toys & Games</Link></li>
+                                    <li><Link to="/products" className="hover:text-[#e6a27a] transition-colors">Feeding</Link></li>
+                                    <li><Link to="/products" className="hover:text-[#e6a27a] transition-colors">Clothing</Link></li>
+                                </>
+                            )}
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="font-bold text-[#3d3130] text-[15px] mb-5">Customer Care</h4>
+                        <ul className="space-y-3 text-[13px]">
+                            <li><Link to="/shipping" className="hover:text-[#e6a27a] transition-colors">Shipping & Delivery</Link></li>
+                            <li><Link to="/returns" className="hover:text-[#e6a27a] transition-colors">Returns & Exchanges</Link></li>
+                            <li><Link to="/faq" className="hover:text-[#e6a27a] transition-colors">FAQ</Link></li>
+                            <li><Link to="/contact" className="hover:text-[#e6a27a] transition-colors">Contact Us</Link></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="font-bold text-[#3d3130] text-[15px] mb-5">Contact Us</h4>
+                        <ul className="space-y-4 text-[13px]">
+                            <li className="flex gap-3 items-start">
+                                <svg className="w-4 h-4 mt-0.5 text-[#e6a27a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                                <span>(512) 555-0198</span>
+                            </li>
+                            <li className="flex gap-3 items-start">
+                                <svg className="w-4 h-4 mt-0.5 text-[#e6a27a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                                <span>hello@littlejoys.com</span>
+                            </li>
+                            <li className="flex gap-3 items-start">
+                                <svg className="w-4 h-4 mt-0.5 text-[#e6a27a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                                <span>123 Happy Lane,<br />Austin, TX 78701</span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
-                {/* Center Columns - Links */}
-                <div className="flex gap-16 md:gap-24 flex-wrap">
-                    <div className="flex flex-col gap-4">
-                        <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[13px] mb-1 opacity-60">My account</h4>
-                        <Link to="/orders" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Track my order</Link>
-                        <Link to="/terms" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Terms of use</Link>
-                        <Link to="/privacy" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Privacy</Link>
-                        <Link to="/contact" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Submit feedback</Link>
+                {/* Bottom */}
+                <div className="border-t border-[#f3eee7] pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[12px]">
+                    <p>© 2026 Little Joys. All rights reserved.</p>
+                    <div className="flex gap-6">
+                        <Link to="/privacy" className="hover:text-[#e6a27a] transition-colors">Privacy Policy</Link>
+                        <Link to="/terms" className="hover:text-[#e6a27a] transition-colors">Terms of Service</Link>
+                        <Link to="/refund" className="hover:text-[#e6a27a] transition-colors">Refund Policy</Link>
                     </div>
-                    <div className="flex flex-col gap-4">
-                        <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[13px] mb-1 opacity-60">Customer center</h4>
-                        <Link to="/delivery" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Delivery & shipping</Link>
-                        <Link to="/faq" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>FAQs & Returns</Link>
-                        <Link to="/contact" className="text-[15px] font-semibold text-slate-700 hover:text-[#1BA4D9] flex items-center gap-2 group transition-colors"><span className="w-0 overflow-hidden group-hover:w-3 text-[#1BA4D9] transition-all">✦</span>Company details</Link>
-                        <a href="mailto:hello@rainbowrattles.com" className="text-[15px] font-bold text-[#1BA4D9] hover:text-[#158ebf] mt-1 flex items-center gap-2 transition-colors">hello@rainbowrattles.com</a>
-                    </div>
-                </div>
-            </div>
-
-            {/* Copyright Bar */}
-            <div className="relative z-10 mt-10 pt-6 px-4 flex flex-col md:flex-row justify-between items-center gap-4 max-w-7xl mx-auto opacity-70">
-                <p className="text-[13px] font-semibold text-slate-700">© 2026 Rainbow Rattles. All rights reserved.</p>
-                <div className="flex gap-6">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4 opacity-70" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-4 opacity-70" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 opacity-70" />
                 </div>
             </div>
         </footer>

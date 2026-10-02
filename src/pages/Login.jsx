@@ -96,59 +96,61 @@ const LoginContent = () => {
     };
 
     return (
-        <div className="h-screen w-full flex bg-slate-50 font-sans relative overflow-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="h-screen w-full flex bg-[#fcfaf7] font-sans relative overflow-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             
             {/* Left Side - Hero Image (Hidden on mobile) */}
-            <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 overflow-hidden bg-slate-900">
+            <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 overflow-hidden bg-[#3d3130]">
                 {/* A vibrant toy image */}
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1599623560574-39d485900c95?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-90"></div>
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1599623560574-39d485900c95?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-70"></div>
                 {/* Subtle gradient just to make text readable */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/30 to-slate-900/10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#3d3130] via-[#3d3130]/40 to-transparent"></div>
                 
                 <div className="relative z-10 flex items-center gap-3">
-                    <div className="w-12 h-12 bg-white rounded-xl shadow-xl flex items-center justify-center p-2 transform -rotate-3 hover:rotate-0 transition-transform">
-                        <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                    <div className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center text-white bg-[#e6a27a]/40 backdrop-blur-sm shadow-xl transform -rotate-3 hover:rotate-0 transition-transform">
+                        <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
                     </div>
-                    <span className="text-2xl font-black text-white tracking-tight">MagicToys.</span>
+                    <div className="flex flex-col leading-none">
+                        <span className="text-3xl font-serif font-bold text-white tracking-tight">Little Joys</span>
+                    </div>
                 </div>
 
                 <div className="relative z-10 mb-10">
-                    <h1 className="text-5xl font-black text-white leading-tight mb-4 drop-shadow-md">
+                    <h1 className="text-5xl font-black text-white leading-tight mb-4 drop-shadow-md font-serif">
                         Discover the magic <br/>of playtime.
                     </h1>
-                    <p className="text-slate-200 text-lg font-medium max-w-md drop-shadow-sm">
+                    <p className="text-white/90 text-lg font-medium max-w-md drop-shadow-sm">
                         Join thousands of happy families and explore our curated collection of premium toys, games, and educational wonders.
                     </p>
                 </div>
             </div>
 
             {/* Right Side - Login Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative bg-white overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative bg-[#fcfaf7] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-amber-100 rounded-full blur-[100px] opacity-60 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-72 h-72 bg-rose-100 rounded-full blur-[80px] opacity-60 translate-y-1/2 -translate-x-1/4 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-96 h-96 bg-[#e6a27a]/20 rounded-full blur-[100px] opacity-60 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-72 h-72 bg-rose-100/50 rounded-full blur-[80px] opacity-60 translate-y-1/2 -translate-x-1/4 pointer-events-none"></div>
 
                 <div className="w-full max-w-md relative z-10">
                     
                     {/* Mobile Logo */}
                     <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
-                        <div className="w-12 h-12 bg-white rounded-xl shadow-lg border border-slate-100 flex items-center justify-center p-2">
-                            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                        <div className="w-12 h-12 rounded-full border-2 border-[#e6a27a] flex items-center justify-center text-[#e6a27a] bg-white shadow-lg">
+                            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
                         </div>
-                        <span className="text-2xl font-black text-slate-800 tracking-tight">MagicToys.</span>
+                        <span className="text-3xl font-serif font-bold text-[#3d3130] tracking-tight">Little Joys</span>
                     </div>
 
-                    <div className="bg-white/80 backdrop-blur-xl p-8 sm:p-10 rounded-[2rem] shadow-[0_20px_40px_rgb(0,0,0,0.04)] border border-white relative">
+                    <div className="bg-white/80 backdrop-blur-xl p-8 sm:p-10 rounded-[2rem] shadow-[0_20px_40px_rgb(0,0,0,0.03)] border border-white relative">
                         <div className="mb-8 text-center lg:text-left">
-                            <h2 className="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Welcome back</h2>
-                            <p className="text-slate-500 font-medium">Please enter your details to sign in.</p>
+                            <h2 className="text-3xl font-extrabold text-[#3d3130] mb-2 tracking-tight font-serif">Welcome back</h2>
+                            <p className="text-[#5e504f] font-medium">Please enter your details to sign in.</p>
                         </div>
 
                         <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Email Address</label>
+                                <label className="block text-xs font-bold text-[#8b7e7c] uppercase tracking-wider mb-2 ml-1">Email Address</label>
                                 <div className="relative group">
-                                    <div className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                                    <div className="absolute top-1/2 -translate-y-1/2 left-4 text-[#8b7e7c] group-focus-within:text-[#e6a27a] transition-colors">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" /></svg>
                                     </div>
                                     <input
@@ -156,15 +158,15 @@ const LoginContent = () => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="hello@example.com"
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-slate-900 font-bold text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all hover:bg-slate-50"
+                                        className="w-full bg-white border border-[#f0e8e6] rounded-2xl pl-12 pr-4 py-3.5 text-[#3d3130] font-bold text-sm placeholder-[#8b7e7c]/50 focus:outline-none focus:border-[#e6a27a] focus:ring-4 focus:ring-[#e6a27a]/10 transition-all hover:border-[#e6a27a]/50"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Password</label>
+                                <label className="block text-xs font-bold text-[#8b7e7c] uppercase tracking-wider mb-2 ml-1">Password</label>
                                 <div className="relative group">
-                                    <div className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                                    <div className="absolute top-1/2 -translate-y-1/2 left-4 text-[#8b7e7c] group-focus-within:text-[#e6a27a] transition-colors">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7z" /></svg>
                                     </div>
                                     <input
@@ -172,36 +174,36 @@ const LoginContent = () => {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-slate-900 font-bold text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all hover:bg-slate-50"
+                                        className="w-full bg-white border border-[#f0e8e6] rounded-2xl pl-12 pr-4 py-3.5 text-[#3d3130] font-bold text-sm placeholder-[#8b7e7c]/50 focus:outline-none focus:border-[#e6a27a] focus:ring-4 focus:ring-[#e6a27a]/10 transition-all hover:border-[#e6a27a]/50"
                                     />
                                 </div>
                             </div>
 
                             <div className="flex items-center justify-between mt-2">
                                 <label className="flex items-center gap-2.5 cursor-pointer group">
-                                    <div className="w-4 h-4 rounded border-2 border-slate-300 bg-white group-hover:border-blue-500 transition-colors flex items-center justify-center">
+                                    <div className="w-4 h-4 rounded border-2 border-[#f0e8e6] bg-white group-hover:border-[#e6a27a] transition-colors flex items-center justify-center">
                                     </div>
-                                    <span className="text-slate-500 font-medium text-sm group-hover:text-slate-800 transition-colors">Remember me</span>
+                                    <span className="text-[#8b7e7c] font-medium text-sm group-hover:text-[#5e504f] transition-colors">Remember me</span>
                                 </label>
-                                <a href="#" onClick={(e) => { e.preventDefault(); toast.error("Password reset functionality coming soon."); }} className="font-bold text-blue-600 text-sm hover:text-blue-700 transition-colors">Forgot password?</a>
+                                <a href="#" onClick={(e) => { e.preventDefault(); toast.error("Password reset functionality coming soon."); }} className="font-bold text-[#e6a27a] text-sm hover:text-[#d8936c] transition-colors">Forgot password?</a>
                             </div>
 
-                            <button type="submit" className="w-full mt-4 bg-slate-900 hover:bg-blue-600 text-white font-extrabold text-sm py-4 rounded-2xl shadow-xl shadow-slate-900/20 active:scale-[0.98] transition-all flex justify-center items-center gap-2 group">
+                            <button type="submit" className="w-full mt-4 bg-[#3d3130] hover:bg-[#e6a27a] text-white font-extrabold text-sm py-4 rounded-2xl shadow-xl shadow-[#e6a27a]/10 active:scale-[0.98] transition-all flex justify-center items-center gap-2 group">
                                 Sign In
                                 <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                             </button>
                         </form>
 
                         <div className="mt-8 relative flex items-center justify-center">
-                            <div className="absolute inset-x-0 h-px bg-slate-200"></div>
-                            <span className="relative bg-white px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Or continue with</span>
+                            <div className="absolute inset-x-0 h-px bg-[#f0e8e6]"></div>
+                            <span className="relative bg-white px-4 text-xs font-bold text-[#8b7e7c] uppercase tracking-wider">Or continue with</span>
                         </div>
 
                         <div className="mt-8 grid grid-cols-2 gap-4">
                             <button 
                                 type="button" 
                                 onClick={() => handleSocialLogin('Google')} 
-                                className="flex items-center justify-center gap-2 h-12 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+                                className="flex items-center justify-center gap-2 h-12 rounded-xl bg-white border border-[#f0e8e6] text-[#5e504f] hover:bg-[#fcfaf7] hover:border-[#e6a27a]/50 transition-all shadow-sm active:scale-95"
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -215,7 +217,7 @@ const LoginContent = () => {
                             <button 
                                 type="button" 
                                 onClick={() => handleSocialLogin('Apple')} 
-                                className="flex items-center justify-center gap-2 h-12 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+                                className="flex items-center justify-center gap-2 h-12 rounded-xl bg-white border border-[#f0e8e6] text-[#5e504f] hover:bg-[#fcfaf7] hover:border-[#e6a27a]/50 transition-all shadow-sm active:scale-95"
                             >
                                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.04 2.26-.82 3.59-.83 1.48-.05 2.76.65 3.53 1.83-3.11 1.76-2.58 5.75.52 7-1.12 1.63-2.14 3.3-2.72 4.17zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
@@ -225,8 +227,8 @@ const LoginContent = () => {
                         </div>
                     </div>
                     
-                    <p className="text-center text-slate-500 font-medium text-sm mt-6 mb-4">
-                        Don't have an account? <Link to="/register" className="text-blue-600 font-bold hover:text-blue-700 transition-colors">Sign up now</Link>
+                    <p className="text-center text-[#5e504f] font-medium text-sm mt-6 mb-4">
+                        Don't have an account? <Link to="/register" className="text-[#e6a27a] font-bold hover:text-[#d8936c] transition-colors">Sign up now</Link>
                     </p>
                 </div>
             </div>

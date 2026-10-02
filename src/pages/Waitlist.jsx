@@ -8,7 +8,7 @@ const Waitlist = () => {
 
     return (
         <div className="max-w-[1200px] mx-auto px-4 py-12">
-            <h1 className="text-3xl font-black text-[#2e4053] mb-8 font-['Outfit']">My Waitlist</h1>
+            <h1 className="text-3xl font-black text-[#2e4053] mb-8 font-['Outfit'] font-serif">My Waitlist</h1>
 
             {(!waitlistItems || waitlistItems.length === 0) ? (
                 <div className="text-center py-16 bg-slate-50 rounded-2xl">
@@ -17,7 +17,7 @@ const Waitlist = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                         </svg>
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-700 mb-4">Your waitlist is empty</h2>
+                    <h2 className="text-2xl font-bold text-slate-700 mb-4 font-serif">Your waitlist is empty</h2>
                     <p className="text-slate-500 mb-8 max-w-md mx-auto">Looks like you haven't added any products to your waitlist yet.</p>
                     <Link to="/products" className="inline-block bg-[#1282a2] hover:bg-[#0f6c87] text-white font-bold py-3 px-8 rounded-full transition-colors shadow-lg shadow-[#1282a2]/30">
                         Continue Shopping

@@ -58,7 +58,7 @@ const Orders = () => {
         return (
             <div className="min-h-[60vh] flex flex-col items-center justify-center p-8">
                 <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-                <h2 className="mt-6 text-xl font-bold text-slate-700 animate-pulse">Loading your orders...</h2>
+                <h2 className="mt-6 text-xl font-bold text-slate-700 animate-pulse font-serif">Loading your orders...</h2>
             </div>
         );
     }
@@ -66,7 +66,7 @@ const Orders = () => {
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="mb-10">
-                <h1 className="text-4xl font-black text-slate-900 tracking-tight">My Orders</h1>
+                <h1 className="text-4xl font-black text-slate-900 tracking-tight font-serif">My Orders</h1>
                 <p className="text-slate-500 mt-2 font-medium">Track and view your recent purchases</p>
             </div>
 
@@ -75,7 +75,7 @@ const Orders = () => {
                     <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
                         <span className="text-5xl">📦</span>
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-800 mb-2">No orders yet</h2>
+                    <h2 className="text-2xl font-bold text-slate-800 mb-2 font-serif">No orders yet</h2>
                     <p className="text-slate-500 mb-8 max-w-md mx-auto">Looks like you haven't made any purchases yet. Explore our magic toy collection and find something wonderful!</p>
                     <Link to="/products" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-1">
                         Start Shopping
@@ -126,11 +126,11 @@ const Orders = () => {
                                                 <p className="text-base font-bold text-slate-900 mb-2">₹{item.price * item.quantity}</p>
                                                 {item.product && (
                                                     item.hasReviewed ? (
-                                                        <span className="text-[12px] font-bold text-green-600 bg-green-50 border border-green-200 px-3 py-1 rounded-lg flex items-center gap-1 cursor-default">
+                                                        <span className="text-[12px] font-bold text-green-600 bg-green-50 border border-green-200 px-3 py-1 rounded-[2rem] flex items-center gap-1 cursor-default">
                                                             <span className="text-sm leading-none mt-[-2px]">✓</span> Reviewed
                                                         </span>
                                                     ) : (
-                                                        <Link to={`/product/${item.product._id}#reviews`} className="text-[12px] font-bold text-[#fbdf14] hover:text-yellow-500 bg-yellow-50/50 border border-yellow-200 hover:bg-yellow-50 px-3 py-1 rounded-lg transition-colors flex items-center gap-1">
+                                                        <Link to={`/product/${item.product._id}#reviews`} className="text-[12px] font-bold text-[#fbdf14] hover:text-yellow-500 bg-yellow-50/50 border border-yellow-200 hover:bg-yellow-50 px-3 py-1 rounded-[2rem] transition-colors flex items-center gap-1">
                                                             <span className="text-lg leading-none mt-[-2px]">★</span> Rate Product
                                                         </Link>
                                                     )

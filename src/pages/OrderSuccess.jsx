@@ -53,7 +53,7 @@ const OrderSuccess = () => {
                         </svg>
                     </div>
 
-                    <h1 className="text-4xl font-black text-slate-800 tracking-tight mb-4">Payment Successful!</h1>
+                    <h1 className="text-4xl font-black text-slate-800 tracking-tight mb-4 font-serif">Payment Successful!</h1>
                     <p className="text-slate-500 font-medium text-lg mb-8 leading-relaxed">
                         Thank you for your purchase. Your order has been placed securely via Razorpay and is now being processed.
                     </p>

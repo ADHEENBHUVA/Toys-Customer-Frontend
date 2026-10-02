@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { X } from 'lucide-react';
 
 const Cart = () => {
-    const { cartItems, removeFromCart, updateQuantity, getCartTotal, calculateShipping } = useCart();
+    const { cartItems, removeFromCart, updateQuantity, getCartTotal, calculateShipping, shippingSettings } = useCart();
     const [coupon, setCoupon] = useState('');
     const shipping = calculateShipping();
     const subTotal = getCartTotal();
@@ -39,10 +39,30 @@ const Cart = () => {
                 <span className="text-[#1282a2]">Your shopping cart</span>
             </div>
 
-            {/* Title */}
-            <h1 className="text-3xl font-bold text-[#2e4053] mb-8" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
-                Your Cart
-            </h1>
+            {/* Title & Free Shipping Banner */}
+            <div className="flex flex-col md:flex-row justify-between md:items-end mb-8 gap-4">
+                <h1 className="text-3xl font-bold text-[#2e4053] font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                    Your Cart
+                </h1>
+                
+                {shippingSettings && shippingSettings.isFreeShippingActive && shipping > 0 && (
+                    <div className="bg-[#f0f9ff] border border-[#bae6fd] text-[#0369a1] px-4 py-2 rounded-lg text-[14px] font-medium flex items-center gap-2">
+                        <span>🚚</span>
+                        {shippingSettings.freeShippingMinAmount > 0 && (
+                            <span>Add ₹{(shippingSettings.freeShippingMinAmount - subTotal).toFixed(2)} more for Free Shipping!</span>
+                        )}
+                        {shippingSettings.freeShippingMinAmount > 0 && shippingSettings.freeShippingMinItems > 0 && <span> or </span>}
+                        {shippingSettings.freeShippingMinItems > 0 && (
+                            <span>Add {shippingSettings.freeShippingMinItems - cartItems.length} more item(s) for Free Shipping!</span>
+                        )}
+                    </div>
+                )}
+                {shippingSettings && shippingSettings.isFreeShippingActive && shipping === 0 && (
+                    <div className="bg-[#f0fdf4] border border-[#bbf7d0] text-[#166534] px-4 py-2 rounded-lg text-[14px] font-bold flex items-center gap-2">
+                        <span>🎉</span> You've unlocked Free Shipping!
+                    </div>
+                )}
+            </div>
 
             {/* Desktop Table Header */}
             <div className="hidden md:grid grid-cols-12 gap-4 bg-[#f3f4f6] py-4 px-6 rounded-t-md font-bold text-[#2e4053] text-[15px]">
@@ -144,7 +164,7 @@ const Cart = () => {
             {/* Cart Total Box */}
             <div className="flex justify-end mt-16 mb-20">
                 <div className="w-full md:w-[400px] border border-slate-200 rounded-2xl p-8">
-                    <h2 className="text-xl font-bold text-[#2e4053] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                    <h2 className="text-xl font-bold text-[#2e4053] mb-6 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
                         Cart total
                     </h2>
                     
@@ -152,8 +172,15 @@ const Cart = () => {
                         <span className="text-[#4b5563] font-medium text-[15px]">Subtotal</span>
                         <span className="font-bold text-[#2e4053] text-[15px]">₹{subTotal.toFixed(2)}</span>
                     </div>
+
+                    <div className="flex justify-between items-center mb-4">
+                        <span className="text-[#4b5563] font-medium text-[15px]">Shipping</span>
+                        <span className="font-bold text-[#2e4053] text-[15px]">
+                            {shipping === 0 ? <span className="text-[#10b981]">Free</span> : `₹${shipping.toFixed(2)}`}
+                        </span>
+                    </div>
                     
-                    <div className="flex justify-between items-center mb-8">
+                    <div className="flex justify-between items-center mb-8 border-t border-slate-100 pt-4">
                         <span className="text-[#4b5563] font-medium text-[15px]">Total</span>
                         <span className="font-bold text-[#2e4053] text-[15px]">₹{total.toFixed(2)}</span>
                     </div>

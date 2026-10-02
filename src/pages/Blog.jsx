@@ -17,7 +17,7 @@ const Blog = () => {
                 <div className="lg:col-span-3 space-y-8">
                     
                     {/* Page Title */}
-                    <h1 className="text-3xl font-bold text-[#2e4053] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                    <h1 className="text-3xl font-bold text-[#2e4053] mb-6 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
                         Blog standard
                     </h1>
 
@@ -57,19 +57,19 @@ const Blog = () => {
                         </h3>
                         <div className="space-y-4">
                             <div className="flex gap-3 items-center group cursor-pointer">
-                                <div className="w-[60px] h-[60px] rounded-lg overflow-hidden shrink-0">
+                                <div className="w-[60px] h-[60px] rounded-[2rem] overflow-hidden shrink-0">
                                     <img src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=150&q=80" alt="Recent 1" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                                 </div>
                                 <h4 className="text-sm font-bold text-[#2e4053] leading-tight group-hover:text-[#1282a2] transition-colors line-clamp-3">Enhancing motor skills through play</h4>
                             </div>
                             <div className="flex gap-3 items-center group cursor-pointer">
-                                <div className="w-[60px] h-[60px] rounded-lg overflow-hidden shrink-0">
+                                <div className="w-[60px] h-[60px] rounded-[2rem] overflow-hidden shrink-0">
                                     <img src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=150&q=80" alt="Recent 2" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                                 </div>
                                 <h4 className="text-sm font-bold text-[#2e4053] leading-tight group-hover:text-[#1282a2] transition-colors line-clamp-3">Fostering problem solving skills</h4>
                             </div>
                             <div className="flex gap-3 items-center group cursor-pointer">
-                                <div className="w-[60px] h-[60px] rounded-lg overflow-hidden shrink-0">
+                                <div className="w-[60px] h-[60px] rounded-[2rem] overflow-hidden shrink-0">
                                     <img src="https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=150&q=80" alt="Recent 3" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                                 </div>
                                 <h4 className="text-sm font-bold text-[#2e4053] leading-tight group-hover:text-[#1282a2] transition-colors line-clamp-3">Emotional and Social Development</h4>
@@ -120,11 +120,11 @@ const Blog = () => {
                             <div className="rounded-2xl overflow-hidden mb-6 h-[250px] md:h-[400px]">
                                 <img src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=1200&q=80" alt="Post" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                             </div>
-                            <div className="flex items-center gap-2 border border-slate-200 rounded-md px-3 py-1.5 w-fit mb-4">
+                            <div className="flex items-center gap-2 border border-slate-200 rounded-2xl px-3 py-1.5 w-fit mb-4">
                                 <Calendar className="w-3.5 h-3.5 text-[#1282a2]" />
                                 <span className="text-[12px] font-medium text-slate-500">March 24, 2024</span>
                             </div>
-                            <h2 className="text-[22px] font-bold text-[#2e4053] mb-3 group-hover:text-[#1282a2] transition-colors">
+                            <h2 className="text-[22px] font-bold text-[#2e4053] mb-3 group-hover:text-[#1282a2] transition-colors font-serif">
                                 Enhancing motor skills through play
                             </h2>
                             <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-4xl">
@@ -137,11 +137,11 @@ const Blog = () => {
                             <div className="rounded-2xl overflow-hidden mb-6 h-[250px] md:h-[400px]">
                                 <img src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&q=80" alt="Post" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                             </div>
-                            <div className="flex items-center gap-2 border border-slate-200 rounded-md px-3 py-1.5 w-fit mb-4">
+                            <div className="flex items-center gap-2 border border-slate-200 rounded-2xl px-3 py-1.5 w-fit mb-4">
                                 <Calendar className="w-3.5 h-3.5 text-[#1282a2]" />
                                 <span className="text-[12px] font-medium text-slate-500">Feb 12, 2024</span>
                             </div>
-                            <h2 className="text-[22px] font-bold text-[#2e4053] mb-3 group-hover:text-[#1282a2] transition-colors">
+                            <h2 className="text-[22px] font-bold text-[#2e4053] mb-3 group-hover:text-[#1282a2] transition-colors font-serif">
                                 Fostering problem solving skills
                             </h2>
                             <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-4xl">
@@ -154,11 +154,11 @@ const Blog = () => {
                             <div className="rounded-2xl overflow-hidden mb-6 h-[250px] md:h-[400px]">
                                 <img src="https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=1200&q=80" alt="Post" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                             </div>
-                            <div className="flex items-center gap-2 border border-slate-200 rounded-md px-3 py-1.5 w-fit mb-4">
+                            <div className="flex items-center gap-2 border border-slate-200 rounded-2xl px-3 py-1.5 w-fit mb-4">
                                 <Calendar className="w-3.5 h-3.5 text-[#1282a2]" />
                                 <span className="text-[12px] font-medium text-slate-500">Jun 10, 2023</span>
                             </div>
-                            <h2 className="text-[22px] font-bold text-[#2e4053] mb-3 group-hover:text-[#1282a2] transition-colors">
+                            <h2 className="text-[22px] font-bold text-[#2e4053] mb-3 group-hover:text-[#1282a2] transition-colors font-serif">
                                 Emotional and Social Development
                             </h2>
                             <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-4xl">
@@ -171,11 +171,11 @@ const Blog = () => {
                             <div className="rounded-2xl overflow-hidden mb-6 h-[250px] md:h-[400px]">
                                 <img src="https://images.unsplash.com/photo-1618842676088-c4d48a6a7c9d?auto=format&fit=crop&w=1200&q=80" alt="Post" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                             </div>
-                            <div className="flex items-center gap-2 border border-slate-200 rounded-md px-3 py-1.5 w-fit mb-4">
+                            <div className="flex items-center gap-2 border border-slate-200 rounded-2xl px-3 py-1.5 w-fit mb-4">
                                 <Calendar className="w-3.5 h-3.5 text-[#1282a2]" />
                                 <span className="text-[12px] font-medium text-slate-500">September 14, 2023</span>
                             </div>
-                            <h2 className="text-[22px] font-bold text-[#2e4053] mb-3 group-hover:text-[#1282a2] transition-colors">
+                            <h2 className="text-[22px] font-bold text-[#2e4053] mb-3 group-hover:text-[#1282a2] transition-colors font-serif">
                                 Language Development and Social Skills
                             </h2>
                             <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-4xl">

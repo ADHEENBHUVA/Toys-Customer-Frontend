@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
+import ProductCardImageCarousel from '../components/ProductCardImageCarousel';
 
-const categoriesList = ['Action Figures', 'Dolls & Playsets', 'Educational', 'Puzzles', 'Board Games'];
-const ageList = ['0-18 months', '18-36 months', '3-5 years', '5-7 years', '7-9 years', '9-12 years', '12+ years'];
+const ageList = ['0-6 Months', '6-12 Months', '1-2 Years', '3-5 Years', '6-8 Years', '9-12 Years', '12+ Years'];
 
 const Products = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const { addToCart, waitlistItems, toggleWaitlist } = useCart();
-    
+    const { addToCart, waitlistItems, toggleWaitlist, websiteSettings } = useCart();
+
     // Read from URL
     const selectedCategories = searchParams.getAll('category');
     const selectedAges = searchParams.getAll('age');
@@ -19,30 +19,44 @@ const Products = () => {
 
     const [allProducts, setAllProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
+    const [categoriesList, setCategoriesList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+    const [visibleCount, setVisibleCount] = useState(8);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchData = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/products`);
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    setAllProducts(data);
+                const isNewArrivals = searchParams.get('filter') === 'new-arrivals';
+                const endpoint = isNewArrivals ? '/products/new-arrivals' : '/products';
+
+                const [prodRes, catRes] = await Promise.all([
+                    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}${endpoint}`),
+                    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/categories`)
+                ]);
+
+                const prodData = await prodRes.json();
+                if (Array.isArray(prodData)) {
+                    setAllProducts(prodData);
                 } else {
-                    console.error('API did not return an array:', data);
+                    console.error('Products API did not return an array:', prodData);
                     setAllProducts([]);
                 }
+
+                const catData = await catRes.json();
+                if (catData && catData.success && Array.isArray(catData.data)) {
+                    setCategoriesList(catData.data.map(c => c.name));
+                }
             } catch (error) {
-                console.error('Error fetching products:', error);
+                console.error('Error fetching data:', error);
                 setAllProducts([]);
             } finally {
                 setLoading(false);
             }
         };
-        fetchProducts();
-    }, []);
+        fetchData();
+    }, [searchParams.get('filter')]);
 
     useEffect(() => {
         let result = [...allProducts];
@@ -82,23 +96,40 @@ const Products = () => {
         }
 
         // Apply Sorting
-        if (sortOrder === 'price-low') {
-            result.sort((a, b) => a.price - b.price);
-        } else if (sortOrder === 'price-high') {
-            result.sort((a, b) => b.price - a.price);
-        } else if (sortOrder === 'newest') {
-            result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        }
+        result.sort((a, b) => {
+            // Out of stock always at the end
+            const aOut = a.status === 'Out of Stock';
+            const bOut = b.status === 'Out of Stock';
+            if (aOut && !bOut) return 1;
+            if (!aOut && bOut) return -1;
+
+            if (sortOrder === 'price-low') {
+                return a.price - b.price;
+            } else if (sortOrder === 'price-high') {
+                return b.price - a.price;
+            } else if (sortOrder === 'newest') {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            } else {
+                // Default sorting (recommended/best selling)
+                // Assuming we want highest sold/orders first. We'll use rating or created date as fallback if no sales field exists
+                const aSales = a.totalSales || a.salesCount || 0;
+                const bSales = b.totalSales || b.salesCount || 0;
+                if (aSales !== bSales) {
+                    return bSales - aSales; // Highest sales first
+                }
+                return 0;
+            }
+        });
 
         setFilteredProducts(result);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams.toString(), selectedMaxPrice, sortOrder, allProducts]);
 
     const handleCategoryClick = (cat) => {
         const newParams = new URLSearchParams(searchParams);
         const currentCats = newParams.getAll('category');
         newParams.delete('category'); // Clear all categories to rebuild
-        
+
         if (currentCats.includes(cat)) {
             // Remove the unselected category
             currentCats.filter(c => c !== cat).forEach(c => newParams.append('category', c));
@@ -107,19 +138,21 @@ const Products = () => {
             [...currentCats, cat].forEach(c => newParams.append('category', c));
         }
         setSearchParams(newParams);
+        setVisibleCount(8);
     };
 
     const handleAgeClick = (age) => {
         const newParams = new URLSearchParams(searchParams);
         const currentAges = newParams.getAll('age');
         newParams.delete('age');
-        
+
         if (currentAges.includes(age)) {
             currentAges.filter(a => a !== age).forEach(a => newParams.append('age', a));
         } else {
             [...currentAges, age].forEach(a => newParams.append('age', a));
         }
         setSearchParams(newParams);
+        setVisibleCount(8);
     };
 
     const handlePriceChange = (e) => {
@@ -132,6 +165,7 @@ const Products = () => {
         const newParams = new URLSearchParams(searchParams);
         newParams.set('sort', e.target.value);
         setSearchParams(newParams);
+        setVisibleCount(8);
     };
 
     const clearFilters = () => {
@@ -147,10 +181,12 @@ const Products = () => {
         displayTitle = 'Filtered Results';
     }
 
+    const displayedProducts = filteredProducts;
+
     return (
         <div className="bg-white min-h-screen pt-6 pb-20 font-['Nunito']">
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-                
+
                 {/* Breadcrumbs */}
                 <div className="text-sm font-bold text-slate-800 mb-8 mt-4 flex items-center gap-2">
                     <Link to="/" className="hover:text-[#118AB2]">Home</Link>
@@ -158,15 +194,15 @@ const Products = () => {
                     <span className="text-[#118AB2]">Products</span>
                 </div>
                 <div className="flex flex-col lg:flex-row gap-8">
-                    
+
                     {/* Sidebar */}
                     <div className="hidden lg:flex flex-col w-[280px] flex-shrink-0 gap-6">
-                        
+
                         {/* Filters Header (Clear All) */}
                         <div className="flex items-center justify-between px-1">
-                            <h2 className="text-[20px] font-black text-slate-800 font-['Nunito']">Filters</h2>
+                            <h2 className="text-[20px] font-black text-slate-800 font-['Nunito'] font-serif">Filters</h2>
                             {(selectedCategories.length > 0 || selectedMaxPrice < 5000 || selectedAges.length > 0 || searchParams.get('search')) && (
-                                <button 
+                                <button
                                     onClick={clearFilters}
                                     className="text-[14px] font-bold text-[#ff6b6b] hover:text-[#ff5252] hover:underline transition-all"
                                 >
@@ -178,20 +214,20 @@ const Products = () => {
                         {/* Box 1: Product categories */}
                         <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                             <h3 className="text-[18px] font-black text-slate-800 font-['Nunito'] mb-5 flex items-center gap-2">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#118AB2]"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#118AB2]"><path d="M4 6h16M4 12h16M4 18h7" /></svg>
                                 Categories
                             </h3>
                             <ul className="space-y-3">
                                 {categoriesList.map(cat => {
                                     const isSelected = selectedCategories.includes(cat);
                                     return (
-                                        <li 
-                                            key={cat} 
+                                        <li
+                                            key={cat}
                                             onClick={() => handleCategoryClick(cat)}
                                             className="flex items-center gap-3 group cursor-pointer"
                                         >
                                             <div className={`w-5 h-5 rounded flex items-center justify-center transition-all ${isSelected ? 'bg-[#118AB2] border-transparent' : 'bg-white border-2 border-slate-200 group-hover:border-[#118AB2]'}`}>
-                                                {isSelected && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
+                                                {isSelected && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>}
                                             </div>
                                             <span className={`font-bold transition-colors text-[15px] ${isSelected ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-800'}`}>
                                                 {cat}
@@ -209,14 +245,14 @@ const Products = () => {
                                 Price Range
                             </h3>
                             <div className="px-2">
-                                <input 
-                                    type="range" 
-                                    min="0" 
-                                    max="5000" 
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="5000"
                                     step="50"
                                     value={selectedMaxPrice}
                                     onChange={handlePriceChange}
-                                    className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-[#118AB2]" 
+                                    className="w-full h-2 bg-slate-100 rounded-[2rem] appearance-none cursor-pointer accent-[#118AB2]"
                                 />
                                 <div className="flex justify-between mt-4">
                                     <span className="text-[13px] font-extrabold text-slate-400 bg-slate-50 px-3 py-1 rounded-full">₹0</span>
@@ -229,33 +265,42 @@ const Products = () => {
                         <div className="bg-white p-6 rounded-2xl border border-slate-200">
                             <h3 className="text-[17px] font-black text-slate-800 font-['Nunito'] mb-5">Popular products</h3>
                             <div className="space-y-5">
-                                {allProducts.slice(0, 3).map((prod) => (
-                                    <div key={prod._id} className="flex gap-4">
-                                        <div className="w-16 h-16 bg-slate-50 rounded-lg flex-shrink-0 flex items-center justify-center p-2">
-                                            <img src={prod.thumbnailImage || (prod.images && prod.images[0])} alt={prod.name} className="w-full h-full object-contain" />
-                                        </div>
-                                        <div className="flex flex-col justify-center">
-                                            <h4 className="text-[14px] font-bold text-slate-700 leading-tight mb-1 line-clamp-2">{prod.name}</h4>
-                                            <span className="text-[14px] font-black text-slate-900">₹{prod.price.toFixed(2)}</span>
-                                            <div className="flex text-[#fbdf14] text-[10px] mt-0.5">
-                                                ★★★★★
+                                {[...allProducts]
+                                    .sort((a, b) => {
+                                        if (a.bestSeller && !b.bestSeller) return -1;
+                                        if (!a.bestSeller && b.bestSeller) return 1;
+                                        return (b.ratingCount || 0) - (a.ratingCount || 0);
+                                    })
+                                    .slice(0, 3)
+                                    .map((prod) => (
+                                        <Link to={`/product/${prod._id}`} key={prod._id} className="flex gap-4 group cursor-pointer p-2 -mx-2 rounded-xl hover:bg-slate-50 transition-colors">
+                                            <div className="w-16 h-16 bg-slate-50 rounded-[2rem] flex-shrink-0 flex items-center justify-center p-2 group-hover:bg-white transition-colors shadow-sm">
+                                                <img src={prod.thumbnailImage || (prod.images && prod.images[0])} alt={prod.name} className="w-full h-full object-contain" />
                                             </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                            <div className="flex flex-col justify-center">
+                                                <h4 className="text-[14px] font-bold text-slate-700 leading-tight mb-1 line-clamp-2 group-hover:text-[#e6a27a] transition-colors">{prod.name}</h4>
+                                                <span className="text-[14px] font-black text-slate-900">₹{prod.price.toFixed(2)}</span>
+                                                <div className="flex text-[#fbdf14] text-[10px] mt-0.5">
+                                                    {[1, 2, 3, 4, 5].map(s => (
+                                                        <span key={s}>{s <= Math.round(prod.rating || 5) ? '★' : '☆'}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
                             </div>
                         </div>
                     </div>
 
                     {/* Main Content Area */}
                     <div className="flex-1">
-                        
+
                         {/* Top Bar */}
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-                            <h1 className="text-3xl font-black text-slate-800 tracking-tight font-['Nunito']">
+                            <h1 className="text-3xl font-black text-slate-800 tracking-tight font-['Nunito'] font-serif">
                                 {displayTitle}
                             </h1>
-                            <button 
+                            <button
                                 onClick={() => setIsMobileFilterOpen(true)}
                                 className="lg:hidden w-full md:w-auto bg-slate-100 text-slate-700 py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors"
                             >
@@ -263,24 +308,24 @@ const Products = () => {
                                 Filters
                             </button>
                         </div>
-                        
+
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-slate-100 gap-4">
                             <div className="flex items-center justify-between w-full sm:w-auto gap-4">
                                 <div className="flex gap-2">
-                                    <button 
+                                    <button
                                         onClick={() => setViewMode('grid')}
                                         className={`${viewMode === 'grid' ? 'text-[#118AB2]' : 'text-slate-300 hover:text-slate-500'} transition-colors`}
                                     >
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z" /></svg>
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={() => setViewMode('list')}
                                         className={`${viewMode === 'list' ? 'text-[#118AB2]' : 'text-slate-300 hover:text-slate-500'} transition-colors`}
                                     >
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></svg>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z" /></svg>
                                     </button>
                                 </div>
-                                <select 
+                                <select
                                     value={sortOrder}
                                     onChange={handleSortChange}
                                     className="bg-transparent text-slate-600 text-sm font-bold outline-none cursor-pointer"
@@ -296,171 +341,214 @@ const Products = () => {
                             </div>
                         </div>
 
-                    {/* Products Grid */}
-                    <div>
-                        {loading ? (
-                            <div className="flex items-center justify-center h-64 w-full">
-                                <div className="w-16 h-16 border-4 border-slate-200 border-t-[#118AB2] rounded-full animate-spin"></div>
-                            </div>
-                        ) : filteredProducts.length > 0 ? (
-                            <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
-                                {filteredProducts.map((product) => (
-                                    viewMode === 'grid' ? (
-                                        // Grid View Card
-                                        <div key={product._id} className="flex flex-col group bg-white border-2 border-slate-200 shadow-sm rounded-3xl p-4 hover:shadow-[0_20px_50px_-12px_rgba(17,138,178,0.2)] hover:border-[#118AB2]/40 transition-all duration-500 hover:-translate-y-1">
-                                            {/* Image Container */}
-                                            <div className="relative mb-4 bg-slate-50 rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-slate-100">
-                                                {/* Sale Badge */}
-                                                {product.compareAtPrice > (product.price || 0) && (
-                                                    <span className="absolute top-4 left-4 bg-[#ff6b6b] text-white text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider z-20 shadow-sm">
-                                                        SALE
-                                                    </span>
-                                                )}
-                                                
-                                                {/* Product Image */}
-                                                <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center">
-                                                    <img 
-                                                        src={product.thumbnailImage || (product.images && product.images[0])} 
-                                                        alt={product.name} 
-                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" 
-                                                    />
-                                                </Link>
-                                            </div>
-                                            
-                                            {/* Product Details */}
-                                            <div className="flex flex-col flex-1 px-1">
-                                                <Link to={`/product/${product._id}`} className="hover:text-[#118AB2] mb-1.5 transition-colors">
-                                                    <h3 className="font-black text-slate-800 text-[17px] leading-tight line-clamp-2 font-['Nunito']">
-                                                        {product.name}
-                                                    </h3>
-                                                </Link>
-                                                
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <div className="flex text-[#fbdf14] text-[12px] tracking-widest">
-                                                        ★★★★★
-                                                    </div>
-                                                    <span className="text-[12px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)}</span>
-                                                </div>
-                                                
-                                                {/* Price and Action Buttons Row */}
-                                                <div className="flex items-center justify-between mt-auto pt-3">
-                                                    <div className="flex flex-col">
-                                                        {product.compareAtPrice > (product.price || 0) && (
-                                                            <span className="text-[12px] text-slate-400 font-bold line-through mb-[-4px]">₹{(product.compareAtPrice || 0).toFixed(2)}</span>
-                                                        )}
-                                                        <span className="font-black text-[#22c55e] text-[20px] leading-none">₹{(product.price || 0).toFixed(2)}</span>
-                                                    </div>
-                                                    
-                                                    <div className="flex items-center gap-2.5">
-                                                        <button 
-                                                            type="button"
-                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                                                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm border hover:scale-110 ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'bg-red-50 border-red-200 text-red-500' : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50'}`}
-                                                        >
-                                                            <svg width="18" height="18" fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                                        </button>
-                                                        <button 
-                                                            type="button"
-                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
-                                                            className="w-10 h-10 bg-[#118AB2] hover:bg-[#0f7a9e] text-white rounded-full flex items-center justify-center transition-all duration-300 shadow-md shadow-[#118AB2]/30 hover:shadow-lg hover:shadow-[#118AB2]/40 hover:scale-110"
-                                                        >
-                                                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        // List View Card
-                                        <div key={product._id} className="flex flex-col sm:flex-row gap-8 bg-transparent">
-                                            {/* Image side */}
-                                            <div className="relative w-full sm:w-[280px] h-[280px] border border-slate-200 rounded-3xl bg-white p-4 flex items-center justify-center flex-shrink-0 group">
-                                                <div className="absolute top-4 left-4 z-10">
-                                                    {product.compareAtPrice > product.price && (
-                                                        <span className="bg-[#ff6b6b] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                                            SALE
+                        {/* Products Grid */}
+                        <div>
+                            {loading ? (
+                                <div className="flex items-center justify-center h-64 w-full">
+                                    <div className="w-16 h-16 border-4 border-slate-200 border-t-[#118AB2] rounded-full animate-spin"></div>
+                                </div>
+                            ) : displayedProducts.length > 0 ? (
+                                <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" : "flex flex-col gap-6"}>
+                                    {displayedProducts.map((product) => (
+                                        viewMode === 'grid' ? (
+                                            // Grid View Card
+                                            <div key={product._id} className="flex flex-col group bg-white border-2 border-slate-200 shadow-sm rounded-3xl p-4 hover:shadow-[0_20px_50px_-12px_rgba(17,138,178,0.2)] hover:border-[#118AB2]/40 transition-all duration-500 hover:-translate-y-1">
+                                                {/* Image Container */}
+                                                <div className="relative mb-4 bg-slate-50 rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-slate-100">
+                                                    {/* Sale Badge */}
+                                                    {product.originalPrice > (product.price || 0) && (
+                                                        <span className="absolute top-4 left-4 bg-[#e8b960] text-white text-[10px] font-black px-2.5 py-1 rounded-2xl uppercase tracking-wider z-20 shadow-sm">
+                                                            {websiteSettings?.discountDisplayType === 'percentage' 
+                                                                ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
+                                                                : `Save ₹${Math.round(product.originalPrice - product.price)}`}
                                                         </span>
                                                     )}
+
+                                                    {/* Product Image */}
+                                                    <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center">
+                                                        {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
+                                                            <div className="absolute top-4 right-4 bg-orange-100 border border-orange-200 text-orange-600 px-3 py-1 rounded-full text-[11px] font-black tracking-widest shadow-sm z-20 uppercase flex items-center gap-1 animate-pulse">
+                                                                <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path></svg>
+                                                                Only {product.stockQuantity} Left!
+                                                            </div>
+                                                        )}
+                                                        <ProductCardImageCarousel 
+                                                            images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])} 
+                                                            productName={product.name} 
+                                                        />
+                                                    </Link>
                                                 </div>
-                                                <Link to={`/product/${product._id}`} className="block w-full h-full flex items-center justify-center">
-                                                    <img src={product.thumbnailImage || (product.images && product.images[0])} alt={product.name} className="w-[90%] h-[90%] object-contain group-hover:scale-105 transition-transform duration-500" />
-                                                </Link>
-                                            </div>
-                                            
-                                            {/* Content side */}
-                                            <div className="flex-1 flex flex-col justify-center py-2">
-                                                <Link to={`/product/${product._id}`}>
-                                                    <h3 className="font-black text-[18px] text-slate-800 leading-tight mb-3 hover:text-[#118AB2] transition-colors font-['Nunito']">
-                                                        {product.name}
-                                                    </h3>
-                                                </Link>
-                                                
-                                                <p className="text-[14px] text-slate-500 leading-relaxed mb-4 max-w-2xl font-semibold">
-                                                    {product.description ? (product.description.length > 150 ? product.description.substring(0, 150) + '...' : product.description) : <span className="italic opacity-70">No description available</span>}                                                </p>
-                                                
-                                                <div className="flex items-baseline gap-2 mb-2">
-                                                    <span className="text-[16px] font-black text-[#22c55e]">₹{product.price.toFixed(2)}</span>
-                                                    {product.compareAtPrice > product.price && (
-                                                        <span className="text-[14px] font-bold text-slate-400 line-through">₹{product.compareAtPrice.toFixed(2)}</span>
-                                                    )}
-                                                </div>
-                                                
-                                                <div className="flex items-center gap-2 mb-6">
-                                                    <div className="flex text-[#fbdf14] text-[13px] tracking-widest">
-                                                        ★★★★★
+
+                                                {/* Product Details */}
+                                                <div className="flex flex-col flex-1 px-1">
+                                                    <Link to={`/product/${product._id}`} className="hover:text-[#118AB2] mb-1.5 transition-colors">
+                                                        <h3 className="font-black text-slate-800 text-[17px] leading-tight line-clamp-2 font-['Nunito']">
+                                                            {product.name}
+                                                        </h3>
+                                                    </Link>
+
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <div className="flex text-[#fbdf14] text-[12px] tracking-widest">
+                                                            {[1, 2, 3, 4, 5].map(s => (
+                                                                <span key={s}>{s <= Math.round(product.rating || 5) ? '★' : '☆'}</span>
+                                                            ))}
+                                                        </div>
+                                                        <span className="text-[12px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)} ({product.ratingCount || 0})</span>
                                                     </div>
-                                                    <span className="text-[13px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)}</span>
-                                                </div>
-                                                
-                                                <div className="flex items-center gap-3">
-                                                    <button 
-                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
-                                                        className="flex items-center gap-2 bg-[#118AB2] hover:bg-[#0b6b8a] text-white px-6 py-2.5 rounded-full text-[14px] font-bold transition-colors"
-                                                    >
-                                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
-                                                        Add to cart
-                                                    </button>
-                                                    <button 
-                                                        type="button"
-                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                                                        className={`w-[42px] h-[42px] rounded-full border border-slate-200 flex items-center justify-center transition-colors cursor-pointer ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'bg-red-50 text-red-500 border-red-500' : 'bg-white text-slate-400 hover:border-red-500 hover:text-red-500'}`}
-                                                    >
-                                                        <svg className="pointer-events-none" width="18" height="18" fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                                    </button>
-                                                    <button className="w-[42px] h-[42px] rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:border-[#118AB2] hover:text-[#118AB2] transition-colors">
-                                                        <svg className="pointer-events-none" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                                    </button>
+
+                                                    {/* Price and Action Buttons Row */}
+                                                    <div className="flex items-center justify-between mt-auto pt-3">
+                                                        <div className="flex flex-col">
+                                                            {product.status === 'Out of Stock' ? (
+                                                                <span className="font-black text-slate-400 text-[16px] leading-none">Out of Stock</span>
+                                                            ) : (
+                                                                <>
+                                                                    {product.originalPrice > (product.price || 0) && (
+                                                                        <span className="text-[12px] text-slate-400 font-bold line-through mb-[-4px]">₹{(product.originalPrice || 0).toFixed(2)}</span>
+                                                                    )}
+                                                                    <span className="font-black text-[#22c55e] text-[20px] leading-none">₹{(product.price || 0).toFixed(2)}</span>
+                                                                </>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2.5">
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                                                                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm border hover:scale-110 ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'bg-red-50 border-red-200 text-red-500' : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50'}`}
+                                                            >
+                                                                <svg width="18" height="18" fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                                            </button>
+                                                            {product.status === 'Out of Stock' ? (
+                                                                <button
+                                                                    type="button"
+                                                                    disabled
+                                                                    className="w-10 h-10 bg-slate-300 text-white rounded-full flex items-center justify-center cursor-not-allowed shadow-sm"
+                                                                    title="Out of Stock"
+                                                                >
+                                                                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"></path></svg>
+                                                                </button>
+                                                            ) : (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
+                                                                    className="w-10 h-10 bg-[#118AB2] hover:bg-[#0f7a9e] text-white rounded-full flex items-center justify-center transition-all duration-300 shadow-md shadow-[#118AB2]/30 hover:shadow-lg hover:shadow-[#118AB2]/40 hover:scale-110"
+                                                                >
+                                                                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    )
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="w-full h-64 bg-white rounded-3xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-center p-8">
-                                <span className="text-6xl mb-4 grayscale opacity-50">😢</span>
-                                <h3 className="text-2xl font-black text-slate-700 mb-2 font-['Nunito']">No Toys Found</h3>
-                                <p className="text-slate-500 font-medium">Try adjusting your filters to find the perfect toy.</p>
-                                <button onClick={clearFilters} className="mt-6 text-[#118AB2] font-bold hover:underline">Clear all filters</button>
-                            </div>
-                        )}
-                        {/* Pagination */}
-                        {filteredProducts.length > 0 && (
-                            <div className="flex justify-center items-center gap-2 mt-12">
-                                <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#118AB2] transition-colors">
-                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
-                                </button>
-                                <button className="w-10 h-10 rounded-full bg-[#118AB2] text-white font-bold flex items-center justify-center">1</button>
-                                <button className="w-10 h-10 rounded-full border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors flex items-center justify-center">2</button>
-                                <button className="w-10 h-10 rounded-full border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors flex items-center justify-center">3</button>
-                                <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#118AB2] transition-colors">
-                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-                                </button>
-                            </div>
-                        )}
+                                        ) : (
+                                            // List View Card
+                                            <div key={product._id} className="flex flex-col sm:flex-row gap-8 bg-transparent">
+                                                {/* Image side */}
+                                                <div className="relative w-full sm:w-[280px] h-[280px] border border-slate-200 rounded-3xl bg-white p-4 flex items-center justify-center flex-shrink-0 group">
+                                                    <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                                                        {product.originalPrice > product.price && (
+                                                            <span className="bg-[#e8b960] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider w-max shadow-sm">
+                                                                {websiteSettings?.discountDisplayType === 'percentage' 
+                                                                    ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
+                                                                    : `Save ₹${Math.round(product.originalPrice - product.price)}`}
+                                                            </span>
+                                                        )}
+                                                        {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
+                                                            <span className="bg-orange-100 border border-orange-200 text-orange-600 text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-widest w-max shadow-sm flex items-center gap-1 animate-pulse">
+                                                                <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path></svg>
+                                                                Only {product.stockQuantity} Left!
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <Link to={`/product/${product._id}`} className="block w-full h-full flex items-center justify-center">
+                                                        <ProductCardImageCarousel 
+                                                            images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])} 
+                                                            productName={product.name} 
+                                                        />
+                                                    </Link>
+                                                </div>
+
+                                                {/* Content side */}
+                                                <div className="flex-1 flex flex-col justify-center py-2">
+                                                    <Link to={`/product/${product._id}`}>
+                                                        <h3 className="font-black text-[18px] text-slate-800 leading-tight mb-3 hover:text-[#118AB2] transition-colors font-['Nunito']">
+                                                            {product.name}
+                                                        </h3>
+                                                    </Link>
+
+                                                    <div className="text-[14px] text-slate-500 leading-relaxed mb-4 max-w-2xl font-semibold line-clamp-2">
+                                                        <p>{product.shortDescription || (product.description?.replace(/<[^>]+>/g, ' ')?.replace(product.name, '')?.trim()) || "No description available"}</p>
+                                                    </div>
+
+                                                    <div className="flex items-baseline gap-2 mb-2">
+                                                        {product.status === 'Out of Stock' ? (
+                                                            <span className="text-[16px] font-black text-slate-400">Out of Stock</span>
+                                                        ) : (
+                                                            <>
+                                                                <span className="text-[16px] font-black text-[#22c55e]">₹{product.price.toFixed(2)}</span>
+                                                                {product.originalPrice > product.price && (
+                                                                    <span className="text-[14px] font-bold text-slate-400 line-through">₹{product.originalPrice.toFixed(2)}</span>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2 mb-6">
+                                                        <div className="flex text-[#fbdf14] text-[13px] tracking-widest">
+                                                            {[1, 2, 3, 4, 5].map(s => (
+                                                                <span key={s}>{s <= Math.round(product.rating || 5) ? '★' : '☆'}</span>
+                                                            ))}
+                                                        </div>
+                                                        <span className="text-[13px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)} ({product.ratingCount || 0})</span>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-3">
+                                                        {product.status === 'Out of Stock' ? (
+                                                            <button
+                                                                disabled
+                                                                className="flex items-center gap-2 bg-slate-300 text-white px-6 py-2.5 rounded-full text-[14px] font-bold cursor-not-allowed"
+                                                            >
+                                                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"></path></svg>
+                                                                Out of Stock
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
+                                                                className="flex items-center gap-2 bg-[#118AB2] hover:bg-[#0b6b8a] text-white px-6 py-2.5 rounded-full text-[14px] font-bold transition-colors"
+                                                            >
+                                                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                                                Add to cart
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                                                            className={`w-[42px] h-[42px] rounded-full border border-slate-200 flex items-center justify-center transition-colors cursor-pointer ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'bg-red-50 text-red-500 border-red-500' : 'bg-white text-slate-400 hover:border-red-500 hover:text-red-500'}`}
+                                                        >
+                                                            <svg className="pointer-events-none" width="18" height="18" fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                                        </button>
+                                                        <button className="w-[42px] h-[42px] rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:border-[#118AB2] hover:text-[#118AB2] transition-colors">
+                                                            <svg className="pointer-events-none" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="w-full h-64 bg-white rounded-3xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-center p-8">
+                                    <span className="text-6xl mb-4 grayscale opacity-50">😢</span>
+                                    <h3 className="text-2xl font-black text-slate-700 mb-2 font-['Nunito']">No Toys Found</h3>
+                                    <p className="text-slate-500 font-medium">Try adjusting your filters to find the perfect toy.</p>
+                                    <button onClick={clearFilters} className="mt-6 text-[#118AB2] font-bold hover:underline">Clear all filters</button>
+                                </div>
+                            )}
+
+                        </div>
                     </div>
                 </div>
-            </div>
             </div>
 
             {/* Mobile Filters Drawer */}
@@ -472,7 +560,7 @@ const Products = () => {
                             <span className="text-xl font-black text-slate-800 font-['Nunito']">Filters</span>
                             <div className="flex items-center gap-4">
                                 {(selectedCategories.length > 0 || selectedMaxPrice < 5000 || selectedAges.length > 0 || searchParams.get('search')) && (
-                                    <button 
+                                    <button
                                         onClick={clearFilters}
                                         className="text-[14px] font-bold text-[#ff6b6b] hover:text-[#ff5252] hover:underline"
                                     >
@@ -484,7 +572,7 @@ const Products = () => {
                                 </button>
                             </div>
                         </div>
-                        
+
                         <div className="p-6 flex-1 overflow-y-auto">
                             <div className="mb-8">
                                 <h4 className="font-bold text-slate-700 mb-4 uppercase tracking-wider text-xs">Categories</h4>
@@ -492,8 +580,8 @@ const Products = () => {
                                     {categoriesList.map(cat => {
                                         const isSelected = selectedCategories.includes(cat);
                                         return (
-                                            <li 
-                                                key={cat} 
+                                            <li
+                                                key={cat}
                                                 onClick={() => handleCategoryClick(cat)}
                                                 className="flex items-center gap-3 group cursor-pointer"
                                             >
@@ -515,8 +603,8 @@ const Products = () => {
                                     {ageList.map(age => {
                                         const isSelected = selectedAges.includes(age);
                                         return (
-                                            <li 
-                                                key={age} 
+                                            <li
+                                                key={age}
                                                 onClick={() => handleAgeClick(age)}
                                                 className="flex items-center gap-3 group cursor-pointer"
                                             >
@@ -534,14 +622,14 @@ const Products = () => {
 
                             <div className="mb-8">
                                 <h4 className="font-bold text-slate-700 mb-4 uppercase tracking-wider text-xs">Price Range</h4>
-                                <input 
-                                    type="range" 
-                                    min="0" 
-                                    max="5000" 
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="5000"
                                     step="100"
                                     value={selectedMaxPrice}
                                     onChange={handlePriceChange}
-                                    className="w-full accent-[#1D4ED8]" 
+                                    className="w-full accent-[#1D4ED8]"
                                 />
                                 <div className="flex justify-between mt-2 text-xs font-bold text-slate-400">
                                     <span>₹0</span>
@@ -551,13 +639,13 @@ const Products = () => {
                         </div>
 
                         <div className="p-4 border-t border-gray-100 bg-gray-50 flex gap-3">
-                            <button 
+                            <button
                                 onClick={clearFilters}
                                 className="flex-1 bg-slate-200 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-300 transition-colors"
                             >
                                 Clear
                             </button>
-                            <button 
+                            <button
                                 onClick={() => setIsMobileFilterOpen(false)}
                                 className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-md"
                             >

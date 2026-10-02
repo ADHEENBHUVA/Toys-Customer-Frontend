@@ -25,6 +25,7 @@ import Returns from './pages/Returns';
 import TrackOrder from './pages/TrackOrder';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
+import About from './pages/About';
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -93,6 +94,7 @@ function App() {
               <Route path="/track-order" element={<TrackOrder />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/about" element={<About />} />
               
               {/* Protected Routes */}
               <Route element={<ProtectedRoute />}>

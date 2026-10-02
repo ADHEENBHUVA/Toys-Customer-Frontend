@@ -19,7 +19,7 @@ const TrackOrder = () => {
                     <div className="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner">
                         📦
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight font-['Nunito'] mb-4">Track Your Order</h1>
+                    <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight font-['Nunito'] mb-4 font-serif">Track Your Order</h1>
                     <p className="text-slate-500 mb-10">Enter your order number and email address below to see the current status of your magical delivery.</p>
 
                     <form className="space-y-6 text-left" onSubmit={(e) => e.preventDefault()}>

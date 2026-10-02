@@ -164,7 +164,7 @@ const Checkout = () => {
             </div>
 
             {/* Title */}
-            <h1 className="text-3xl font-bold text-[#2e4053] mb-8" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+            <h1 className="text-3xl font-bold text-[#2e4053] mb-8 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
                 Check out
             </h1>
 
@@ -174,65 +174,65 @@ const Checkout = () => {
                     
                     {/* Delivery Info */}
                     <div className="border border-slate-200 rounded-2xl p-6 md:p-8 mb-8">
-                        <h2 className="text-xl font-bold text-[#2e4053] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                        <h2 className="text-xl font-bold text-[#2e4053] mb-6 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
                             Delivery info
                         </h2>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label className="block text-sm font-bold text-[#2e4053] mb-2">First name *</label>
-                                <input type="text" name="firstName" value={address.firstName} onChange={handleInputChange} placeholder="Join" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                                <input type="text" name="firstName" value={address.firstName} onChange={handleInputChange} placeholder="Join" className="w-full border border-slate-200 rounded-[2rem] px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-[#2e4053] mb-2">Last name *</label>
-                                <input type="text" name="lastName" value={address.lastName} onChange={handleInputChange} placeholder="Gray" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                                <input type="text" name="lastName" value={address.lastName} onChange={handleInputChange} placeholder="Gray" className="w-full border border-slate-200 rounded-[2rem] px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
                             </div>
                             
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-bold text-[#2e4053] mb-2">Street address *</label>
-                                <input type="text" name="streetAddress" value={address.streetAddress} onChange={handleInputChange} placeholder="Address" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                                <input type="text" name="streetAddress" value={address.streetAddress} onChange={handleInputChange} placeholder="Address" className="w-full border border-slate-200 rounded-[2rem] px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
                             </div>
                             
                             <div>
                                 <label className="block text-sm font-bold text-[#2e4053] mb-2">ZIP code *</label>
-                                <input type="text" name="zipCode" value={address.zipCode} onChange={handleInputChange} placeholder="e.g. 380015" maxLength="6" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                                <input type="text" name="zipCode" value={address.zipCode} onChange={handleInputChange} placeholder="e.g. 380015" maxLength="6" className="w-full border border-slate-200 rounded-[2rem] px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
                             </div>
                             
                             <div>
                                 <label className="block text-sm font-bold text-[#2e4053] mb-2">Town / City *</label>
-                                <input type="text" name="city" value={address.city} onChange={handleInputChange} placeholder="City" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053] bg-slate-50" />
+                                <input type="text" name="city" value={address.city} onChange={handleInputChange} placeholder="City" className="w-full border border-slate-200 rounded-[2rem] px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053] bg-slate-50" />
                             </div>
                             
                             <div>
                                 <label className="block text-sm font-bold text-[#2e4053] mb-2">State *</label>
-                                <input type="text" name="state" value={address.state} onChange={handleInputChange} placeholder="State" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053] bg-slate-50" />
+                                <input type="text" name="state" value={address.state} onChange={handleInputChange} placeholder="State" className="w-full border border-slate-200 rounded-[2rem] px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053] bg-slate-50" />
                             </div>
                             
                             <div>
                                 <label className="block text-sm font-bold text-[#2e4053] mb-2">Phone *</label>
-                                <input type="text" name="phone" value={address.phone} onChange={handleInputChange} placeholder="(1230) 456-7868" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                                <input type="text" name="phone" value={address.phone} onChange={handleInputChange} placeholder="(1230) 456-7868" className="w-full border border-slate-200 rounded-[2rem] px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
                             </div>
                             
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-bold text-[#2e4053] mb-2">Email address *</label>
-                                <input type="email" name="email" value={address.email} onChange={handleInputChange} placeholder="Example@youremail.com" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
+                                <input type="email" name="email" value={address.email} onChange={handleInputChange} placeholder="Example@youremail.com" className="w-full border border-slate-200 rounded-[2rem] px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053]" />
                             </div>
                             
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-bold text-[#2e4053] mb-2">Order notes (optional)</label>
-                                <textarea name="orderNotes" value={address.orderNotes} onChange={handleInputChange} placeholder="Notes about your order, e.g. special notes for delivery." rows="3" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053] resize-none"></textarea>
+                                <textarea name="orderNotes" value={address.orderNotes} onChange={handleInputChange} placeholder="Notes about your order, e.g. special notes for delivery." rows="3" className="w-full border border-slate-200 rounded-[2rem] px-4 py-3 focus:outline-none focus:border-[#1282a2] text-sm text-[#2e4053] resize-none"></textarea>
                             </div>
                         </div>
                     </div>
 
                     {/* Payment Info */}
                     <div className="border border-slate-200 rounded-2xl p-6 md:p-8">
-                        <h2 className="text-xl font-bold text-[#2e4053] mb-2" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                        <h2 className="text-xl font-bold text-[#2e4053] mb-2 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
                             Payment
                         </h2>
                         <p className="text-sm text-slate-500 mb-6">All transactions are secure and encrypted via Razorpay.</p>
                         
-                        <div className={`border rounded-lg p-5 mb-8 ${paymentMethod === 'razorpay' ? 'border-[#1282a2] bg-blue-50/30' : 'border-slate-200'}`}>
+                        <div className={`border rounded-[2rem] p-5 mb-8 ${paymentMethod === 'razorpay' ? 'border-[#1282a2] bg-blue-50/30' : 'border-slate-200'}`}>
                             <label className="flex items-center cursor-pointer">
                                 <div className="relative flex items-center justify-center w-5 h-5 rounded-full border border-[#1282a2] mr-3 shrink-0">
                                     {paymentMethod === 'razorpay' && <div className="w-2.5 h-2.5 bg-[#1282a2] rounded-full"></div>}
@@ -269,7 +269,7 @@ const Checkout = () => {
                 {/* Right Column (Order Summary) */}
                 <div className="lg:col-span-5">
                     <div className="border border-slate-200 rounded-2xl p-6 md:p-8">
-                        <h2 className="text-xl font-bold text-[#2e4053] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                        <h2 className="text-xl font-bold text-[#2e4053] mb-6 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
                             Your order
                         </h2>
                         

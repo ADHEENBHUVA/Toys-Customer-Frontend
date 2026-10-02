@@ -1,565 +1,625 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, Shield, Leaf, Heart as HeartIcon, Bell } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import ProductCardImageCarousel from '../components/ProductCardImageCarousel';
 
 const Dashboard = () => {
-    const { addToCart, waitlistItems, toggleWaitlist } = useCart();
+    const { addToCart, waitlistItems, toggleWaitlist, shippingSettings, websiteSettings } = useCart();
     const [trendingProducts, setTrendingProducts] = useState([]);
-    const [activeTab, setActiveTab] = useState('Featured');
-    const [testimonialIndex, setTestimonialIndex] = useState(0);
-    const [heroBanners, setHeroBanners] = useState([]);
-    const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+    const [visibleCount, setVisibleCount] = useState(8);
+    const [allProducts, setAllProducts] = useState([]);
+    const [dbCategories, setDbCategories] = useState([]);
 
-    const testimonialsData = [
-        { id: 1, name: "Jessica", avatar: "https://i.pravatar.cc/150?u=jessica_toys", text: "Sagittis vitae et leo duis ut diam quam nulla porttitor massa id neque aliquam", variant: 1 },
-        { id: 2, name: "John Smith", avatar: "https://i.pravatar.cc/150?u=john_smith", text: "Sagittis vitae et leo duis ut diam quam nulla porttitor massa id neque aliquam vestibulum", variant: 2 },
-        { id: 3, name: "Andrea", avatar: "https://i.pravatar.cc/150?u=andrea_toys", text: "Sagittis vitae et leo duis ut diam quam nulla porttitor massa id neque", variant: 3 },
-        { id: 4, name: "Michael", avatar: "https://i.pravatar.cc/150?u=michael_toys", text: "Quisque egestas diam in arcu cursus euismod quis viverra. Purus in massa tempor nec.", variant: 1 },
-        { id: 5, name: "Emily", avatar: "https://i.pravatar.cc/150?u=emily_toys", text: "Tincidunt eget nullam non nisi est sit amet. Egestas purus viverra accumsan in nisl nisi.", variant: 2 }
-    ];
+    // Continuous Scroll & Drag states
+    const categoryContainerRef = React.useRef(null);
+    const animationRef = React.useRef(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+    const [startX, setStartX] = useState(0);
+    const [scrollLeftPos, setScrollLeftPos] = useState(0);
+    const [dragDistance, setDragDistance] = useState(0);
+    const [dynamicGap, setDynamicGap] = useState(32);
 
-    const nextTestimonial = () => setTestimonialIndex(prev => (prev + 1) % testimonialsData.length);
-    const prevTestimonial = () => setTestimonialIndex(prev => (prev - 1 + testimonialsData.length) % testimonialsData.length);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            nextTestimonial();
-        }, 10000);
-        return () => clearInterval(interval);
-    }, [testimonialIndex]);
 
-    const [galleryIndex, setGalleryIndex] = useState(0);
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setGalleryIndex(prev => prev + 1);
-        }, 5000);
-        return () => clearInterval(interval);
-    }, []);
-
-    // Auto rotate hero banners
-    useEffect(() => {
-        if (heroBanners.length <= 1) return;
-        const interval = setInterval(() => {
-            setCurrentBannerIndex(prev => (prev + 1) % heroBanners.length);
-        }, 5000);
-        return () => clearInterval(interval);
-    }, [heroBanners.length]);
-
-    const visibleTestimonials = [
-        testimonialsData[(testimonialIndex) % testimonialsData.length],
-        testimonialsData[(testimonialIndex + 1) % testimonialsData.length],
-        testimonialsData[(testimonialIndex + 2) % testimonialsData.length]
-    ];
-
-    const galleryImages = Array.from({ length: 20 }, (_, i) => `/gallery/img${i + 1}.jpg?v=2`);
+    // Testimonials
+    const [testimonials, setTestimonials] = useState([]);
+    const [testimonialIdx, setTestimonialIdx] = useState(0);
+    const [isTestimonialTransitioning, setIsTestimonialTransitioning] = useState(true);
 
     useEffect(() => {
         const fetchTrendingProducts = async () => {
             try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/products/trending`);
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    // Limit to 8 products for the exact grid look
-                    setTrendingProducts(data.slice(0, 8));
+                if (res.ok) {
+                    const data = await res.json();
+                    setTrendingProducts(data);
                 }
             } catch (error) {
                 console.error('Error fetching trending products:', error);
             }
         };
-        fetchTrendingProducts();
-
-        const fetchHeroBanners = async () => {
+        const fetchAllProducts = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/banners/active`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/products`);
                 if (res.ok) {
                     const data = await res.json();
-                    if (data && data.length > 0) {
-                        setHeroBanners(data);
+                    setAllProducts(data);
+                }
+            } catch (error) {
+                console.error('Error fetching all products:', error);
+            }
+        };
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/categories`);
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json.success) {
+                        setDbCategories(json.data);
                     }
                 }
             } catch (error) {
-                console.error('Error fetching hero banners:', error);
+                console.error('Error fetching categories:', error);
             }
         };
-        fetchHeroBanners();
+        const fetchTestimonials = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/testimonials`);
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json.success) {
+                        setTestimonials(json.data);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching testimonials:', error);
+            }
+        };
+        fetchTrendingProducts();
+        fetchAllProducts();
+        fetchCategories();
+        fetchTestimonials();
     }, []);
 
-    const categories = [
-        { name: 'Playsets', searchQuery: 'Playset', icon: '🪀', color: 'bg-[#bde8f5]' },
-        { name: 'Control Toys', searchQuery: 'Control', icon: '🚙', color: 'bg-[#bde8f5]' },
-        { name: 'Educational Toys', searchQuery: 'Educat', icon: '🔠', color: 'bg-[#bde8f5]' },
-        { name: 'Eco- Friendly Toys', searchQuery: 'Eco', icon: '🎠', color: 'bg-[#bde8f5]' },
-        { name: 'Stuffed Toys', searchQuery: 'Stuffed', icon: '🧸', color: 'bg-[#bde8f5]' }
+    // Testimonials auto-slider
+    useEffect(() => {
+        if (testimonials.length <= 3 && window.innerWidth >= 768) return; 
+        if (testimonials.length <= 1 && window.innerWidth < 768) return;
+
+        const interval = setInterval(() => {
+            setIsTestimonialTransitioning(true);
+            setTestimonialIdx(prev => prev + 1);
+        }, 10000); // 10 seconds
+        return () => clearInterval(interval);
+    }, [testimonials.length]);
+
+    const handleTestimonialTransitionEnd = () => {
+        if (testimonialIdx >= testimonials.length) {
+            setIsTestimonialTransitioning(false);
+            setTestimonialIdx(0);
+        }
+    };
+
+    // Process categories dynamically based on DB categories
+    const categoryMap = {};
+    allProducts.forEach(product => {
+        if (product.category) {
+            let catKey = typeof product.category === 'object' ? (product.category._id || product.category.name) : product.category;
+            if (catKey) {
+                categoryMap[catKey] = (categoryMap[catKey] || 0) + 1;
+            }
+        }
+    });
+
+    // Default images mapping
+    const catImages = [
+        'https://images.unsplash.com/photo-1522771731472-31ebed253c82?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1558066191-ffc45778a48b?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1522771930-78848d9287ec?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=400&fit=crop'
     ];
 
-    const CloudShape = ({ children }) => (
-        <div className="relative w-28 h-20 md:w-36 md:h-28 flex items-center justify-center mt-4">
-            {/* Fluffy cloud approximation matching Image 2 */}
-            <div className="absolute bottom-2 left-2 right-2 h-10 md:h-12 bg-[#bde8f5] rounded-full z-0"></div>
-            <div className="absolute bottom-4 left-0 w-12 h-12 md:w-16 md:h-16 bg-[#bde8f5] rounded-full z-0"></div>
-            <div className="absolute bottom-6 left-6 w-14 h-14 md:w-20 md:h-20 bg-[#bde8f5] rounded-full z-0"></div>
-            <div className="absolute bottom-8 right-8 w-16 h-16 md:w-24 md:h-24 bg-[#bde8f5] rounded-full z-0"></div>
-            <div className="absolute bottom-4 right-0 w-14 h-14 md:w-20 md:h-20 bg-[#bde8f5] rounded-full z-0"></div>
-            <div className="relative z-10 text-4xl md:text-5xl mb-2">{children}</div>
-        </div>
-    );
+    const dynamicCategories = dbCategories.map((dbCat, idx) => {
+        const imageUrl = dbCat.image ? dbCat.image : catImages[idx % catImages.length];
+        const count = (categoryMap[dbCat.name] || 0) + (categoryMap[dbCat._id] || 0);
+        return {
+            name: dbCat.name,
+            count: count,
+            img: imageUrl
+        };
+    });
 
-    const StarRating = ({ rating = 5 }) => {
-        return (
-            <div className="flex text-[#facc15] text-[15px] mt-1 gap-0.5">
+    // If no categories from backend, use fallback
+    const categories = dynamicCategories.length > 0 ? dynamicCategories : [
+        { name: 'Nursery', count: 20, img: catImages[0] },
+        { name: 'Toys & Games', count: 35, img: catImages[1] },
+        { name: 'Feeding', count: 25, img: catImages[2] },
+        { name: 'Baby Gear', count: 30, img: catImages[3] },
+        { name: 'Clothing', count: 40, img: catImages[4] },
+        { name: 'Bath & Care', count: 25, img: catImages[5] }
+    ];
+
+    // Calculate perfect dynamic gap to ensure exactly whole categories fit on screen
+    useEffect(() => {
+        const handleResize = () => {
+            const w = window.innerWidth;
+            const targetStride = 176; // 144px width + roughly 32px gap
+            const count = Math.max(1, Math.floor(w / targetStride));
+            const leftover = w - (count * 144);
+            const gap = leftover / count;
+            setDynamicGap(gap);
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Continuous smooth auto-scroll (requestAnimationFrame)
+    useEffect(() => {
+        if (!categories || categories.length === 0) return;
+
+        const animate = () => {
+            const container = categoryContainerRef.current;
+            if (container && !isHovered && !isDragging) {
+                container.scrollLeft += 1; // Adjust speed here (1px per frame)
+
+                // Seamless infinite loop: jump back when reaching the middle of duplicated content
+                if (container.scrollLeft >= container.scrollWidth / 2) {
+                    container.scrollLeft = 0;
+                }
+            }
+            animationRef.current = requestAnimationFrame(animate);
+        };
+
+        animationRef.current = requestAnimationFrame(animate);
+
+        return () => {
+            if (animationRef.current) cancelAnimationFrame(animationRef.current);
+        };
+    }, [categories, isHovered, isDragging]);
+
+    const handleManualScroll = (direction) => {
+        const container = categoryContainerRef.current;
+        if (!container) return;
+
+        const stride = 144 + dynamicGap;
+        const currentScroll = container.scrollLeft;
+
+        // Find nearest snap point
+        let currentIndex = Math.round(currentScroll / stride);
+        const itemsToScroll = window.innerWidth < 768 ? 1 : 3;
+
+        let targetIndex = direction === 'left' ? currentIndex - itemsToScroll : currentIndex + itemsToScroll;
+        let targetScroll = targetIndex * stride;
+
+        // Handle boundaries
+        if (direction === 'left' && targetScroll < 0) {
+            container.scrollLeft = container.scrollWidth / 2 + currentScroll;
+            targetScroll = container.scrollWidth / 2 + (targetIndex * stride);
+        } else if (direction === 'right' && targetScroll > container.scrollWidth / 2) {
+            container.scrollLeft = currentScroll - (container.scrollWidth / 2);
+            targetScroll = targetScroll - (container.scrollWidth / 2);
+        }
+
+        container.scrollTo({ left: targetScroll, behavior: 'smooth' });
+    };
+
+    const handleMouseDown = (e) => {
+        setIsDragging(true);
+        setDragDistance(0);
+        setStartX(e.pageX - categoryContainerRef.current.offsetLeft);
+        setScrollLeftPos(categoryContainerRef.current.scrollLeft);
+    };
+
+    const handleMouseLeaveDrag = () => {
+        setIsDragging(false);
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - categoryContainerRef.current.offsetLeft;
+        const walk = (x - startX) * 1.5; // Scroll speed multiplier
+        setDragDistance(Math.abs(walk));
+        categoryContainerRef.current.scrollLeft = scrollLeftPos - walk;
+    };
+    const StarRating = ({ rating = 5, count }) => (
+        <div className="flex items-center gap-1.5 mt-1">
+            <div className="flex text-[#e8b960] text-[12px]">
                 {[1, 2, 3, 4, 5].map((star) => (
                     <span key={star}>{star <= rating ? '★' : '☆'}</span>
                 ))}
             </div>
-        );
-    };
-
-    const ProductCard = ({ product, badge }) => (
-        <div className="flex flex-col group bg-white border-2 border-slate-200 shadow-sm rounded-3xl p-4 hover:shadow-[0_20px_50px_-12px_rgba(17,138,178,0.2)] hover:border-[#118AB2]/40 transition-all duration-500 hover:-translate-y-1 relative">
-            {/* Image Container with Soft Background */}
-            <div className="relative bg-slate-50 rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-slate-100">
-                {/* Badges */}
-                <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
-                    {product.compareAtPrice > (product.price || 0) && (
-                        <span className="bg-[#ff6b6b] text-white text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm">
-                            SALE
-                        </span>
-                    )}
-                    {badge && (
-                        <span className="bg-gradient-to-r from-[#FF9800] to-[#F44336] text-white text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm">
-                            {badge}
-                        </span>
-                    )}
-                </div>
-
-                {/* Product Image */}
-                <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center">
-                    {product.thumbnailImage || (product.images && product.images.length > 0) ? (
-                        <img
-                            src={product.thumbnailImage || product.images[0]}
-                            alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
-                        />
-                    ) : (
-                        <div className="text-6xl drop-shadow-sm opacity-50">🧸</div>
-                    )}
-                </Link>
-            </div>
-
-            {/* Product Details */}
-            <div className="flex flex-col flex-1 px-1 pt-4 pb-1">
-                <Link to={`/product/${product._id}`} className="hover:text-[#118AB2] mb-1">
-                    <h3 className="font-extrabold text-[#2c3e50] text-[17px] leading-snug line-clamp-2" style={{ fontFamily: '"Nunito", sans-serif' }}>
-                        {product.name}
-                    </h3>
-                </Link>
-
-                <div className="flex items-center gap-2 mb-2 mt-1">
-                    <StarRating rating={product.rating || 5} />
-                    <span className="text-[12px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)}</span>
-                </div>
-
-                {/* Price and Action Buttons Row */}
-                <div className="flex items-center justify-between mt-auto pt-4">
-                    <div className="flex flex-col">
-                        {product.compareAtPrice > (product.price || 0) && (
-                            <span className="text-[12px] text-slate-400 font-bold line-through mb-[-4px]">₹{(product.compareAtPrice || 0).toFixed(2)}</span>
-                        )}
-                        <span className="font-black text-[#22c55e] text-[20px] leading-none">₹{(product.price || 0).toFixed(2)}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2.5">
-                        <button
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm border hover:scale-110 ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'bg-red-50 border-red-200 text-red-500' : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50'}`}
-                        >
-                            <Heart className="w-[18px] h-[18px]" strokeWidth={2.5} fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product, 1); }}
-                            className="w-10 h-10 bg-[#118AB2] hover:bg-[#0f7a9e] text-white rounded-full flex items-center justify-center transition-all duration-300 shadow-md shadow-[#118AB2]/30 hover:shadow-lg hover:shadow-[#118AB2]/40 hover:scale-110"
-                        >
-                            <ShoppingCart className="w-[18px] h-[18px]" strokeWidth={2.5} />
-                        </button>
-                    </div>
-                </div>
-            </div>
+            {count && <span className="text-[11px] text-[#9ca3af]">({count})</span>}
         </div>
     );
 
-    const activeBanner = heroBanners.length > 0 ? heroBanners[currentBannerIndex] : null;
-
     return (
-        <div className="w-full min-h-screen bg-white font-['Outfit'] pb-20">
-            {/* Hero Section */}
-            <div className="w-full bg-[#dbe2e6] min-h-[550px] md:min-h-[600px] relative overflow-hidden" style={{ fontFamily: '"Nunito", sans-serif' }}>
-                {heroBanners.length > 0 ? heroBanners.map((banner, index) => (
-                    <div
-                        key={banner._id || index}
-                        className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === currentBannerIndex ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}
-                    >
-                        {/* Full Width Background Image */}
-                        <div
-                            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-                            style={{
-                                backgroundImage: `url('${banner.image || "/baby-hero.png"}')`
-                            }}
-                        />
-                        {/* Gradient overlay to ensure text is always readable */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/50 to-transparent md:w-2/3"></div>
+        <div className="w-full min-h-screen bg-[#fcfaf7] font-sans text-[#4a3e3d]">
 
-                        {/* Content Overlay */}
-                        <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 md:px-16 lg:px-32">
-                            <div className="max-w-xl text-center md:text-left transform transition-all duration-1000 translate-y-0">
-                                <h1
-                                    className="text-[44px] md:text-[56px] lg:text-[72px] font-black text-[#1282a2] leading-[1.15] mb-6 tracking-tight drop-shadow-sm"
-                                    style={{ textShadow: '4px 4px 0 #ffffff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
-                                >
-                                    {banner.title || "Play, learn, & grow!"}
-                                </h1>
-                                <div className="inline-block bg-white/60 backdrop-blur-md px-6 py-3 rounded-2xl mb-8 shadow-sm">
-                                    <p className="text-[#3a4d5c] text-[18px] md:text-[20px] font-bold leading-relaxed font-['Outfit']">
-                                        {banner.subtitle || "Crafting smiles with every toy, made for learning, fun, and growth"}
-                                    </p>
+            {/* Top Bar */}
+            <div className="w-full bg-[#fcfaf7] border-b border-[#f3eee7] py-2.5 px-4 flex flex-col md:flex-row justify-between items-center text-[12px] font-medium text-[#8b7e7c] gap-2 md:gap-0 max-w-[1400px] mx-auto">
+                <div className="flex items-center gap-2">
+                    <span className="text-[#d69f7e]">🚚</span>
+                    {shippingSettings ? (
+                        shippingSettings.isFreeShippingActive ? (
+                            `Free shipping on orders over ₹${shippingSettings.freeShippingMinAmount}${shippingSettings.freeShippingMinItems > 0 ? ` or ${shippingSettings.freeShippingMinItems}+ items` : ''}`
+                        ) : (
+                            `Standard shipping applies`
+                        )
+                    ) : (
+                        `Free shipping on orders over ₹999`
+                    )}
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-[#d69f7e]">♥</span> Safe. Natural. Made for little ones.
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-[#d69f7e]">⟲</span> Easy returns within 7 days
+                </div>
+            </div>
+
+            {/* Hero Section */}
+            <div className="max-w-[1400px] mx-auto p-4 md:p-6">
+                <div className="w-full bg-gradient-to-br from-[#fcf3ea] via-[#f7e6d8] to-[#f0ccb6] rounded-[2.5rem] relative overflow-hidden min-h-[500px] md:min-h-[600px] flex flex-col md:flex-row items-center p-8 md:p-16">
+
+                    {/* Decorative Elements */}
+                    <div className="absolute top-10 left-10 text-[#e9b896] opacity-50 text-4xl">✦</div>
+                    <div className="absolute top-20 left-[40%] text-[#e9b896] opacity-50 text-2xl">✦</div>
+
+                    {/* Left Content */}
+                    <div className="w-full md:w-1/2 relative z-10 pt-10 md:pt-0">
+                        <h1 className="text-5xl md:text-[70px] leading-[1.1] font-serif text-[#3d3130] mb-6 tracking-tight">
+                            Little Things, <br /> Big Joys
+                            <span className="inline-block ml-4 text-[#e6a27a]">♡</span>
+                        </h1>
+                        <p className="text-[18px] md:text-[20px] text-[#5e504f] mb-10 max-w-[400px] leading-relaxed">
+                            Thoughtfully chosen essentials for every precious moment.
+                        </p>
+
+                        <div className="flex flex-wrap gap-4 mb-12">
+                            <Link to="/products">
+                                <button className="bg-[#e6a27a] hover:bg-[#d99268] text-white font-medium text-[15px] px-8 py-3.5 rounded-full flex items-center gap-3 transition-colors shadow-sm">
+                                    Shop Now <span className="bg-white text-[#e6a27a] rounded-full w-6 h-6 flex items-center justify-center text-sm">→</span>
+                                </button>
+                            </Link>
+                            <Link to="/products">
+                                <button className="bg-transparent border border-[#3d3130] hover:bg-[#3d3130] hover:text-white text-[#3d3130] font-medium text-[15px] px-8 py-3.5 rounded-full transition-colors">
+                                    Explore Collection
+                                </button>
+                            </Link>
+                        </div>
+
+                        {/* Badges row */}
+                        <div className="flex flex-wrap items-center gap-6 md:gap-10 text-[12px] font-medium text-[#5e504f]">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-white/50 flex items-center justify-center text-[#93b38c]">
+                                    <Leaf className="w-4 h-4" />
                                 </div>
-                                <div>
-                                    <Link to={banner.buttonLink || "/shop"}>
-                                        <button className="bg-[#fbdf14] hover:bg-[#ebd013] text-[#2e4053] font-bold text-[18px] px-10 py-3.5 rounded-full transition-transform hover:-translate-y-1 shadow-lg">
-                                            {banner.buttonText || "Shop now"}
-                                        </button>
-                                    </Link>
+                                <div className="flex flex-col">
+                                    <span className="font-bold text-[#3d3130]">Safe Materials</span>
+                                    <span className="text-[11px] text-[#8b7e7c]">Non-toxic & baby-safe</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-white/50 flex items-center justify-center text-[#e6a27a]">
+                                    <Shield className="w-4 h-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="font-bold text-[#3d3130]">Trusted Quality</span>
+                                    <span className="text-[11px] text-[#8b7e7c]">Tested & certified</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-white/50 flex items-center justify-center text-[#e8b960]">
+                                    <HeartIcon className="w-4 h-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="font-bold text-[#3d3130]">Made with Love</span>
+                                    <span className="text-[11px] text-[#8b7e7c]">For happy little ones</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                )) : (
-                    // Fallback static hero if no banners from API
-                    <div className="absolute inset-0 w-full h-full opacity-100 z-20">
-                        <div
-                            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-                            style={{ backgroundImage: `url('/baby-hero.png')` }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/50 to-transparent md:w-2/3"></div>
 
-                        <div className="relative z-10 w-full h-full flex flex-col justify-center px-6 md:px-16 lg:px-32">
-                            <div className="max-w-xl text-center md:text-left">
-                                <h1
-                                    className="text-[44px] md:text-[56px] lg:text-[72px] font-black text-[#1282a2] leading-[1.15] mb-6 tracking-tight drop-shadow-sm"
-                                    style={{ textShadow: '4px 4px 0 #ffffff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
-                                >
-                                    Play, learn, & grow!
-                                </h1>
-                                <div className="inline-block bg-white/60 backdrop-blur-md px-6 py-3 rounded-2xl mb-8 shadow-sm">
-                                    <p className="text-[#3a4d5c] text-[18px] md:text-[20px] font-bold leading-relaxed font-['Outfit']">
-                                        Crafting smiles with every toy, made for learning, fun, and growth
-                                    </p>
+                    {/* Right Image */}
+                    <div className="w-full md:w-1/2 relative h-full flex justify-end items-end mt-12 md:mt-0 z-0">
+                        <div className="absolute top-10 right-10 bg-[#fdfaf7] rounded-full w-[130px] h-[130px] flex flex-col items-center justify-center shadow-sm z-20">
+                            <span className="text-[12px] font-medium text-[#8b7e7c]">For Every</span>
+                            <span className="text-[18px] font-serif text-[#3d3130] leading-tight text-center">Little<br />Adventure</span>
+                            <span className="text-[#e6a27a] text-[10px] mt-1">♡</span>
+                        </div>
+                        {/* Replace with actual baby image in final */}
+                        <div className="w-[90%] md:w-[120%] h-auto -mb-8 -mr-8 relative z-10">
+                            <img src="/baby-hero-new.png" alt="Baby" onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80' }} className="w-full h-full object-cover rounded-3xl" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Categories */}
+            <div className="w-full pt-16 pb-8 text-center">
+                <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+                    <div className="mb-2 text-[#e6a27a]">♡</div>
+                    <h2 className="text-[32px] font-serif text-[#3d3130] mb-2">Shop by Categories</h2>
+                    <p className="text-[#8b7e7c] text-[15px] mb-12">Everything your little one needs, all in one place.</p>
+                </div>
+
+                <div
+                    className="relative w-full py-4 group"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    {/* Left Arrow - Centered on Image */}
+                    <button
+                        onClick={() => handleManualScroll('left')}
+                        className="absolute left-4 top-[88px] -translate-y-1/2 z-20 bg-white/95 text-[#3d3130] p-3 rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.15)] opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-[#fcfaf7] hidden md:flex items-center justify-center cursor-pointer"
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </button>
+
+                    {/* Right Arrow - Centered on Image */}
+                    <button
+                        onClick={() => handleManualScroll('right')}
+                        className="absolute right-4 top-[88px] -translate-y-1/2 z-20 bg-white/95 text-[#3d3130] p-3 rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.15)] opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-[#fcfaf7] hidden md:flex items-center justify-center cursor-pointer"
+                    >
+                        <ChevronRight className="w-6 h-6" />
+                    </button>
+
+                    <style>
+                        {`
+                        .hide-scrollbar::-webkit-scrollbar {
+                            display: none;
+                        }
+                        .hide-scrollbar {
+                            -ms-overflow-style: none;
+                            scrollbar-width: none;
+                        }
+                        `}
+                    </style>
+                    <div
+                        ref={categoryContainerRef}
+                        className={`flex overflow-x-auto hide-scrollbar ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                        style={{ gap: `${dynamicGap}px` }}
+                        onMouseDown={handleMouseDown}
+                        onMouseLeave={handleMouseLeaveDrag}
+                        onMouseUp={handleMouseUp}
+                        onMouseMove={handleMouseMove}
+                    >
+                        {/* Duplicate categories exactly twice for seamless 50% loop math */}
+                        {[...categories, ...categories, ...categories, ...categories, ...categories, ...categories, ...categories, ...categories].map((cat, idx) => (
+                            <Link
+                                to={`/products?search=${encodeURIComponent(cat.name)}`}
+                                key={idx}
+                                onClick={(e) => { if (dragDistance > 5) e.preventDefault(); }}
+                                className="group flex flex-col items-center justify-start flex-shrink-0"
+                                style={{ width: '144px' }}
+                            >
+                                <div className="w-36 h-36 mb-4 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex items-center justify-center overflow-hidden rounded-full border-[6px] border-white transition-all duration-500 transform group-hover:-translate-y-2 group-hover:shadow-[0_12px_40px_rgb(230,162,122,0.2)]">
+                                    <img src={cat.img} alt={cat.name} draggable="false" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
                                 </div>
-                                <div>
-                                    <Link to="/shop">
-                                        <button className="bg-[#fbdf14] hover:bg-[#ebd013] text-[#2e4053] font-bold text-[18px] px-10 py-3.5 rounded-full transition-transform hover:-translate-y-1 shadow-lg">
-                                            Shop now
-                                        </button>
+                                <span className="font-bold text-[#3d3130] text-[16px] text-center font-serif group-hover:text-[#e6a27a] transition-colors">{cat.name}</span>
+                                <span className="text-[13px] text-[#8b7e7c] text-center mt-0.5">{cat.count} products</span>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Featured Products */}
+            <div className="max-w-[1400px] mx-auto pt-8 pb-8 px-4 md:px-6">
+                <div className="text-center mb-14">
+                    <div className="mb-2 text-[#e6a27a] text-lg">♡</div>
+                    <h2 className="text-[36px] font-serif text-[#3d3130] mb-2">Featured Products</h2>
+                    <p className="text-[#8b7e7c] text-[16px]">Carefully selected favorites for your little ones.</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                    {[...allProducts]
+                        .sort((a, b) => {
+                            if (a.bestSeller && !b.bestSeller) return -1;
+                            if (!a.bestSeller && b.bestSeller) return 1;
+                            return (b.ratingCount || 0) - (a.ratingCount || 0);
+                        })
+                        .slice(0, visibleCount)
+                        .map((product, idx) => (
+                            <div key={product._id} className="flex flex-col bg-white rounded-3xl overflow-hidden border border-[#f3eee7] transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(230,162,122,0.15)] group cursor-pointer">
+
+                                {/* Image Container - Premium gradient background */}
+                                <div className="relative w-full aspect-[5/4] overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white to-[#fdfaf7] p-4">
+                                    {/* Badges */}
+                                    <div className="absolute top-4 left-4 z-20 flex flex-col gap-2 items-start">
+                                        {idx === 0 && <span className="bg-[#e6a27a] text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">Best Seller</span>}
+                                        {idx === 1 && <span className="bg-[#93b38c] text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">New</span>}
+                                        
+                                        {product.originalPrice > product.price && (
+                                            <span className="bg-[#e8b960] text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
+                                                {websiteSettings?.discountDisplayType === 'percentage' 
+                                                    ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
+                                                    : `Save ₹${Math.round(product.originalPrice - product.price)}`}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
+                                        <span className="absolute bottom-4 left-4 z-20 bg-orange-100 border border-orange-200 text-orange-600 text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-sm flex items-center gap-1 animate-pulse">
+                                            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path></svg>
+                                            Only {product.stockQuantity} Left!
+                                        </span>
+                                    )}
+
+                                    {/* Waitlist Heart (Top Right inside Square Box) */}
+                                    <button
+                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                                        className="absolute top-4 right-4 z-20 bg-white/95 p-2.5 rounded-full shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-110"
+                                        title="Join Waitlist"
+                                    >
+                                        <Heart
+                                            className={`w-5 h-5 text-red-500 transition-colors ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'fill-red-500' : 'hover:fill-red-500/30'}`}
+                                        />
+                                    </button>
+
+                                    <Link to={`/product/${product._id}`} className="absolute inset-4 z-10 flex items-center justify-center">
+                                        <ProductCardImageCarousel 
+                                            images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])} 
+                                            productName={product.name} 
+                                        />
                                     </Link>
                                 </div>
+
+                                {/* Content Section */}
+                                <div className="p-5 flex flex-col flex-grow">
+                                    <Link to={`/product/${product._id}`} className="font-bold font-serif text-[#3d3130] text-[17px] mb-1 hover:text-[#e6a27a] transition-colors truncate">
+                                        {product.name}
+                                    </Link>
+
+                                    <StarRating rating={Math.round(product.rating || 5)} count={product.ratingCount || 0} />
+
+                                    <div className="text-[12px] text-[#8b7e7c] mt-1 mb-2 leading-relaxed">
+                                        <p className="line-clamp-1">
+                                            {product.shortDescription || (product.description?.replace(/<[^>]+>/g, ' ')?.replace(product.name, '')?.trim()) || "A wonderful and safe toy for your little ones to play, learn, and grow."}
+                                        </p>
+                                        <Link to={`/product/${product._id}`} className="text-[#e6a27a] hover:text-[#d38b60] font-bold text-[11px] mt-1 inline-block">
+                                            View more
+                                        </Link>
+                                    </div>
+
+                                    <div className="mt-2 pt-3 border-t border-[#f3eee7] flex flex-col gap-2">
+                                        <div className="flex items-end gap-2 h-[24px]">
+                                            {product.status === 'Out of Stock' ? (
+                                                <span className="font-bold text-slate-400 text-[18px] leading-none">Out of Stock</span>
+                                            ) : (
+                                                <>
+                                                    <span className="font-bold text-[#e6a27a] text-[20px] leading-none">₹{`${(product.price || 0).toFixed(2)}`}</span>
+                                                    {product.originalPrice > (product.price || 0) && (
+                                                        <span className="text-[13px] text-[#b3a8a6] line-through font-medium leading-none">₹{`${(product.originalPrice || 0).toFixed(2)}`}</span>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        {product.status === 'Out of Stock' ? (
+                                            <button disabled className="w-full bg-slate-50 text-slate-400 border border-slate-200 py-3 rounded-full cursor-not-allowed font-bold text-[14px] flex items-center justify-center gap-2" title="Out of Stock">
+                                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"></path></svg> Out of Stock
+                                            </button>
+                                        ) : (
+                                            <button onClick={() => addToCart(product, 1)} className="w-full bg-white text-[#3d3130] border border-[#ebe5df] py-3 rounded-full shadow-sm hover:shadow-md hover:bg-[#e6a27a] hover:text-white hover:border-[#e6a27a] transition-all duration-300 font-bold text-[14px] flex items-center justify-center gap-2 group/btn" title="Add to Cart">
+                                                <ShoppingCart className="w-4 h-4 group-hover/btn:scale-110 transition-transform" /> Add to Cart
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
                             </div>
-                        </div>
+                        ))}
+                </div>
+
+                {/* View More Products Button */}
+                {visibleCount < allProducts.length && (
+                    <div className="flex justify-center mt-12">
+                        <button onClick={() => setVisibleCount(prev => prev + 8)} className="bg-[#118AB2] text-white px-8 py-3.5 rounded-full font-bold shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-[#0a5c78] transition-all duration-300">
+                            View More
+                        </button>
                     </div>
                 )}
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            {/* Why Parents Choose */}
+            <div className="max-w-[1400px] mx-auto pt-8 pb-8 px-4 md:px-6">
+                <div className="bg-[#f4f6f1] rounded-[2.5rem] flex flex-col lg:flex-row overflow-hidden">
+                    <div className="w-full lg:w-1/2 p-10 md:p-16 flex flex-col justify-center">
+                        <h2 className="text-[32px] md:text-[40px] font-serif text-[#3d3130] mb-2 leading-tight">Why Parents Choose Little Joys</h2>
+                        <p className="text-[#8b7e7c] text-[15px] mb-10">Because your baby deserves the very best.</p>
 
-                {/* Find the Perfect Toy */}
-                <div className="text-center mb-12 mt-8">
-                    <h2 className="text-4xl font-bold text-[#2e2b2a] mb-2" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive', letterSpacing: '0.5px', wordSpacing: '4px' }}>
-                        Find the Perfect Toy
-                    </h2>
-                    <p className="text-slate-500 text-[15px] font-medium">Our Collections</p>
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-8 md:gap-16 mb-20">
-                    {categories.map((cat, idx) => (
-                        <Link to={`/products?search=${encodeURIComponent(cat.searchQuery)}`} key={idx} className="flex flex-col items-center cursor-pointer group">
-                            <div className="mb-4 transform group-hover:-translate-y-2 transition-transform duration-300">
-                                <CloudShape>{cat.icon}</CloudShape>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-8">
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 text-[#93b38c]">
+                                    <Leaf className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-[#3d3130] text-[15px] mb-1">Safe & Non-Toxic</h4>
+                                    <p className="text-[#8b7e7c] text-[13px] leading-relaxed">We use only non-toxic, BPA-free, and baby-safe materials.</p>
+                                </div>
                             </div>
-                            <span className="font-bold text-slate-700 text-sm">{cat.name}</span>
-                        </Link>
-                    ))}
-                </div>
-
-                {/* Top Picks */}
-                <div className="text-center mb-8">
-                    <h2 className="text-4xl font-bold text-[#2e2b2a] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive', letterSpacing: '0.5px' }}>
-                        Top picks for your little ones
-                    </h2>
-                    <div className="flex justify-center gap-2 md:gap-4">
-                        {['Featured', 'Best seller', 'New arrivals'].map(tab => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-5 py-2 rounded-full text-[15px] font-medium transition-colors ${activeTab === tab ? 'bg-[#f4ebf9] text-[#4b5563]' : 'bg-transparent text-[#4b5563] hover:bg-slate-50'}`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-20">
-                    {trendingProducts.slice(0, 8).map(product => (
-                        <ProductCard key={product._id} product={product} />
-                    ))}
-                </div>
-
-                {/* Banners */}
-                <div className="grid lg:grid-cols-2 gap-6 md:gap-8 mb-20">
-                    {/* Left Banner - Discover the Joy of Play */}
-                    <div className="bg-[#fff1f2] rounded-[32px] p-8 md:p-12 relative overflow-hidden flex flex-col justify-center min-h-[340px] shadow-sm hover:shadow-md transition-shadow group">
-                        {/* Decorative Shapes */}
-                        <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#fef08a] rounded-full mix-blend-multiply opacity-70 group-hover:scale-110 transition-transform duration-500"></div>
-                        <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-[#bfdbfe] rounded-[40px] rotate-12 mix-blend-multiply opacity-70 group-hover:-rotate-12 transition-transform duration-500"></div>
-
-                        <div className="relative z-10 max-w-[80%]">
-                            <span className="inline-block py-1 px-3 rounded-full bg-pink-100 text-pink-600 font-bold text-xs uppercase tracking-wider mb-4">New Arrivals</span>
-                            <h3 className="text-4xl md:text-5xl font-black text-[#831843] mb-4 leading-tight font-['Nunito']">
-                                Discover the <br /> Joy of Play
-                            </h3>
-                            <p className="text-pink-900/70 font-medium mb-8 text-[15px] max-w-[280px]">
-                                Explore our premium collection of interactive toys for kids of all ages.
-                            </p>
-                            <button className="bg-[#f43f5e] hover:bg-[#e11d48] text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-pink-200 transition-transform hover:-translate-y-1">
-                                Explore Collection
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Right Banner - Eco-Friendly Toys */}
-                    <div className="bg-[#f0fdfa] rounded-[32px] p-8 md:p-12 relative overflow-hidden flex flex-col justify-center min-h-[340px] shadow-sm hover:shadow-md transition-shadow group">
-                        {/* Decorative Shapes */}
-                        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-l from-[#ccfbf1] to-transparent opacity-50 z-0"></div>
-
-                        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 h-full">
-                            <div className="flex-1 text-center md:text-left order-2 md:order-1">
-                                <span className="inline-block py-1 px-3 rounded-full bg-teal-100 text-teal-700 font-bold text-xs uppercase tracking-wider mb-4">Save 30% Today</span>
-                                <h3 className="text-4xl md:text-5xl font-black text-[#134e4a] mb-4 leading-tight font-['Nunito']">
-                                    Eco-Friendly <br /> Toys
-                                </h3>
-                                <p className="text-teal-900/60 font-medium mb-8 text-[15px]">
-                                    Safe, sustainable, and super fun! Extra discount for loyal customers.
-                                </p>
-                                <button className="bg-[#14b8a6] hover:bg-[#0d9488] text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-teal-200 transition-transform hover:-translate-y-1">
-                                    Shop Now
-                                </button>
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 text-[#93b38c]">
+                                    <Shield className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-[#3d3130] text-[15px] mb-1">Premium Quality</h4>
+                                    <p className="text-[#8b7e7c] text-[13px] leading-relaxed">Durable, long-lasting products tested to the highest standards.</p>
+                                </div>
                             </div>
-
-                            <div className="order-1 md:order-2 relative w-[200px] h-[200px] md:w-[240px] md:h-[240px] shrink-0">
-                                <div className="absolute inset-0 bg-[#99f6e4] rounded-full scale-105 group-hover:scale-110 transition-transform duration-500"></div>
-                                <div className="absolute inset-0 bg-white rounded-full p-2 shadow-xl">
-                                    <img
-                                        src="/baby-hero.png"
-                                        alt="Baby playing"
-                                        className="w-full h-full object-cover rounded-full"
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=400&q=80";
-                                        }}
-                                    />
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 text-[#e6a27a]">
+                                    <HeartIcon className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-[#3d3130] text-[15px] mb-1">Gentle on Baby</h4>
+                                    <p className="text-[#8b7e7c] text-[13px] leading-relaxed">Designed with care for your baby's sensitive skin and comfort.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 text-[#93b38c]">
+                                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" /><path d="M12 16V12" /><path d="M12 8H12.01" /></svg>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-[#3d3130] text-[15px] mb-1">Sustainable Choice</h4>
+                                    <p className="text-[#8b7e7c] text-[13px] leading-relaxed">Eco-friendly materials and packaging for a better tomorrow.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div className="w-full lg:w-1/2 relative min-h-[300px]">
+                        <div className="absolute top-8 right-8 bg-[#fdfaf7] rounded-[50%_50%_50%_50%/60%_60%_40%_40%] w-[120px] h-[110px] flex flex-col items-center justify-center shadow-sm z-20 transform rotate-12">
+                            <span className="text-[14px] font-serif text-[#3d3130] leading-tight text-center">Quality<br />You Can<br />Trust</span>
+                            <span className="text-[#e6a27a] text-[10px] mt-1">♡</span>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=800&q=80" alt="Baby Basket" className="w-full h-full object-cover" />
+                    </div>
                 </div>
+            </div>
 
-                {/* Customer Loves */}
-                <div className="text-center mb-10">
-                    <h2 className="text-3xl font-black text-[#2c3e50] font-['Nunito'] mb-2">Customer Loves</h2>
-                    <p className="text-slate-500 text-sm">Popular product</p>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-24">
-                    {trendingProducts.slice(0, 8).map((product, idx) => (
-                        <ProductCard key={`love-${product._id}`} product={product} badge={idx < 4 ? "Best Seller" : "Trending"} />
-                    ))}
-                </div>
+            {/* Loved by Parents */}
+            <div className="max-w-[1400px] mx-auto pt-8 pb-16 px-4 md:px-6 text-center">
+                <div className="mb-2 text-[#e6a27a]">♡</div>
+                <h2 className="text-[32px] font-serif text-[#3d3130] mb-2">Loved by Parents</h2>
+                <p className="text-[#8b7e7c] text-[15px] mb-12">Real stories from our happy Little Joys family.</p>
 
-                {/* Testimonials */}
-                <div className="text-center mb-10">
-                    <h2 className="text-[34px] font-bold text-[#333333] mb-1" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Nunito", sans-serif' }}>
-                        Hear from Other Happy Parents
-                    </h2>
-                    <p className="text-[#666666] text-[17px] font-medium" style={{ fontFamily: '"Nunito", sans-serif' }}>
-                        Customer testimonials
-                    </p>
-                </div>
-
-                <div className="relative mb-24 flex items-center px-6">
-                    <button onClick={prevTestimonial} className="absolute left-0 z-10 bg-white shadow-sm rounded-full w-9 h-9 flex items-center justify-center text-[#999999] hover:text-slate-800 border-[2px] border-[#e5e5e5] transition-colors">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-                    </button>
-
-                    <div className="grid md:grid-cols-3 gap-6 w-full">
-                        {visibleTestimonials.map((testimonial, idx) => (
-                            <div key={`${testimonial.id}-${idx}`} className="bg-[#fcf5f5] p-8 rounded-2xl relative overflow-hidden text-left border border-transparent animate-slide-left">
-                                <div className="absolute top-6 right-6 text-[#d1d5db] text-[54px] font-serif leading-none rotate-180" style={{ transform: 'rotateY(180deg)' }}>"</div>
-
-                                {/* Decorations */}
-                                {testimonial.variant === 1 && (
-                                    <>
-                                        <div className="absolute top-10 right-14 text-[#ffc1cc] text-lg flex gap-1 -rotate-12">
-                                            <span className="translate-y-2 text-sm">❤</span>
-                                            <span className="-translate-y-1 text-xs">❤</span>
-                                            <span className="translate-y-4 text-[10px]">❤</span>
-                                        </div>
-                                        <div className="absolute bottom-6 left-6 text-[#ffc1cc]">
-                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                                                <path d="M6 22L12 10M2 18L7 12M12 24L16 16" />
-                                            </svg>
-                                        </div>
-                                        <div className="absolute bottom-10 right-4 text-[#a3d9a5] opacity-80">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="absolute -bottom-4 right-4"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
-                                        </div>
-                                    </>
-                                )}
-                                {testimonial.variant === 2 && (
-                                    <>
-                                        <div className="absolute top-10 right-16 text-[#a3d9a5] opacity-80">
-                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="absolute top-2 -right-6"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
-                                        </div>
-                                        <div className="absolute bottom-6 left-6 text-[#ffc1cc]">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                                                <path d="M6 22L12 10M2 18L7 12M12 24L16 16" />
-                                            </svg>
-                                        </div>
-                                        <div className="absolute bottom-6 right-6 text-[#ffc1cc] text-lg flex gap-2 rotate-12">
-                                            <span className="-translate-y-3 text-[10px]">❤</span>
-                                            <span className="translate-y-1 text-sm">❤</span>
-                                            <span className="-translate-y-1 text-xs">❤</span>
-                                        </div>
-                                    </>
-                                )}
-                                {testimonial.variant === 3 && (
-                                    <>
-                                        <div className="absolute top-8 right-14 text-[#ffc1cc] text-lg flex gap-2 rotate-[25deg]">
-                                            <span className="-translate-y-2 text-[10px]">❤</span>
-                                            <span className="translate-y-1 text-sm">❤</span>
-                                            <span className="translate-y-3 text-xs">❤</span>
-                                        </div>
-                                        <div className="absolute bottom-6 left-6 text-[#ffc1cc]">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                                                <path d="M6 22L12 10M2 18L7 12M12 24L16 16" />
-                                            </svg>
-                                        </div>
-                                        <div className="absolute bottom-10 right-4 text-[#a3d9a5] opacity-80">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="absolute -bottom-4 right-6"><path d="M12 2v20M2 12h20M5 5l14 14M5 19l14-14" /></svg>
-                                        </div>
-                                    </>
-                                )}
-
-                                <div className="flex gap-[2px] mb-5 text-[#ffd700] text-xl">
-                                    ★★★★★
-                                </div>
-
-                                <p className="text-[#7a7a7a] text-[15px] font-medium leading-relaxed mb-8 z-10 relative pr-4">
-                                    {testimonial.text}
+                <div className="relative overflow-hidden w-full py-2">
+                    <div
+                        className={`flex gap-6 ${isTestimonialTransitioning ? 'transition-transform duration-1000 ease-in-out' : ''}`}
+                        style={{ transform: `translateX(calc(-${testimonialIdx * (100 / (window.innerWidth < 768 ? 1 : 3))}% - ${testimonialIdx * (24 / (window.innerWidth < 768 ? 1 : 3))}px))` }}
+                        onTransitionEnd={handleTestimonialTransitionEnd}
+                    >
+                        {[...testimonials, ...testimonials].map((test, index) => (
+                            <div key={`${test._id || test.name}-${index}`} className="bg-white border border-[#f3eee7] rounded-[2rem] p-8 text-left shadow-sm min-w-[100%] md:min-w-[calc(33.333%-16px)]">
+                                <p className="text-[#5e504f] text-[14px] leading-relaxed mb-6 min-h-[80px]">
+                                    {test.text}
                                 </p>
-
-                                <div className="flex items-center gap-3">
-                                    <img src={testimonial.avatar} alt={testimonial.name} className="w-10 h-10 rounded-full object-cover shadow-sm" />
-                                    <span className="font-semibold text-[#4a4a4a] text-[15px]">{testimonial.name}</span>
+                                <StarRating rating={test.rating || 5} />
+                                <div className="flex items-center gap-3 mt-6 pt-6 border-t border-[#f3eee7]">
+                                    <img src={test.avatar} alt={test.name} className="w-10 h-10 rounded-full object-cover" />
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-[#3d3130] text-[14px]">{test.name}</span>
+                                        <span className="text-[11px] text-[#8b7e7c]">{test.location}</span>
+                                    </div>
                                 </div>
                             </div>
                         ))}
                     </div>
-
-                    <button onClick={nextTestimonial} className="absolute right-0 z-10 bg-white shadow-sm rounded-full w-9 h-9 flex items-center justify-center text-[#999999] hover:text-slate-800 border-[2px] border-[#e5e5e5] transition-colors">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
-                    </button>
-                </div>
-
-            </div>
-
-            {/* Edge to Edge Gallery */}
-            <div className="text-center mb-8">
-                <h2 className="text-[34px] font-bold text-[#333333] mb-1" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Nunito", sans-serif' }}>
-                    Recent photoshoots
-                </h2>
-                <p className="text-[#666666] text-[17px] font-medium" style={{ fontFamily: '"Nunito", sans-serif' }}>
-                    Check gallery
-                </p>
-            </div>
-
-            <div className="w-full overflow-hidden mb-24 max-w-[1600px] mx-auto px-4">
-                <div
-                    className="flex transition-transform duration-1000 ease-in-out"
-                    style={{ transform: `translateX(-${galleryIndex * (window.innerWidth < 768 ? 50 : 25)}%)` }}
-                >
-                    {Array(100).fill(galleryImages).flat().map((src, idx) => (
-                        <div key={`gallery-item-${idx}`} className="w-1/2 md:w-1/4 shrink-0 px-2 aspect-square">
-                            <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                                <img src={src} className="w-full h-full object-cover" alt={`Photoshoot ${idx + 1}`} />
-                            </div>
-                        </div>
-                    ))}
                 </div>
             </div>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-                {/* Features */}
-                <div className="grid md:grid-cols-3 gap-6">
-                    {/* Customer Care */}
-                    <div className="rounded-[24px] bg-[#f4f9fd] py-8 px-4 flex flex-col items-center text-center transition-transform hover:-translate-y-1">
-                        <div className="mb-4">
-                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#2bb0e3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                                <path d="M3 3v5h5" />
-                                <circle cx="12" cy="12" r="6" stroke="none" fill="#f4f9fd" />
-                                <text x="12" y="14.5" fontSize="6.5" fontWeight="bold" textAnchor="middle" stroke="none" fill="#2bb0e3">24</text>
-                            </svg>
-                        </div>
-                        <h4 className="font-semibold text-[#2bb0e3] text-[18px] mb-1">Customer care</h4>
-                        <p className="text-[#666666] text-[14px]">24h hour follow up</p>
-                    </div>
-
-                    {/* Free Ship */}
-                    <div className="rounded-[24px] bg-[#fffaf5] py-8 px-4 flex flex-col items-center text-center transition-transform hover:-translate-y-1">
-                        <div className="mb-4 relative">
-                            <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#f48624" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11" />
-                                <path d="M14 9h4l4 4v5c0 .6-.4 1-1 1h-2" />
-                                <circle cx="7" cy="18" r="2" />
-                                <circle cx="17" cy="18" r="2" />
-                                <text x="8.5" y="12" fontSize="3.5" fontWeight="bold" textAnchor="middle" stroke="none" fill="#f48624">FREE</text>
-                            </svg>
-                        </div>
-                        <h4 className="font-semibold text-[#f48624] text-[18px] mb-1">Free ship</h4>
-                        <p className="text-[#666666] text-[14px]">Free shipping for ₹150 and up</p>
-                    </div>
-
-                    {/* Return */}
-                    <div className="rounded-[24px] bg-[#f4fcf6] py-8 px-4 flex flex-col items-center text-center transition-transform hover:-translate-y-1">
-                        <div className="mb-4">
-                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#1abf52" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="7" r="4" />
-                                <path d="M12 4.5v5" />
-                                <path d="M10.5 5.5c0-1 3-1 3 0s-3 1-3 0" />
-                                <path d="M10.5 7.5c0 1 3 1 3 0" />
-                                <path d="M4 14c2-1 4-1 6 0l2 1c2 1 4 1 6 0l2-1" />
-                                <path d="M4 17c2-1 4-1 6 0l2 1c2 1 4 1 6 0l2-1" />
-                            </svg>
-                        </div>
-                        <h4 className="font-semibold text-[#1abf52] text-[18px] mb-1">Return</h4>
-                        <p className="text-[#666666] text-[14px]">Within 7 days</p>
-                    </div>
-                </div>
-            </div>
-
         </div>
     );
 };

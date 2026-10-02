@@ -41,7 +41,7 @@ const FAQ = () => {
             </div>
 
             {/* Title */}
-            <h1 className="text-3xl font-bold text-[#2e4053] mb-8" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+            <h1 className="text-3xl font-bold text-[#2e4053] mb-8 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
                 FAQ'S
             </h1>
 

@@ -13,7 +13,7 @@ const Contact = () => {
             </div>
 
             {/* Title */}
-            <h1 className="text-3xl font-bold text-[#2e4053] mb-8" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+            <h1 className="text-3xl font-bold text-[#2e4053] mb-8 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
                 Contact
             </h1>
 
@@ -42,7 +42,7 @@ const Contact = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
                 
                 {/* Left: Map */}
-                <div className="h-[450px] rounded-lg overflow-hidden border border-slate-200 relative bg-slate-100">
+                <div className="h-[450px] rounded-[2rem] overflow-hidden border border-slate-200 relative bg-slate-100">
                     <iframe 
                         title="Miami Location"
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d114964.53925916665!2d-80.2994992026862!3d25.782390733064336!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9b0a20ec8c111%3A0xff96f271ddad4f65!2sMiami%2C%20FL!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" 
@@ -57,7 +57,7 @@ const Contact = () => {
 
                 {/* Right: Contact Form */}
                 <div className="pt-4 lg:pt-0">
-                    <h2 className="text-2xl font-bold text-[#2e4053] mb-8" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                    <h2 className="text-2xl font-bold text-[#2e4053] mb-8 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
                         Contact Us
                     </h2>
                     
