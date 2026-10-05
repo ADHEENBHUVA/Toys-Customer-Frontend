@@ -153,10 +153,7 @@ const LoginContent = () => {
                                     <div className="absolute top-1/2 -translate-y-1/2 left-4 text-[#8b7e7c] group-focus-within:text-[#e6a27a] transition-colors">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" /></svg>
                                     </div>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Please enter a valid email address with @ and ." required
                                         placeholder="hello@example.com"
                                         className="w-full bg-white border border-[#f0e8e6] rounded-2xl pl-12 pr-4 py-3.5 text-[#3d3130] font-bold text-sm placeholder-[#8b7e7c]/50 focus:outline-none focus:border-[#e6a27a] focus:ring-4 focus:ring-[#e6a27a]/10 transition-all hover:border-[#e6a27a]/50"
                                     />

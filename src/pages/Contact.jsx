@@ -79,11 +79,7 @@ const Contact = () => {
                         </div>
                         
                         <div>
-                            <input 
-                                type="email" 
-                                placeholder="Email address" 
-                                className="w-full border border-slate-300 rounded-xl px-5 py-3 text-[14px] text-[#2e4053] focus:outline-none focus:border-[#1282a2] placeholder-slate-400"
-                            />
+                            <input type="email" placeholder="Email address" className="w-full border border-slate-300 rounded-xl px-5 py-3 text-[14px] text-[#2e4053] focus:outline-none focus:border-[#1282a2] placeholder-slate-400" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Please enter a valid email address with @ and ." />
                         </div>
                         
                         <div>

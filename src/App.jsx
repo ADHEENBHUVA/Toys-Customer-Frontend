@@ -39,10 +39,10 @@ const ScrollToTop = () => {
 
 const Layout = () => {
     return (
-        <div className="min-h-screen bg-transparent font-sans text-slate-800 flex flex-col relative overflow-hidden">
+        <div className="min-h-screen bg-transparent font-sans text-slate-800 flex flex-col relative">
             <ScrollToTop />
             <Navbar />
-            <main className="flex-1 relative z-10 px-2 md:px-6">
+            <main className="flex-1 relative z-10">
                 <Outlet />
             </main>
             <Footer />

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const FAQ = () => {
     const [openIndex, setOpenIndex] = useState(0);
@@ -35,7 +36,7 @@ const FAQ = () => {
         <div className="max-w-[1200px] mx-auto px-4 py-10 font-['Outfit'] bg-white min-h-[60vh]">
             {/* Breadcrumb */}
             <div className="text-[14px] mb-8 font-medium">
-                <span className="text-[#2e4053] font-bold">Home</span>
+                <Link to="/" className="text-[#2e4053] font-bold hover:text-[#1282a2] transition-colors">Home</Link>
                 <span className="text-slate-400 mx-2">/</span>
                 <span className="text-[#1282a2]">FAQ'S</span>
             </div>

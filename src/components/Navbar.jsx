@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, User, Heart, ShoppingBag, Menu, X } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Search, LogOut, Heart, ShoppingBag, Menu, X, Package } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const Navbar = () => {
@@ -10,6 +10,7 @@ const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -51,12 +52,12 @@ const Navbar = () => {
 
                 {/* Center Links */}
                 <nav className="hidden lg:flex items-center gap-8 text-[14px] font-medium text-[#5e504f] h-full">
-                    <Link to="/" className="text-[#e6a27a] border-b-2 border-[#e6a27a] pb-1">Home</Link>
+                    <Link to="/" className={`transition-colors pb-1 ${location.pathname === '/' ? 'text-[#e6a27a] border-b-2 border-[#e6a27a]' : 'hover:text-[#e6a27a]'}`}>Home</Link>
                     
-                    <Link to="/products" className="hover:text-[#e6a27a] transition-colors flex items-center gap-1">Shop</Link>
+                    <Link to="/products" className={`transition-colors flex items-center gap-1 pb-1 ${location.pathname === '/products' ? 'text-[#e6a27a] border-b-2 border-[#e6a27a]' : 'hover:text-[#e6a27a]'}`}>Shop</Link>
                     
                     <div className="relative group h-full flex items-center">
-                        <Link to="/products" className="hover:text-[#e6a27a] transition-colors flex items-center gap-1 cursor-pointer">Shop By Age <span className="text-[10px]">▼</span></Link>
+                        <Link to="/products" className={`transition-colors flex items-center gap-1 cursor-pointer pb-1 ${location.pathname === '/products' && (location.search.includes('age=') || location.search.includes('category=')) ? 'text-[#e6a27a]' : 'hover:text-[#e6a27a]'}`}>Shop By Age <span className="text-[10px]">▼</span></Link>
                         
                         <div className="absolute top-[80%] left-0 w-44 bg-white shadow-[0_10px_40px_rgba(0,0,0,0.08)] rounded-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
                             <div className="py-3 flex flex-col">
@@ -74,7 +75,7 @@ const Navbar = () => {
                     </div>
 
                     <div className="relative group h-full flex items-center">
-                        <Link to="/products" className="hover:text-[#e6a27a] transition-colors flex items-center gap-1 cursor-pointer">Categories <span className="text-[10px]">▼</span></Link>
+                        <Link to="/products" className={`transition-colors flex items-center gap-1 cursor-pointer pb-1 ${location.pathname === '/products' && location.search.includes('category=') ? 'text-[#e6a27a]' : 'hover:text-[#e6a27a]'}`}>Categories <span className="text-[10px]">▼</span></Link>
                         
                         <div className="absolute top-[80%] left-0 w-max bg-white shadow-[0_10px_40px_rgba(0,0,0,0.08)] rounded-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
                             <div className="p-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
@@ -94,8 +95,8 @@ const Navbar = () => {
                             </div>
                         </div>
                     </div>
-                    <Link to="/about" className="hover:text-[#e6a27a] transition-colors">About Us</Link>
-                    <Link to="/contact" className="hover:text-[#e6a27a] transition-colors">Contact</Link>
+                    <Link to="/about" className={`transition-colors pb-1 ${location.pathname === '/about' ? 'text-[#e6a27a] border-b-2 border-[#e6a27a]' : 'hover:text-[#e6a27a]'}`}>About Us</Link>
+                    <Link to="/contact" className={`transition-colors pb-1 ${location.pathname === '/contact' ? 'text-[#e6a27a] border-b-2 border-[#e6a27a]' : 'hover:text-[#e6a27a]'}`}>Contact</Link>
                 </nav>
 
                 {/* Right Tools */}
@@ -115,19 +116,25 @@ const Navbar = () => {
                             <Search className="w-5 h-5" strokeWidth={2} />
                         </button>
                     </div>
-                    <Link to="/login" className="hidden md:block hover:text-[#e6a27a] transition-colors">
-                        <User className="w-5 h-5" strokeWidth={2} />
+
+                    <Link to="/orders" className="hover:text-[#e6a27a] transition-colors" title="My Orders">
+                        <Package className="w-5 h-5" strokeWidth={2} />
                     </Link>
-                    <Link to="/waitlist" className="hover:text-[#e6a27a] transition-colors">
+                    <Link to="/waitlist" className="hover:text-[#e6a27a] transition-colors" title="Waitlist">
                         <Heart className="w-5 h-5" strokeWidth={2} />
                     </Link>
-                    <Link to="/cart" className="relative hover:text-[#e6a27a] transition-colors">
+                    <Link to="/cart" className="relative hover:text-[#e6a27a] transition-colors" title="Cart">
                         <ShoppingBag className="w-5 h-5" strokeWidth={2} />
                         {getCartCount() > 0 && (
                             <span className="absolute -top-1.5 -right-2 bg-[#e6a27a] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                                 {getCartCount()}
                             </span>
                         )}
+                    </Link>
+                    <div className="hidden md:block w-[1px] h-6 bg-slate-200 mx-2"></div>
+                    <Link to="/login" className="hidden md:flex items-center gap-2 text-[#e6a27a] bg-[#e6a27a]/10 hover:bg-[#e6a27a] hover:text-white px-4 py-1.5 rounded-full transition-all duration-300">
+                        <span className="text-[13px] font-bold">Logout</span>
+                        <LogOut className="w-4 h-4" strokeWidth={2.5} />
                     </Link>
                     <button className="lg:hidden text-[#3d3130]" onClick={() => setIsMobileMenuOpen(true)}>
                         <Menu className="w-6 h-6" />
@@ -145,6 +152,7 @@ const Navbar = () => {
                     <nav className="flex flex-col gap-6 text-[18px] font-medium text-[#5e504f]">
                         <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
                         <Link to="/products" onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
+                        <Link to="/orders" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
                         <Link to="/about" onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
                         <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
                         <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>My Account</Link>

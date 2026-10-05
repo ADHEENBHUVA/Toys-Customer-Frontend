@@ -1,14 +1,37 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { X } from 'lucide-react';
+import { X, ShoppingBag, ArrowRight, Truck, CheckCircle2, Ticket } from 'lucide-react';
 
 const Cart = () => {
-    const { cartItems, removeFromCart, updateQuantity, getCartTotal, calculateShipping, shippingSettings } = useCart();
+    const { cartItems, removeFromCart, updateQuantity, getCartTotal, calculateShipping, shippingSettings, appliedCoupon, applyCoupon, removeCoupon } = useCart();
     const [coupon, setCoupon] = useState('');
+    const [applying, setApplying] = useState(false);
+    
     const shipping = calculateShipping();
     const subTotal = getCartTotal();
-    const total = subTotal + shipping; // Could add coupon logic here if needed
+    
+    let discount = 0;
+    if (appliedCoupon) {
+        if (appliedCoupon.discountType === 'Percentage') {
+            discount = (subTotal * appliedCoupon.discountValue) / 100;
+        } else {
+            discount = appliedCoupon.discountValue;
+        }
+        if (discount > subTotal) discount = subTotal;
+    }
+
+    const total = subTotal + shipping - discount;
+
+    const handleApplyCoupon = async () => {
+        if (!coupon) return;
+        setApplying(true);
+        const res = await applyCoupon(coupon, subTotal);
+        if (res.success) {
+            setCoupon('');
+        }
+        setApplying(false);
+    };
 
     const handleQuantityChange = (id, currentQty, delta) => {
         const newQty = currentQty + delta;
@@ -19,178 +42,243 @@ const Cart = () => {
 
     if (cartItems.length === 0) {
         return (
-            <div className="max-w-[1200px] mx-auto px-4 py-16 text-center font-['Outfit'] min-h-[50vh] flex flex-col justify-center items-center">
-                <span className="text-6xl mb-4 grayscale opacity-50 block">🛒</span>
-                <h3 className="text-3xl font-black text-slate-800 mb-4" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>Your cart is empty</h3>
-                <p className="text-slate-500 font-medium mb-8">Looks like you haven't added any products yet.</p>
-                <Link to="/products" className="bg-[#1282a2] hover:bg-[#0f6c87] text-white py-3 px-8 rounded-full font-bold transition-colors">
-                    Continue Shopping
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-20 min-h-[70vh] flex flex-col justify-center items-center">
+                <div className="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center mb-6 shadow-sm border border-slate-100">
+                    <ShoppingBag className="w-12 h-12 text-slate-300" />
+                </div>
+                <h3 className="text-3xl font-black text-slate-800 mb-3 tracking-tight">Your cart is empty</h3>
+                <p className="text-slate-500 font-medium mb-8 max-w-md text-center">Looks like you haven't added any toys to your cart yet. Discover our latest arrivals and find something special!</p>
+                <Link to="/products" className="bg-[#2eb3a6] hover:bg-[#26978c] text-white py-3.5 px-8 rounded-full font-bold transition-all hover:shadow-lg hover:shadow-[#2eb3a6]/20 hover:-translate-y-0.5 active:scale-95 flex items-center gap-2">
+                    Start Shopping <ArrowRight className="w-5 h-5" />
                 </Link>
             </div>
         );
     }
 
     return (
-        <div className="max-w-[1200px] mx-auto px-4 py-10 font-['Outfit']">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-10 md:py-16">
             {/* Breadcrumb */}
-            <div className="text-[14px] mb-8 font-medium">
-                <span className="text-[#2e4053] font-bold">Home</span>
-                <span className="text-slate-400 mx-2">/</span>
-                <span className="text-[#1282a2]">Your shopping cart</span>
+            <div className="flex items-center gap-2 text-[14px] mb-8 font-medium">
+                <Link to="/" className="text-slate-500 hover:text-[#2eb3a6] transition-colors">Home</Link>
+                <span className="text-slate-300">/</span>
+                <span className="text-slate-800 font-bold">Shopping Cart</span>
             </div>
 
-            {/* Title & Free Shipping Banner */}
-            <div className="flex flex-col md:flex-row justify-between md:items-end mb-8 gap-4">
-                <h1 className="text-3xl font-bold text-[#2e4053] font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
-                    Your Cart
-                </h1>
-                
-                {shippingSettings && shippingSettings.isFreeShippingActive && shipping > 0 && (
-                    <div className="bg-[#f0f9ff] border border-[#bae6fd] text-[#0369a1] px-4 py-2 rounded-lg text-[14px] font-medium flex items-center gap-2">
-                        <span>🚚</span>
-                        {shippingSettings.freeShippingMinAmount > 0 && (
-                            <span>Add ₹{(shippingSettings.freeShippingMinAmount - subTotal).toFixed(2)} more for Free Shipping!</span>
-                        )}
-                        {shippingSettings.freeShippingMinAmount > 0 && shippingSettings.freeShippingMinItems > 0 && <span> or </span>}
-                        {shippingSettings.freeShippingMinItems > 0 && (
-                            <span>Add {shippingSettings.freeShippingMinItems - cartItems.length} more item(s) for Free Shipping!</span>
-                        )}
-                    </div>
-                )}
-                {shippingSettings && shippingSettings.isFreeShippingActive && shipping === 0 && (
-                    <div className="bg-[#f0fdf4] border border-[#bbf7d0] text-[#166534] px-4 py-2 rounded-lg text-[14px] font-bold flex items-center gap-2">
-                        <span>🎉</span> You've unlocked Free Shipping!
-                    </div>
-                )}
-            </div>
-
-            {/* Desktop Table Header */}
-            <div className="hidden md:grid grid-cols-12 gap-4 bg-[#f3f4f6] py-4 px-6 rounded-t-md font-bold text-[#2e4053] text-[15px]">
-                <div className="col-span-5">Product</div>
-                <div className="col-span-2">Price</div>
-                <div className="col-span-2">Quantity</div>
-                <div className="col-span-2">Subtotal</div>
-                <div className="col-span-1 text-center">Action</div>
-            </div>
-
-            {/* Cart Items */}
-            <div className="flex flex-col border-b border-slate-200">
-                {cartItems.map(item => (
-                    <div key={item._id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center py-6 px-0 md:px-6 border-t border-slate-100">
+            <div className="flex flex-col lg:flex-row gap-10">
+                {/* Left Side: Cart Items */}
+                <div className="w-full lg:w-2/3 flex flex-col gap-6">
+                    {/* Header & Shipping Banner */}
+                    <div className="flex flex-col gap-4">
+                        <h1 className="text-4xl font-black text-slate-800 tracking-tight">
+                            Your Cart <span className="text-slate-400 text-2xl font-bold ml-2">({cartItems.length} items)</span>
+                        </h1>
                         
-                        {/* Product */}
-                        <div className="col-span-5 flex items-center gap-6">
-                            <div className="w-24 h-24 border border-slate-200 rounded-2xl flex items-center justify-center p-2 shrink-0 bg-white">
-                                <img 
-                                    src={item.thumbnailImage || (item.images && item.images[0]) || '/placeholder.png'} 
-                                    alt={item.name} 
-                                    className="w-full h-full object-contain"
-                                />
+                        {shippingSettings && shippingSettings.isFreeShippingActive && shipping > 0 && (
+                            <div className="bg-indigo-50 border border-indigo-100 text-indigo-700 px-5 py-4 rounded-2xl text-[15px] font-medium flex items-center gap-3 shadow-sm">
+                                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center shrink-0">
+                                    <Truck className="w-5 h-5 text-indigo-600" />
+                                </div>
+                                <div>
+                                    {shippingSettings.freeShippingMinAmount > 0 && (
+                                        <span>Add <strong className="font-black text-indigo-900">₹{(shippingSettings.freeShippingMinAmount - subTotal).toFixed(2)}</strong> more for Free Shipping!</span>
+                                    )}
+                                    {shippingSettings.freeShippingMinAmount > 0 && shippingSettings.freeShippingMinItems > 0 && <span className="mx-2">or</span>}
+                                    {shippingSettings.freeShippingMinItems > 0 && (
+                                        <span>Add <strong className="font-black text-indigo-900">{shippingSettings.freeShippingMinItems - cartItems.length}</strong> more item(s) for Free Shipping!</span>
+                                    )}
+                                </div>
                             </div>
-                            <h3 className="font-semibold text-[#2e4053] text-[15px]">{item.name}</h3>
+                        )}
+                        {shippingSettings && shippingSettings.isFreeShippingActive && shipping === 0 && (
+                            <div className="bg-[#f0fdf4] border border-[#bbf7d0] text-[#166534] px-5 py-4 rounded-2xl text-[15px] font-medium flex items-center gap-3 shadow-sm">
+                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+                                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                                </div>
+                                <span>Congratulations! You've unlocked <strong className="font-black text-green-800">Free Shipping!</strong></span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Cart Items List */}
+                    <div className="bg-white border border-slate-100 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+                        {/* Desktop Header */}
+                        <div className="hidden md:grid grid-cols-12 gap-4 bg-slate-50/80 border-b border-slate-100 py-4 px-6 font-bold text-slate-500 text-xs uppercase tracking-wider">
+                            <div className="col-span-6">Product details</div>
+                            <div className="col-span-2 text-center">Quantity</div>
+                            <div className="col-span-2 text-right">Price</div>
+                            <div className="col-span-2 text-right">Total</div>
                         </div>
 
-                        {/* Price */}
-                        <div className="col-span-2 font-bold text-[#2e4053] text-[14px] mt-2 md:mt-0">
-                            <span className="md:hidden text-slate-400 font-normal mr-2">Price:</span>
-                            ₹{item.price.toFixed(2)}
+                        <div className="divide-y divide-slate-100">
+                            {cartItems.map(item => (
+                                <div key={item._id} className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center p-6 group hover:bg-slate-50/50 transition-colors relative">
+                                    
+                                    {/* Product */}
+                                    <div className="col-span-6 flex items-center gap-5">
+                                        <Link to={`/product/${item._id}`} className="w-24 h-24 sm:w-28 sm:h-28 border border-slate-100 rounded-2xl flex items-center justify-center p-3 shrink-0 bg-white group-hover:border-slate-200 transition-colors">
+                                            <img 
+                                                src={item.thumbnailImage || (item.images && item.images[0]) || '/placeholder.png'} 
+                                                alt={item.name} 
+                                                className="w-full h-full object-contain"
+                                            />
+                                        </Link>
+                                        <div className="flex flex-col">
+                                            <Link to={`/product/${item._id}`} className="font-bold text-slate-800 text-[16px] hover:text-[#2eb3a6] transition-colors leading-tight mb-1">
+                                                {item.name}
+                                            </Link>
+                                            <span className="text-sm font-medium text-slate-400">ID: {item._id.substring(0, 8)}</span>
+                                            
+                                            {/* Mobile Price */}
+                                            <div className="md:hidden mt-3 font-black text-slate-800 text-[16px]">
+                                                ₹{item.price.toFixed(2)}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Quantity */}
+                                    <div className="col-span-2 flex md:justify-center items-center">
+                                        <div className="flex items-center bg-slate-50 border border-slate-200 rounded-full overflow-hidden h-10 w-28 group-hover:bg-white group-hover:border-slate-300 transition-colors">
+                                            <button 
+                                                onClick={() => handleQuantityChange(item._id, item.quantity, -1)} 
+                                                className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-bold transition-colors"
+                                            >
+                                                -
+                                            </button>
+                                            <span className="w-1/3 h-full flex items-center justify-center font-bold text-slate-800 text-[14px]">
+                                                {item.quantity}
+                                            </span>
+                                            <button 
+                                                onClick={() => handleQuantityChange(item._id, item.quantity, 1)} 
+                                                className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-bold transition-colors"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Unit Price (Desktop) */}
+                                    <div className="hidden md:block col-span-2 text-right">
+                                        <div className="font-bold text-slate-500 text-[15px]">
+                                            ₹{item.price.toFixed(2)}
+                                        </div>
+                                    </div>
+
+                                    {/* Subtotal & Action */}
+                                    <div className="col-span-2 flex items-center justify-between md:justify-end gap-4">
+                                        <div className="md:hidden text-sm font-bold text-slate-400">Total:</div>
+                                        <div className="font-black text-slate-800 text-[16px]">
+                                            ₹{(item.price * item.quantity).toFixed(2)}
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Remove Button */}
+                                    <button 
+                                        onClick={() => removeFromCart(item._id)} 
+                                        className="absolute top-6 right-6 md:top-1/2 md:-translate-y-1/2 md:-right-3 w-8 h-8 bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 rounded-full flex items-center justify-center transition-all shadow-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-hover:-translate-x-6"
+                                        title="Remove item"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Actions Below Table */}
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
+                        <Link to="/products" className="text-slate-500 hover:text-slate-800 font-bold text-[15px] transition-colors flex items-center gap-2 px-2 py-1">
+                            <ArrowRight className="w-4 h-4 rotate-180" /> Continue Shopping
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Right Side: Order Summary */}
+                <div className="w-full lg:w-1/3">
+                    <div className="bg-slate-50/80 border border-slate-100 rounded-3xl p-6 lg:p-8 sticky top-32">
+                        <h2 className="text-2xl font-black text-slate-800 mb-6 tracking-tight">Order Summary</h2>
+                        
+                        {/* Coupon Input */}
+                        <div className="mb-8">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">Discount Code</label>
+                            {appliedCoupon ? (
+                                <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                                    <div className="flex items-center gap-2 text-green-700 font-bold">
+                                        <Ticket className="w-4 h-4" />
+                                        {appliedCoupon.code}
+                                    </div>
+                                    <button onClick={removeCoupon} className="text-green-600 hover:text-green-800 transition-colors text-xs font-bold">
+                                        Remove
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex relative">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Ticket className="w-4 h-4 text-slate-400" />
+                                    </div>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Enter coupon code" 
+                                        value={coupon}
+                                        onChange={(e) => setCoupon(e.target.value)}
+                                        className="w-full bg-white border border-slate-200 rounded-xl rounded-r-none pl-10 pr-4 py-3 text-[14px] focus:outline-none focus:ring-2 focus:ring-[#2eb3a6]/20 focus:border-[#2eb3a6] text-slate-800 placeholder-slate-400 font-medium transition-all"
+                                    />
+                                    <button 
+                                        onClick={handleApplyCoupon}
+                                        disabled={applying}
+                                        className="bg-slate-800 hover:bg-slate-900 text-white px-5 py-3 rounded-xl rounded-l-none font-bold text-[14px] transition-colors shrink-0 border border-slate-800 disabled:opacity-50"
+                                    >
+                                        {applying ? 'Applying...' : 'Apply'}
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Quantity */}
-                        <div className="col-span-2 flex items-center mt-2 md:mt-0">
-                            <div className="flex items-center border border-[#1282a2] rounded-full overflow-hidden h-9 w-28">
-                                <button 
-                                    onClick={() => handleQuantityChange(item._id, item.quantity, -1)} 
-                                    className="w-1/3 h-full flex items-center justify-center text-[#1282a2] hover:bg-slate-50 font-bold"
-                                >
-                                    -
-                                </button>
-                                <span className="w-1/3 h-full flex items-center justify-center font-bold text-[#2e4053] text-[14px] border-x border-[#1282a2]">
-                                    {item.quantity}
+                        <div className="space-y-4 mb-6 pb-6 border-b border-slate-200/80">
+                            <div className="flex justify-between items-center">
+                                <span className="text-slate-500 font-medium text-[15px]">Subtotal</span>
+                                <span className="font-bold text-slate-800 text-[15px]">₹{subTotal.toFixed(2)}</span>
+                            </div>
+                            {appliedCoupon && (
+                                <div className="flex justify-between items-center text-green-600">
+                                    <span className="font-medium text-[15px]">Discount ({appliedCoupon.code})</span>
+                                    <span className="font-bold text-[15px]">-₹{discount.toFixed(2)}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between items-center">
+                                <span className="text-slate-500 font-medium text-[15px]">Shipping</span>
+                                <span className="font-bold text-slate-800 text-[15px]">
+                                    {shipping === 0 ? <span className="text-[#2eb3a6] bg-[#2eb3a6]/10 px-2 py-0.5 rounded-md text-xs uppercase tracking-wider">Free</span> : `₹${shipping.toFixed(2)}`}
                                 </span>
-                                <button 
-                                    onClick={() => handleQuantityChange(item._id, item.quantity, 1)} 
-                                    className="w-1/3 h-full flex items-center justify-center text-[#1282a2] hover:bg-slate-50 font-bold"
-                                >
-                                    +
-                                </button>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-slate-500 font-medium text-[15px]">Tax</span>
+                                <span className="font-bold text-slate-800 text-[15px]">Calculated at checkout</span>
                             </div>
                         </div>
-
-                        {/* Subtotal */}
-                        <div className="col-span-2 font-bold text-[#2e4053] text-[14px] mt-2 md:mt-0">
-                            <span className="md:hidden text-slate-400 font-normal mr-2">Subtotal:</span>
-                            ₹{(item.price * item.quantity).toFixed(2)}
+                        
+                        <div className="flex justify-between items-end mb-8">
+                            <div className="flex flex-col">
+                                <span className="text-slate-500 font-bold text-[13px] uppercase tracking-wider mb-1">Estimated Total</span>
+                                <span className="text-xs text-slate-400 font-medium">Includes taxes</span>
+                            </div>
+                            <span className="font-black text-slate-800 text-3xl">₹{total.toFixed(2)}</span>
                         </div>
+                        
+                        <Link to="/checkout" className="w-full bg-[#2eb3a6] hover:bg-[#26978c] text-white text-center font-bold text-[16px] py-4 rounded-xl transition-all shadow-lg shadow-[#2eb3a6]/20 hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2 group">
+                            Proceed to Checkout
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </Link>
 
-                        {/* Action */}
-                        <div className="col-span-1 text-right md:text-center mt-4 md:mt-0 absolute md:static right-4">
-                            <button 
-                                onClick={() => removeFromCart(item._id)} 
-                                className="text-slate-400 hover:text-red-500 transition-colors"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
+                        {/* Trust Badges */}
+                        <div className="mt-6 flex flex-col gap-3">
+                            <div className="flex items-center gap-2 text-slate-500 text-[13px] font-medium justify-center">
+                                <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                Secure encrypted checkout
+                            </div>
                         </div>
                     </div>
-                ))}
-            </div>
-
-            {/* Actions Below Table */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mt-8 gap-4">
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                    <input 
-                        type="text" 
-                        placeholder="Coupon code" 
-                        value={coupon}
-                        onChange={(e) => setCoupon(e.target.value)}
-                        className="border border-slate-300 rounded-full px-5 py-2.5 text-[14px] w-full md:w-64 focus:outline-none focus:border-[#1282a2] text-[#2e4053]"
-                    />
-                    <button className="bg-[#1282a2] hover:bg-[#0f6c87] text-white px-8 py-2.5 rounded-full font-bold text-[14px] transition-colors shrink-0">
-                        Apply
-                    </button>
-                </div>
-                
-                <div className="flex items-center gap-4 w-full md:w-auto mt-4 md:mt-0">
-                    <Link to="/products" className="bg-[#e5e7eb] hover:bg-[#d1d5db] text-[#4b5563] px-6 py-2.5 rounded-full font-bold text-[14px] transition-colors w-full md:w-auto text-center">
-                        Continue Shopping
-                    </Link>
-                    <button className="bg-[#1282a2] hover:bg-[#0f6c87] text-white px-6 py-2.5 rounded-full font-bold text-[14px] transition-colors w-full md:w-auto">
-                        Update Cart
-                    </button>
                 </div>
             </div>
-
-            {/* Cart Total Box */}
-            <div className="flex justify-end mt-16 mb-20">
-                <div className="w-full md:w-[400px] border border-slate-200 rounded-2xl p-8">
-                    <h2 className="text-xl font-bold text-[#2e4053] mb-6 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
-                        Cart total
-                    </h2>
-                    
-                    <div className="flex justify-between items-center mb-4">
-                        <span className="text-[#4b5563] font-medium text-[15px]">Subtotal</span>
-                        <span className="font-bold text-[#2e4053] text-[15px]">₹{subTotal.toFixed(2)}</span>
-                    </div>
-
-                    <div className="flex justify-between items-center mb-4">
-                        <span className="text-[#4b5563] font-medium text-[15px]">Shipping</span>
-                        <span className="font-bold text-[#2e4053] text-[15px]">
-                            {shipping === 0 ? <span className="text-[#10b981]">Free</span> : `₹${shipping.toFixed(2)}`}
-                        </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center mb-8 border-t border-slate-100 pt-4">
-                        <span className="text-[#4b5563] font-medium text-[15px]">Total</span>
-                        <span className="font-bold text-[#2e4053] text-[15px]">₹{total.toFixed(2)}</span>
-                    </div>
-                    
-                    <Link to="/checkout" className="block w-full bg-[#fbdf14] hover:bg-[#ebd013] text-[#2e4053] text-center font-bold py-3.5 rounded-full transition-colors">
-                        Proceed to checkout
-                    </Link>
-                </div>
-            </div>
-
         </div>
     );
 };

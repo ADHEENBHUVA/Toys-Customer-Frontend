@@ -27,6 +27,8 @@ export const CartProvider = ({ children }) => {
         freeShippingMinItems: 0
     });
 
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+
     const [websiteSettings, setWebsiteSettings] = useState({
         discountDisplayType: 'amount'
     });
@@ -38,6 +40,8 @@ export const CartProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('magic_toys_waitlist', JSON.stringify(waitlistItems));
     }, [waitlistItems]);
+
+    // Removed coupon localStorage persistence
 
     useEffect(() => {
         const fetchShippingSettings = async () => {
@@ -124,6 +128,7 @@ export const CartProvider = ({ children }) => {
 
     const clearCart = () => {
         setCartItems([]);
+        setAppliedCoupon(null);
     };
 
     const getCartTotal = () => {
@@ -150,6 +155,34 @@ export const CartProvider = ({ children }) => {
         return Array.isArray(waitlistItems) ? waitlistItems.length : 0;
     };
 
+    const applyCoupon = async (code, subTotal) => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/coupons/validate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, subTotal })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setAppliedCoupon(data.data);
+                toast.success('Coupon applied successfully!');
+                return { success: true };
+            } else {
+                toast.error(data.message || 'Invalid coupon code');
+                return { success: false, message: data.message };
+            }
+        } catch (error) {
+            console.error('Error applying coupon:', error);
+            toast.error('Failed to apply coupon');
+            return { success: false, message: 'Server error' };
+        }
+    };
+
+    const removeCoupon = () => {
+        setAppliedCoupon(null);
+        toast.success('Coupon removed');
+    };
+
     return (
         <CartContext.Provider value={{
             cartItems,
@@ -164,7 +197,10 @@ export const CartProvider = ({ children }) => {
             waitlistItems,
             toggleWaitlist,
             getWaitlistCount,
-            websiteSettings
+            websiteSettings,
+            appliedCoupon,
+            applyCoupon,
+            removeCoupon
         }}>
             {children}
         </CartContext.Provider>

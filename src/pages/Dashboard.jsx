@@ -23,6 +23,30 @@ const Dashboard = () => {
 
 
 
+    // Brands
+    const [brands, setBrands] = useState([]);
+    const [brandSlideIndex, setBrandSlideIndex] = useState(0);
+    const [isBrandTransitioning, setIsBrandTransitioning] = useState(true);
+
+    useEffect(() => {
+        if (brands.length === 0) return;
+        const interval = setInterval(() => {
+            setBrandSlideIndex(prev => prev + 1);
+            setIsBrandTransitioning(true);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [brands.length]);
+
+    useEffect(() => {
+        if (brands.length > 0 && brandSlideIndex >= brands.length) {
+            const timeout = setTimeout(() => {
+                setIsBrandTransitioning(false);
+                setBrandSlideIndex(0);
+            }, 1000); // 1s matches duration-1000
+            return () => clearTimeout(timeout);
+        }
+    }, [brandSlideIndex, brands.length]);
+
     // Testimonials
     const [testimonials, setTestimonials] = useState([]);
     const [testimonialIdx, setTestimonialIdx] = useState(0);
@@ -77,10 +101,23 @@ const Dashboard = () => {
                 console.error('Error fetching testimonials:', error);
             }
         };
+        const fetchBrands = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/brands`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setBrands(data);
+                }
+            } catch (error) {
+                console.error('Error fetching brands:', error);
+            }
+        };
+
         fetchTrendingProducts();
         fetchAllProducts();
         fetchCategories();
         fetchTestimonials();
+        fetchBrands();
     }, []);
 
     // Testimonials auto-slider
@@ -424,10 +461,11 @@ const Dashboard = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                     {[...allProducts]
+                        .filter(product => product.status !== 'Out of Stock')
                         .sort((a, b) => {
                             if (a.bestSeller && !b.bestSeller) return -1;
                             if (!a.bestSeller && b.bestSeller) return 1;
-                            return (b.ratingCount || 0) - (a.ratingCount || 0);
+                            return (b.reviewCount || 0) - (a.reviewCount || 0);
                         })
                         .slice(0, visibleCount)
                         .map((product, idx) => (
@@ -442,7 +480,7 @@ const Dashboard = () => {
                                         
                                         {product.originalPrice > product.price && (
                                             <span className="bg-[#e8b960] text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
-                                                {websiteSettings?.discountDisplayType === 'percentage' 
+                                                {(product.discountDisplayType || websiteSettings?.discountDisplayType) === 'percentage' 
                                                     ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
                                                     : `Save ₹${Math.round(product.originalPrice - product.price)}`}
                                             </span>
@@ -481,7 +519,7 @@ const Dashboard = () => {
                                         {product.name}
                                     </Link>
 
-                                    <StarRating rating={Math.round(product.rating || 5)} count={product.ratingCount || 0} />
+                                    <StarRating rating={Math.round(product.rating || 5)} count={product.reviewCount || 0} />
 
                                     <div className="text-[12px] text-[#8b7e7c] mt-1 mb-2 leading-relaxed">
                                         <p className="line-clamp-1">
@@ -534,62 +572,105 @@ const Dashboard = () => {
             </div>
 
             {/* Why Parents Choose */}
-            <div className="max-w-[1400px] mx-auto pt-8 pb-8 px-4 md:px-6">
-                <div className="bg-[#f4f6f1] rounded-[2.5rem] flex flex-col lg:flex-row overflow-hidden">
-                    <div className="w-full lg:w-1/2 p-10 md:p-16 flex flex-col justify-center">
-                        <h2 className="text-[32px] md:text-[40px] font-serif text-[#3d3130] mb-2 leading-tight">Why Parents Choose Little Joys</h2>
-                        <p className="text-[#8b7e7c] text-[15px] mb-10">Because your baby deserves the very best.</p>
+            <div className="max-w-[1400px] mx-auto py-16 px-4 md:px-6 font-['Outfit']">
+                <div className="bg-[#1282a2]/5 rounded-[3rem] flex flex-col lg:flex-row overflow-hidden border border-[#1282a2]/10 relative">
+                    {/* Decorative Elements */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#1282a2]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#e6a27a]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-8">
-                            <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 text-[#93b38c]">
-                                    <Leaf className="w-5 h-5" />
+                    <div className="w-full lg:w-1/2 p-10 md:p-14 lg:p-20 flex flex-col justify-center relative z-10">
+                        <h2 className="text-[36px] md:text-[46px] font-black text-[#2e4053] mb-4 leading-tight font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                            Why Parents Choose Little Joys
+                        </h2>
+                        <p className="text-[#666666] text-[18px] mb-12 font-medium">Because your baby deserves the very best.</p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {/* Card 1 */}
+                            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border border-slate-100 group">
+                                <div className="w-14 h-14 rounded-full bg-[#1282a2]/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                                    <Leaf className="w-7 h-7 text-[#1282a2]" />
                                 </div>
-                                <div>
-                                    <h4 className="font-bold text-[#3d3130] text-[15px] mb-1">Safe & Non-Toxic</h4>
-                                    <p className="text-[#8b7e7c] text-[13px] leading-relaxed">We use only non-toxic, BPA-free, and baby-safe materials.</p>
-                                </div>
+                                <h4 className="font-bold text-[#2e4053] text-[17px] mb-2">Safe & Non-Toxic</h4>
+                                <p className="text-[#666666] text-[14px] leading-relaxed">We use only non-toxic, BPA-free, and baby-safe materials.</p>
                             </div>
-                            <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 text-[#93b38c]">
-                                    <Shield className="w-5 h-5" />
+                            
+                            {/* Card 2 */}
+                            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border border-slate-100 group">
+                                <div className="w-14 h-14 rounded-full bg-[#e6a27a]/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                                    <Shield className="w-7 h-7 text-[#e6a27a]" />
                                 </div>
-                                <div>
-                                    <h4 className="font-bold text-[#3d3130] text-[15px] mb-1">Premium Quality</h4>
-                                    <p className="text-[#8b7e7c] text-[13px] leading-relaxed">Durable, long-lasting products tested to the highest standards.</p>
-                                </div>
+                                <h4 className="font-bold text-[#2e4053] text-[17px] mb-2">Premium Quality</h4>
+                                <p className="text-[#666666] text-[14px] leading-relaxed">Durable, long-lasting products tested to the highest standards.</p>
                             </div>
-                            <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 text-[#e6a27a]">
-                                    <HeartIcon className="w-5 h-5" />
+
+                            {/* Card 3 */}
+                            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border border-slate-100 group">
+                                <div className="w-14 h-14 rounded-full bg-[#f4a261]/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                                    <HeartIcon className="w-7 h-7 text-[#f4a261]" />
                                 </div>
-                                <div>
-                                    <h4 className="font-bold text-[#3d3130] text-[15px] mb-1">Gentle on Baby</h4>
-                                    <p className="text-[#8b7e7c] text-[13px] leading-relaxed">Designed with care for your baby's sensitive skin and comfort.</p>
-                                </div>
+                                <h4 className="font-bold text-[#2e4053] text-[17px] mb-2">Gentle on Baby</h4>
+                                <p className="text-[#666666] text-[14px] leading-relaxed">Designed with care for your baby's sensitive skin and comfort.</p>
                             </div>
-                            <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 text-[#93b38c]">
-                                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" /><path d="M12 16V12" /><path d="M12 8H12.01" /></svg>
+
+                            {/* Card 4 */}
+                            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border border-slate-100 group">
+                                <div className="w-14 h-14 rounded-full bg-[#2a9d8f]/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                                    <svg className="w-7 h-7 text-[#2a9d8f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" /><path d="M12 16V12" /><path d="M12 8H12.01" /></svg>
                                 </div>
-                                <div>
-                                    <h4 className="font-bold text-[#3d3130] text-[15px] mb-1">Sustainable Choice</h4>
-                                    <p className="text-[#8b7e7c] text-[13px] leading-relaxed">Eco-friendly materials and packaging for a better tomorrow.</p>
-                                </div>
+                                <h4 className="font-bold text-[#2e4053] text-[17px] mb-2">Sustainable Choice</h4>
+                                <p className="text-[#666666] text-[14px] leading-relaxed">Eco-friendly materials and packaging for a better tomorrow.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="w-full lg:w-1/2 relative min-h-[300px]">
-                        <div className="absolute top-8 right-8 bg-[#fdfaf7] rounded-[50%_50%_50%_50%/60%_60%_40%_40%] w-[120px] h-[110px] flex flex-col items-center justify-center shadow-sm z-20 transform rotate-12">
-                            <span className="text-[14px] font-serif text-[#3d3130] leading-tight text-center">Quality<br />You Can<br />Trust</span>
-                            <span className="text-[#e6a27a] text-[10px] mt-1">♡</span>
+                    <div className="w-full lg:w-1/2 relative min-h-[500px] lg:min-h-auto flex items-center justify-center p-8 lg:p-12 z-10 bg-white lg:bg-transparent">
+                        {/* Spinning Badge */}
+                        <div className="absolute top-12 right-12 bg-white rounded-full w-32 h-32 flex flex-col items-center justify-center shadow-xl z-20 animate-[bounce_4s_ease-in-out_infinite]">
+                            <div className="absolute inset-2 border-2 border-dashed border-[#e6a27a] rounded-full animate-[spin_10s_linear_infinite]"></div>
+                            <span className="text-[14px] font-black text-[#2e4053] leading-tight text-center uppercase tracking-wider relative z-10 mt-1">Quality<br /><span className="text-[#1282a2]">You Can</span><br />Trust</span>
+                            <span className="text-[#e6a27a] text-[12px] mt-1 relative z-10">⭐</span>
                         </div>
-                        <img src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=800&q=80" alt="Baby Basket" className="w-full h-full object-cover" />
+                        
+                        {/* Main Image */}
+                        <div className="w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl relative border-8 border-white group lg:-ml-12 mt-12 lg:mt-0">
+                            <div className="absolute inset-0 bg-[#2e4053]/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
+                            <img src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=800&q=80" alt="Quality Products" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                        </div>
                     </div>
                 </div>
             </div>
 
+            {/* Brands Marquee */}
+            {brands.length > 0 && (
+                <div className="w-full pt-16 pb-8 overflow-hidden bg-slate-50/50">
+                    <div className="text-center mb-10 px-4">
+                        <div className="mb-2 text-[#e6a27a]">✦</div>
+                        <h2 className="text-[32px] font-serif text-[#3d3130] mb-2">Our Premium Brands</h2>
+                    </div>
+                    
+                    <div className="w-full flex justify-center py-6">
+                        <div className="relative overflow-hidden group w-[160px] min-[400px]:w-[368px] sm:w-[576px] md:w-[784px] lg:w-[992px] xl:w-[1200px] 2xl:w-[1408px] transition-all duration-300 rounded-2xl p-2 -m-2">
+                            <div 
+                                className={`flex gap-12 shrink-0 items-center w-max ${isBrandTransitioning ? 'transition-transform duration-1000 ease-in-out' : ''}`} 
+                                style={{ transform: `translateX(calc(-${brandSlideIndex} * (10rem + 3rem)))` }}
+                            >
+                            {[...brands, ...brands, ...brands, ...brands, ...brands, ...brands, ...brands].map((brand, idx) => {
+                                return (
+                                    <div key={`brand-${idx}-${brand._id}`} className={`w-40 h-40 flex shrink-0 items-center justify-center bg-white rounded-full border-[8px] border-white shadow-[0_12px_35px_rgba(0,0,0,0.08)] transition-all duration-500 hover:scale-105 hover:shadow-[0_20px_45px_rgba(0,0,0,0.12)] relative overflow-hidden group`}>
+                                        <img 
+                                            src={brand.logo ? (brand.logo.startsWith('data:') ? brand.logo : (brand.logo.startsWith('/uploads/') ? `http://localhost:5000${brand.logo}` : brand.logo)) : 'https://via.placeholder.com/150'} 
+                                            alt={brand.name} 
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                        />
+                                    </div>
+                                );
+                            })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
             {/* Loved by Parents */}
             <div className="max-w-[1400px] mx-auto pt-8 pb-16 px-4 md:px-6 text-center">
                 <div className="mb-2 text-[#e6a27a]">♡</div>

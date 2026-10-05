@@ -29,7 +29,10 @@ const Products = () => {
         const fetchData = async () => {
             try {
                 const isNewArrivals = searchParams.get('filter') === 'new-arrivals';
-                const endpoint = isNewArrivals ? '/products/new-arrivals' : '/products';
+                const isBestSellers = searchParams.get('filter') === 'best-sellers';
+                let endpoint = '/products';
+                if (isNewArrivals) endpoint = '/products/new-arrivals';
+                if (isBestSellers) endpoint = '/products/best-sellers';
 
                 const [prodRes, catRes] = await Promise.all([
                     fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}${endpoint}`),
@@ -93,6 +96,12 @@ const Products = () => {
         // Filter by max price
         if (selectedMaxPrice < 5000) {
             result = result.filter(p => p.price <= selectedMaxPrice);
+        }
+
+        // Filter by special filters (e.g. sale)
+        const filterParam = searchParams.get('filter');
+        if (filterParam === 'sale') {
+            result = result.filter(p => p.originalPrice > p.price && p.status !== 'Out of Stock');
         }
 
         // Apply Sorting
@@ -173,7 +182,14 @@ const Products = () => {
     };
 
     let displayTitle = 'All Products';
-    if (selectedCategories.length === 1 && selectedAges.length === 0) {
+    const filterParamTitle = searchParams.get('filter');
+    if (filterParamTitle === 'sale') {
+        displayTitle = 'Sell';
+    } else if (filterParamTitle === 'new-arrivals') {
+        displayTitle = 'New Arrivals';
+    } else if (filterParamTitle === 'best-sellers') {
+        displayTitle = 'Best Sellers';
+    } else if (selectedCategories.length === 1 && selectedAges.length === 0) {
         displayTitle = selectedCategories[0];
     } else if (selectedAges.length === 1 && selectedCategories.length === 0) {
         displayTitle = selectedAges[0];
@@ -196,7 +212,7 @@ const Products = () => {
                 <div className="flex flex-col lg:flex-row gap-8">
 
                     {/* Sidebar */}
-                    <div className="hidden lg:flex flex-col w-[280px] flex-shrink-0 gap-6">
+                    <div className="hidden lg:flex flex-col w-[280px] flex-shrink-0 gap-6 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
 
                         {/* Filters Header (Clear All) */}
                         <div className="flex items-center justify-between px-1">
@@ -269,7 +285,7 @@ const Products = () => {
                                     .sort((a, b) => {
                                         if (a.bestSeller && !b.bestSeller) return -1;
                                         if (!a.bestSeller && b.bestSeller) return 1;
-                                        return (b.ratingCount || 0) - (a.ratingCount || 0);
+                                        return (b.reviewCount || 0) - (a.reviewCount || 0);
                                     })
                                     .slice(0, 3)
                                     .map((prod) => (
@@ -358,7 +374,7 @@ const Products = () => {
                                                     {/* Sale Badge */}
                                                     {product.originalPrice > (product.price || 0) && (
                                                         <span className="absolute top-4 left-4 bg-[#e8b960] text-white text-[10px] font-black px-2.5 py-1 rounded-2xl uppercase tracking-wider z-20 shadow-sm">
-                                                            {websiteSettings?.discountDisplayType === 'percentage' 
+                                                            {(product.discountDisplayType || websiteSettings?.discountDisplayType) === 'percentage' 
                                                                 ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
                                                                 : `Save ₹${Math.round(product.originalPrice - product.price)}`}
                                                         </span>
@@ -393,7 +409,7 @@ const Products = () => {
                                                                 <span key={s}>{s <= Math.round(product.rating || 5) ? '★' : '☆'}</span>
                                                             ))}
                                                         </div>
-                                                        <span className="text-[12px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)} ({product.ratingCount || 0})</span>
+                                                        <span className="text-[12px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)} ({product.reviewCount || 0})</span>
                                                     </div>
 
                                                     {/* Price and Action Buttons Row */}
@@ -449,7 +465,7 @@ const Products = () => {
                                                     <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
                                                         {product.originalPrice > product.price && (
                                                             <span className="bg-[#e8b960] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider w-max shadow-sm">
-                                                                {websiteSettings?.discountDisplayType === 'percentage' 
+                                                                {(product.discountDisplayType || websiteSettings?.discountDisplayType) === 'percentage' 
                                                                     ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
                                                                     : `Save ₹${Math.round(product.originalPrice - product.price)}`}
                                                             </span>
@@ -500,7 +516,7 @@ const Products = () => {
                                                                 <span key={s}>{s <= Math.round(product.rating || 5) ? '★' : '☆'}</span>
                                                             ))}
                                                         </div>
-                                                        <span className="text-[13px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)} ({product.ratingCount || 0})</span>
+                                                        <span className="text-[13px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)} ({product.reviewCount || 0})</span>
                                                     </div>
 
                                                     <div className="flex items-center gap-3">
@@ -660,3 +676,4 @@ const Products = () => {
 };
 
 export default Products;
+

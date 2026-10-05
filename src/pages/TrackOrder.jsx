@@ -29,7 +29,7 @@ const TrackOrder = () => {
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-slate-700 ml-2">Email Address</label>
-                            <input type="email" className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all text-lg" placeholder="Used during checkout" />
+                            <input type="email" className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all text-lg" placeholder="Used during checkout" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Please enter a valid email address with @ and ." />
                         </div>
                         <button type="submit" className="w-full bg-slate-900 hover:bg-blue-600 text-white px-8 py-5 rounded-2xl font-bold shadow-xl transition-all duration-300 hover:shadow-blue-500/30 active:scale-95 text-lg mt-4">
                             Track Package

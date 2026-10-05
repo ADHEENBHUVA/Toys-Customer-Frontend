@@ -24,8 +24,24 @@ const ProductDetails = () => {
     const [reviewMessage, setReviewMessage] = useState('');
     const [reviewError, setReviewError] = useState('');
     const [reviewEligibility, setReviewEligibility] = useState({ canReview: false, hasPurchased: false, hasReviewed: false });
+    const [websiteSettings, setWebsiteSettings] = useState(null);
+    const [visibleReviewsCount, setVisibleReviewsCount] = useState(2);
 
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/settings`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success) {
+                        setWebsiteSettings(data.data);
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching settings:", err);
+            }
+        };
+
         const fetchProduct = async () => {
             try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/products/${id}`);
@@ -74,6 +90,7 @@ const ProductDetails = () => {
                 setLoading(false);
             }
         };
+        fetchSettings();
         fetchProduct();
         if (window.location.hash === '#reviews') {
             setTimeout(() => {
@@ -233,8 +250,8 @@ const ProductDetails = () => {
                             ) : (
                                 <>
                                     <span className="text-2xl font-black text-slate-800">₹{(product.price || 0).toFixed(2)}</span>
-                                    {product.compareAtPrice > (product.price || 0) && (
-                                        <span className="text-lg font-bold text-slate-400 line-through">₹{(product.compareAtPrice || 0).toFixed(2)}</span>
+                                    {product.originalPrice > (product.price || 0) && (
+                                        <span className="text-lg font-bold text-slate-400 line-through">₹{(product.originalPrice || 0).toFixed(2)}</span>
                                     )}
                                 </>
                             )}
@@ -370,7 +387,7 @@ const ProductDetails = () => {
                                 {/* Reviews List */}
                                 {product.reviews && product.reviews.length > 0 ? (
                                     <div className="space-y-6">
-                                        {product.reviews.map(review => (
+                                        {product.reviews.slice(0, visibleReviewsCount).map(review => (
                                             <div key={review._id} className="border-b border-slate-100 pb-6">
                                                 <div className="flex items-center gap-3 mb-2">
                                                     <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-500">
@@ -388,6 +405,16 @@ const ProductDetails = () => {
                                                 </p>
                                             </div>
                                         ))}
+                                        {product.reviews.length > visibleReviewsCount && (
+                                            <div className="text-center mt-6">
+                                                <button 
+                                                    onClick={() => setVisibleReviewsCount(prev => prev + 10)}
+                                                    className="bg-white border-2 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50 font-bold py-2 px-6 rounded-full transition-colors text-sm"
+                                                >
+                                                    View More
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="text-slate-500 font-semibold text-center text-[15px] mb-8">
@@ -401,9 +428,9 @@ const ProductDetails = () => {
                                     {reviewMessage && <div className="p-3 mb-4 bg-green-100 text-green-700 rounded-xl text-sm font-bold">{reviewMessage}</div>}
                                     {reviewError && <div className="p-3 mb-4 bg-red-100 text-red-600 rounded-xl text-sm font-bold">{reviewError}</div>}
 
-                                    {(reviewEligibility.hasReviewed || reviewMessage === 'Review submitted successfully!') ? (
+                                    {(!reviewEligibility.canReview && reviewEligibility.hasReviewed) || reviewMessage === 'Review submitted successfully!' ? (
                                         <div className="p-4 bg-green-50 text-green-700 rounded-xl text-sm font-bold text-center border border-green-200">
-                                            {reviewMessage || "You have already reviewed this product. Thank you for your feedback!"}
+                                            {reviewMessage || "You have already reviewed this product for all your past orders. Thank you for your feedback!"}
                                         </div>
                                     ) : (
                                         <form onSubmit={async (e) => {
@@ -440,7 +467,7 @@ const ProductDetails = () => {
                                             </div>
                                             <div>
                                                 <label className="block text-[13px] font-bold text-slate-700 mb-2">Review</label>
-                                                <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} rows="3" className="w-full border border-slate-200 rounded-xl p-3 bg-white text-sm focus:outline-none focus:border-[#2eb3a6]" placeholder="What do you think about this product?" required></textarea>
+                                                <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} rows="3" className="w-full border border-slate-200 rounded-xl p-3 bg-white text-sm focus:outline-none focus:border-[#2eb3a6]" placeholder="What do you think about this product?"></textarea>
                                             </div>
                                             <button type="submit" className="bg-[#2eb3a6] hover:bg-[#1d9c90] text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-sm self-start">
                                                 Submit Review
@@ -463,9 +490,11 @@ const ProductDetails = () => {
                                 <div className="relative mb-3 bg-slate-50/70 rounded-xl overflow-hidden aspect-[4/3] flex items-center justify-center p-4 group-hover:bg-slate-100/70 transition-colors">
 
                                     {/* Sale Badge */}
-                                    {rp.compareAtPrice > (rp.price || 0) && (
-                                        <span className="absolute top-3 left-3 bg-[#ff6b6b] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider z-10 shadow-sm">
-                                            SALE
+                                    {rp.originalPrice > (rp.price || 0) && (
+                                        <span className="absolute top-3 left-3 bg-[#e8b960] text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm z-10">
+                                            {(rp.discountDisplayType || websiteSettings?.discountDisplayType) === 'percentage' 
+                                                ? `${Math.round(((rp.originalPrice - rp.price) / rp.originalPrice) * 100)}% OFF`
+                                                : `Save ₹${Math.round(rp.originalPrice - rp.price)}`}
                                         </span>
                                     )}
 
@@ -498,8 +527,8 @@ const ProductDetails = () => {
                                                 <span className="font-black text-slate-400 text-[16px] leading-none">Out of Stock</span>
                                             ) : (
                                                 <>
-                                                    {rp.compareAtPrice > (rp.price || 0) && (
-                                                        <span className="text-[12px] text-slate-400 font-bold line-through mb-[-4px]">₹{(rp.compareAtPrice || 0).toFixed(2)}</span>
+                                                    {rp.originalPrice > (rp.price || 0) && (
+                                                        <span className="text-[12px] text-slate-400 font-bold line-through mb-[-4px]">₹{(rp.originalPrice || 0).toFixed(2)}</span>
                                                     )}
                                                     <span className="font-black text-[#22c55e] text-[20px] leading-none">₹{(rp.price || 0).toFixed(2)}</span>
                                                 </>

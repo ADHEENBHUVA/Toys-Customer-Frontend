@@ -16,7 +16,7 @@ const Privacy = () => {
                     <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight font-['Nunito'] font-serif">Privacy Policy</h1>
                 </div>
                 <div className="prose prose-slate max-w-none prose-headings:font-black prose-headings:font-['Nunito'] prose-a:text-blue-600 hover:prose-a:text-blue-500">
-                    <p className="text-lg text-slate-500 mb-8 font-medium">Last updated: {new Date().toLocaleDateString()}</p>
+                    <p className="text-lg text-slate-500 mb-8 font-medium">Last updated: {new Date().toLocaleDateString('en-GB')}</p>
                     
                     <h3>1. Information We Collect</h3>
                     <p>At Appifly Toys, we collect information to provide better services to our users. This includes personal information such as your name, email address, phone number, and shipping details when you create an account or make a purchase.</p>
@@ -36,3 +36,4 @@ const Privacy = () => {
 };
 
 export default Privacy;
+
