@@ -457,13 +457,19 @@ const ProductDetails = () => {
                                         }} className="flex flex-col gap-4">
                                             <div>
                                                 <label className="block text-[13px] font-bold text-slate-700 mb-2">Rating</label>
-                                                <select value={rating} onChange={e => setRating(Number(e.target.value))} className="w-full md:w-32 border border-slate-200 rounded-xl p-3 bg-white text-sm focus:outline-none focus:border-[#2eb3a6]">
-                                                    <option value="5">5 Stars</option>
-                                                    <option value="4">4 Stars</option>
-                                                    <option value="3">3 Stars</option>
-                                                    <option value="2">2 Stars</option>
-                                                    <option value="1">1 Star</option>
-                                                </select>
+                                                <div className="flex gap-1.5 items-center">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <button
+                                                            key={star}
+                                                            type="button"
+                                                            onClick={() => setRating(star)}
+                                                            className={`text-2xl sm:text-3xl transition-all duration-200 focus:outline-none hover:scale-110 active:scale-95 ${star <= rating ? 'text-[#fbdf14]' : 'text-slate-200 hover:text-[#fbdf14]/50'}`}
+                                                        >
+                                                            ★
+                                                        </button>
+                                                    ))}
+                                                    <span className="ml-3 text-[13px] font-bold text-slate-500">{rating} out of 5</span>
+                                                </div>
                                             </div>
                                             <div>
                                                 <label className="block text-[13px] font-bold text-slate-700 mb-2">Review</label>

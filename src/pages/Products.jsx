@@ -278,9 +278,14 @@ const Products = () => {
                         </div>
 
                         {/* Box 3: Popular products */}
-                        <div className="bg-white p-6 rounded-2xl border border-slate-200">
-                            <h3 className="text-[17px] font-black text-slate-800 font-['Nunito'] mb-5">Popular products</h3>
-                            <div className="space-y-5">
+                        <div className="bg-gradient-to-br from-[#fcfaf7] to-white p-6 rounded-[2rem] border border-[#f3eee7] shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#f7e6d8] to-transparent opacity-30 rounded-bl-full pointer-events-none"></div>
+                            
+                            <h3 className="text-[18px] font-bold text-[#3d3130] font-serif mb-6 relative z-10 flex items-center gap-2">
+                                <span className="text-[#e6a27a] text-[16px]">★</span> Top Picks
+                            </h3>
+                            
+                            <div className="space-y-3 relative z-10">
                                 {[...allProducts]
                                     .sort((a, b) => {
                                         if (a.bestSeller && !b.bestSeller) return -1;
@@ -289,17 +294,26 @@ const Products = () => {
                                     })
                                     .slice(0, 3)
                                     .map((prod) => (
-                                        <Link to={`/product/${prod._id}`} key={prod._id} className="flex gap-4 group cursor-pointer p-2 -mx-2 rounded-xl hover:bg-slate-50 transition-colors">
-                                            <div className="w-16 h-16 bg-slate-50 rounded-[2rem] flex-shrink-0 flex items-center justify-center p-2 group-hover:bg-white transition-colors shadow-sm">
-                                                <img src={prod.thumbnailImage || (prod.images && prod.images[0])} alt={prod.name} className="w-full h-full object-contain" />
+                                        <Link to={`/product/${prod._id}`} key={prod._id} className="flex gap-4 group cursor-pointer p-3 -mx-3 rounded-2xl hover:bg-white transition-all duration-300 hover:shadow-[0_8px_30px_rgb(230,162,122,0.15)] hover:-translate-y-1">
+                                            <div className="w-[72px] h-[72px] bg-[#fcfaf7] rounded-[1.25rem] overflow-hidden flex-shrink-0 flex items-center justify-center p-2 group-hover:bg-white transition-colors border border-[#f3eee7]">
+                                                <img src={prod.thumbnailImage || (prod.images && prod.images[0])} alt={prod.name} className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500" />
                                             </div>
-                                            <div className="flex flex-col justify-center">
-                                                <h4 className="text-[14px] font-bold text-slate-700 leading-tight mb-1 line-clamp-2 group-hover:text-[#e6a27a] transition-colors">{prod.name}</h4>
-                                                <span className="text-[14px] font-black text-slate-900">₹{prod.price.toFixed(2)}</span>
-                                                <div className="flex text-[#fbdf14] text-[10px] mt-0.5">
-                                                    {[1, 2, 3, 4, 5].map(s => (
-                                                        <span key={s}>{s <= Math.round(prod.rating || 5) ? '★' : '☆'}</span>
-                                                    ))}
+                                            <div className="flex flex-col justify-center flex-1">
+                                                <h4 className="text-[14px] font-bold text-[#3d3130] leading-[1.3] mb-1 line-clamp-2 font-['Nunito'] tracking-tight group-hover:text-[#e6a27a] transition-colors">{prod.name}</h4>
+                                                
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                    <span className="text-[15px] font-black text-[#e6a27a]">₹{prod.price.toFixed(2)}</span>
+                                                    {prod.originalPrice > prod.price && (
+                                                        <span className="text-[11px] text-[#b3a8a6] line-through font-medium">₹{prod.originalPrice.toFixed(2)}</span>
+                                                    )}
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-1 mt-1">
+                                                    <div className="flex text-[#e8b960] text-[10px]">
+                                                        {[1, 2, 3, 4, 5].map(s => (
+                                                            <span key={s}>{s <= Math.round(prod.rating || 5) ? '★' : '☆'}</span>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Link>
@@ -398,7 +412,7 @@ const Products = () => {
                                                 {/* Product Details */}
                                                 <div className="flex flex-col flex-1 px-1">
                                                     <Link to={`/product/${product._id}`} className="hover:text-[#118AB2] mb-1.5 transition-colors">
-                                                        <h3 className="font-black text-slate-800 text-[17px] leading-tight line-clamp-2 font-['Nunito']">
+                                                        <h3 className="font-bold text-[#3d3130] text-[17.5px] leading-tight line-clamp-2 font-['Nunito'] tracking-tight">
                                                             {product.name}
                                                         </h3>
                                                     </Link>

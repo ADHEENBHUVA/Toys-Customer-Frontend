@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { X, ShoppingBag, ArrowRight, Truck, CheckCircle2, Ticket } from 'lucide-react';
+import { X, ShoppingBag, ArrowRight, Truck, CheckCircle2, Ticket, Trash2 } from 'lucide-react';
 
 const Cart = () => {
     const { cartItems, removeFromCart, updateQuantity, getCartTotal, calculateShipping, shippingSettings, appliedCoupon, applyCoupon, removeCoupon } = useCart();
@@ -135,23 +135,34 @@ const Cart = () => {
                                         </div>
                                     </div>
 
-                                    {/* Quantity */}
+                                    {/* Quantity & Remove */}
                                     <div className="col-span-2 flex md:justify-center items-center">
-                                        <div className="flex items-center bg-slate-50 border border-slate-200 rounded-full overflow-hidden h-10 w-28 group-hover:bg-white group-hover:border-slate-300 transition-colors">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex items-center bg-slate-50 border border-slate-200 rounded-full overflow-hidden h-10 w-28 group-hover:bg-white group-hover:border-slate-300 transition-colors">
+                                                <button 
+                                                    onClick={() => handleQuantityChange(item._id, item.quantity, -1)} 
+                                                    className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-bold transition-colors"
+                                                >
+                                                    -
+                                                </button>
+                                                <span className="w-1/3 h-full flex items-center justify-center font-bold text-slate-800 text-[14px]">
+                                                    {item.quantity}
+                                                </span>
+                                                <button 
+                                                    onClick={() => handleQuantityChange(item._id, item.quantity, 1)} 
+                                                    className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-bold transition-colors"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            
+                                            {/* Remove Button Next to Quantity */}
                                             <button 
-                                                onClick={() => handleQuantityChange(item._id, item.quantity, -1)} 
-                                                className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-bold transition-colors"
+                                                onClick={() => removeFromCart(item._id)} 
+                                                className="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                                                title="Remove item"
                                             >
-                                                -
-                                            </button>
-                                            <span className="w-1/3 h-full flex items-center justify-center font-bold text-slate-800 text-[14px]">
-                                                {item.quantity}
-                                            </span>
-                                            <button 
-                                                onClick={() => handleQuantityChange(item._id, item.quantity, 1)} 
-                                                className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-bold transition-colors"
-                                            >
-                                                +
+                                                <Trash2 className="w-[18px] h-[18px]" />
                                             </button>
                                         </div>
                                     </div>
@@ -170,15 +181,6 @@ const Cart = () => {
                                             ₹{(item.price * item.quantity).toFixed(2)}
                                         </div>
                                     </div>
-                                    
-                                    {/* Remove Button */}
-                                    <button 
-                                        onClick={() => removeFromCart(item._id)} 
-                                        className="absolute top-6 right-6 md:top-1/2 md:-translate-y-1/2 md:-right-3 w-8 h-8 bg-white border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 rounded-full flex items-center justify-center transition-all shadow-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-hover:-translate-x-6"
-                                        title="Remove item"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
                                 </div>
                             ))}
                         </div>

@@ -85,10 +85,10 @@ export const CartProvider = ({ children }) => {
             return shippingSettings.baseShippingCharge;
         }
 
-        const amountMet = minAmount === 0 || subTotal >= minAmount;
-        const itemsMet = minItems === 0 || itemCount >= minItems;
+        const amountMet = minAmount > 0 && subTotal >= minAmount;
+        const itemsMet = minItems > 0 && itemCount >= minItems;
 
-        if (amountMet && itemsMet) {
+        if (amountMet || itemsMet) {
             return 0;
         }
 
@@ -157,9 +157,13 @@ export const CartProvider = ({ children }) => {
 
     const applyCoupon = async (code, subTotal) => {
         try {
+            const token = localStorage.getItem('token');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            
             const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/coupons/validate`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: JSON.stringify({ code, subTotal })
             });
             const data = await res.json();
