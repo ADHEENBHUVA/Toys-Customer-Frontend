@@ -111,57 +111,56 @@ const Cart = () => {
 
                         <div className="divide-y divide-slate-100">
                             {cartItems.map(item => (
-                                <div key={item._id} className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center p-6 group hover:bg-slate-50/50 transition-colors relative">
+                                <div key={item._id} className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-6 items-start md:items-center p-4 md:p-6 group hover:bg-slate-50/50 transition-colors relative border-b border-slate-100 last:border-0 md:border-none">
                                     
-                                    {/* Product */}
-                                    <div className="col-span-6 flex items-center gap-5">
-                                        <Link to={`/product/${item._id}`} className="w-24 h-24 sm:w-28 sm:h-28 border border-slate-100 rounded-2xl flex items-center justify-center p-3 shrink-0 bg-white group-hover:border-slate-200 transition-colors">
+                                    {/* Mobile Premium Layout wrapper (visible on mobile, wraps image and details) */}
+                                    <div className="flex w-full gap-4 md:col-span-6 md:gap-5 md:items-center">
+                                        <Link to={`/product/${item._id}`} className="w-24 h-24 sm:w-28 sm:h-28 border border-slate-100 rounded-2xl flex items-center justify-center p-2 shrink-0 bg-white group-hover:border-slate-200 transition-colors">
                                             <img 
                                                 src={item.thumbnailImage || (item.images && item.images[0]) || '/placeholder.png'} 
                                                 alt={item.name} 
                                                 className="w-full h-full object-contain"
                                             />
                                         </Link>
-                                        <div className="flex flex-col">
-                                            <Link to={`/product/${item._id}`} className="font-bold text-slate-800 text-[16px] hover:text-[#2eb3a6] transition-colors leading-tight mb-1">
-                                                {item.name}
-                                            </Link>
-                                            <span className="text-sm font-medium text-slate-400">ID: {item._id.substring(0, 8)}</span>
+                                        <div className="flex flex-col flex-1 py-1 relative">
+                                            <div className="flex justify-between items-start gap-2">
+                                                <Link to={`/product/${item._id}`} className="font-bold text-slate-800 text-[15px] sm:text-[16px] hover:text-[#2eb3a6] transition-colors leading-tight line-clamp-2">
+                                                    {item.name}
+                                                </Link>
+                                                {/* Mobile Remove Button */}
+                                                <button 
+                                                    onClick={() => removeFromCart(item._id)} 
+                                                    className="md:hidden w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0 -mt-1 -mr-2"
+                                                    title="Remove item"
+                                                >
+                                                    <Trash2 className="w-[16px] h-[16px]" />
+                                                </button>
+                                            </div>
+                                            <span className="text-xs font-medium text-slate-400 mt-1 hidden md:block">ID: {item._id.substring(0, 8)}</span>
                                             
-                                            {/* Mobile Price */}
-                                            <div className="md:hidden mt-3 font-black text-slate-800 text-[16px]">
-                                                ₹{item.price.toFixed(2)}
+                                            <div className="mt-auto pt-3 flex items-center justify-between">
+                                                <div className="font-black text-slate-800 text-[16px]">
+                                                    ₹{item.price.toFixed(2)}
+                                                </div>
+                                                {/* Mobile Quantity Selector */}
+                                                <div className="md:hidden flex items-center bg-slate-50 border border-slate-200 rounded-full overflow-hidden h-8 w-20">
+                                                    <button onClick={() => handleQuantityChange(item._id, item.quantity, -1)} className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:bg-slate-100 font-bold">-</button>
+                                                    <span className="w-1/3 h-full flex items-center justify-center font-bold text-slate-800 text-[12px]">{item.quantity}</span>
+                                                    <button onClick={() => handleQuantityChange(item._id, item.quantity, 1)} className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:bg-slate-100 font-bold">+</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Quantity & Remove */}
-                                    <div className="col-span-2 flex md:justify-center items-center">
+                                    {/* Desktop Quantity & Remove */}
+                                    <div className="hidden md:flex col-span-2 justify-center items-center">
                                         <div className="flex items-center gap-2">
                                             <div className="flex items-center bg-slate-50 border border-slate-200 rounded-full overflow-hidden h-10 w-28 group-hover:bg-white group-hover:border-slate-300 transition-colors">
-                                                <button 
-                                                    onClick={() => handleQuantityChange(item._id, item.quantity, -1)} 
-                                                    className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-bold transition-colors"
-                                                >
-                                                    -
-                                                </button>
-                                                <span className="w-1/3 h-full flex items-center justify-center font-bold text-slate-800 text-[14px]">
-                                                    {item.quantity}
-                                                </span>
-                                                <button 
-                                                    onClick={() => handleQuantityChange(item._id, item.quantity, 1)} 
-                                                    className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-bold transition-colors"
-                                                >
-                                                    +
-                                                </button>
+                                                <button onClick={() => handleQuantityChange(item._id, item.quantity, -1)} className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:bg-slate-100 font-bold">-</button>
+                                                <span className="w-1/3 h-full flex items-center justify-center font-bold text-slate-800 text-[14px]">{item.quantity}</span>
+                                                <button onClick={() => handleQuantityChange(item._id, item.quantity, 1)} className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:bg-slate-100 font-bold">+</button>
                                             </div>
-                                            
-                                            {/* Remove Button Next to Quantity */}
-                                            <button 
-                                                onClick={() => removeFromCart(item._id)} 
-                                                className="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
-                                                title="Remove item"
-                                            >
+                                            <button onClick={() => removeFromCart(item._id)} className="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100" title="Remove item">
                                                 <Trash2 className="w-[18px] h-[18px]" />
                                             </button>
                                         </div>
@@ -174,9 +173,8 @@ const Cart = () => {
                                         </div>
                                     </div>
 
-                                    {/* Subtotal & Action */}
-                                    <div className="col-span-2 flex items-center justify-between md:justify-end gap-4">
-                                        <div className="md:hidden text-sm font-bold text-slate-400">Total:</div>
+                                    {/* Total (Desktop) */}
+                                    <div className="hidden md:block col-span-2 text-right">
                                         <div className="font-black text-slate-800 text-[16px]">
                                             ₹{(item.price * item.quantity).toFixed(2)}
                                         </div>

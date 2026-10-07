@@ -328,30 +328,64 @@ const Dashboard = () => {
         <div className="w-full min-h-screen bg-[#fcfaf7] font-sans text-[#4a3e3d]">
 
             {/* Top Bar */}
-            <div className="w-full bg-[#fcfaf7] border-b border-[#f3eee7] py-2.5 px-4 flex flex-col md:flex-row justify-between items-center text-[12px] font-medium text-[#8b7e7c] gap-2 md:gap-0 max-w-[1400px] mx-auto">
-                <div className="flex items-center gap-2">
-                    <span className="text-[#d69f7e]">🚚</span>
-                    {shippingSettings ? (
-                        shippingSettings.isFreeShippingActive ? (
-                            `Free shipping on orders over ₹${shippingSettings.freeShippingMinAmount}${shippingSettings.freeShippingMinItems > 0 ? ` or ${shippingSettings.freeShippingMinItems}+ items` : ''}`
+            <div className="w-full bg-[#fcfaf7] border-b border-[#f3eee7] py-2.5 overflow-hidden">
+                {/* Desktop View */}
+                <div className="hidden md:flex flex-row justify-between items-center text-[12px] font-medium text-[#8b7e7c] max-w-[1400px] mx-auto px-4">
+                    <div className="flex items-center gap-2">
+                        <span className="text-[#d69f7e]">🚚</span>
+                        {shippingSettings ? (
+                            shippingSettings.isFreeShippingActive ? (
+                                `Free shipping on orders over ₹${shippingSettings.freeShippingMinAmount}${shippingSettings.freeShippingMinItems > 0 ? ` or ${shippingSettings.freeShippingMinItems}+ items` : ''}`
+                            ) : (
+                                `Standard shipping applies`
+                            )
                         ) : (
-                            `Standard shipping applies`
-                        )
-                    ) : (
-                        `Free shipping on orders over ₹999`
-                    )}
+                            `Free shipping on orders over ₹999`
+                        )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[#d69f7e]">♥</span> Safe. Natural. Made for little ones.
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[#d69f7e]">⟲</span> Easy returns within 7 days
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-[#d69f7e]">♥</span> Safe. Natural. Made for little ones.
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-[#d69f7e]">⟲</span> Easy returns within 7 days
+
+                {/* Mobile Marquee View */}
+                <div className="flex md:hidden whitespace-nowrap overflow-hidden relative w-full">
+                    <style>
+                        {`
+                        @keyframes mobileMarquee {
+                            0% { transform: translateX(0); }
+                            100% { transform: translateX(-50%); }
+                        }
+                        .animate-mobile-marquee {
+                            animation: mobileMarquee 15s linear infinite;
+                            display: flex;
+                            width: max-content;
+                        }
+                        `}
+                    </style>
+                    <div className="animate-mobile-marquee text-[12px] font-medium text-[#8b7e7c] items-center">
+                        {/* First Set */}
+                        <div className="flex items-center gap-8 px-4">
+                            <div className="flex items-center gap-1.5"><span className="text-[#d69f7e]">🚚</span> {shippingSettings ? (shippingSettings.isFreeShippingActive ? `Free shipping over ₹${shippingSettings.freeShippingMinAmount}` : 'Standard shipping applies') : 'Free shipping over ₹999'}</div>
+                            <div className="flex items-center gap-1.5"><span className="text-[#d69f7e]">♥</span> Safe & Natural</div>
+                            <div className="flex items-center gap-1.5"><span className="text-[#d69f7e]">⟲</span> 7-day returns</div>
+                        </div>
+                        {/* Duplicate Set for continuous loop */}
+                        <div className="flex items-center gap-8 px-4">
+                            <div className="flex items-center gap-1.5"><span className="text-[#d69f7e]">🚚</span> {shippingSettings ? (shippingSettings.isFreeShippingActive ? `Free shipping over ₹${shippingSettings.freeShippingMinAmount}` : 'Standard shipping applies') : 'Free shipping over ₹999'}</div>
+                            <div className="flex items-center gap-1.5"><span className="text-[#d69f7e]">♥</span> Safe & Natural</div>
+                            <div className="flex items-center gap-1.5"><span className="text-[#d69f7e]">⟲</span> 7-day returns</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {/* Hero Section */}
-            <div className="max-w-[1400px] mx-auto p-4 md:p-6 group/hero">
-                <div className="w-full bg-gradient-to-br from-[#fcf3ea] via-[#f7e6d8] to-[#f0ccb6] rounded-3xl md:rounded-[2.5rem] relative overflow-hidden flex flex-col items-center p-5 sm:p-8 md:p-16 min-h-[380px] md:min-h-[600px]">
+            <div className="max-w-[1400px] mx-auto p-0 md:p-6 group/hero">
+                <div className="w-full bg-gradient-to-br from-[#fcf3ea] via-[#f7e6d8] to-[#f0ccb6] rounded-none md:rounded-[2.5rem] relative overflow-hidden flex flex-col items-center pt-0 pb-6 px-0 md:py-16 md:px-16 min-h-0 md:min-h-[600px]">
 
                     {/* Navigation Arrows */}
                     <button onClick={prevBanner} className="absolute left-2 md:left-4 top-[40%] md:top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/70 hover:bg-white rounded-full flex items-center justify-center text-[#3d3130] shadow-md backdrop-blur-sm transition-all opacity-0 group-hover/hero:opacity-100">
@@ -365,18 +399,18 @@ const Dashboard = () => {
                     <div className="absolute top-4 left-4 md:top-10 md:left-10 text-[#e9b896] opacity-50 text-2xl md:text-4xl">✦</div>
                     <div className="absolute top-12 left-[45%] text-[#e9b896] opacity-50 text-xl md:text-2xl">✦</div>
 
-                    <div className="flex flex-row w-full items-center justify-between z-10 flex-1">
+                    <div className="flex flex-col-reverse md:flex-row w-full items-center justify-between z-10 flex-1 gap-6 md:gap-0 mt-0 md:mt-0">
                         {/* Left Content */}
-                        <div className="w-[52%] md:w-1/2 pr-2 md:pr-4">
-                            <h1 className="text-[26px] sm:text-4xl md:text-[50px] lg:text-[70px] leading-[1.15] font-serif text-[#3d3130] mb-3 md:mb-6 tracking-tight transition-opacity duration-500">
+                        <div className="w-full md:w-1/2 px-5 md:px-0 md:pr-4 flex flex-col items-center md:items-start text-center md:text-left">
+                            <h1 className="text-[32px] sm:text-4xl md:text-[50px] lg:text-[70px] leading-[1.15] font-serif text-[#3d3130] mb-3 md:mb-6 tracking-tight transition-opacity duration-500">
                                 {currentBanner ? currentBanner.title : 'Little Things, Big Joys'}
                                 <span className="inline-block ml-1 sm:ml-2 md:ml-4 text-[#e6a27a]">♡</span>
                             </h1>
-                            <p className="text-[12px] sm:text-[14px] md:text-[20px] text-[#5e504f] mb-5 md:mb-10 max-w-[400px] leading-relaxed transition-opacity duration-500 line-clamp-2 md:line-clamp-none">
+                            <p className="text-[14px] sm:text-[15px] md:text-[20px] text-[#5e504f] mb-6 md:mb-10 max-w-[400px] leading-relaxed transition-opacity duration-500">
                                 {currentBanner ? currentBanner.subtitle : 'Thoughtfully chosen essentials for every precious moment.'}
                             </p>
 
-                            <div className="flex mb-2 sm:mb-6 md:mb-12">
+                            <div className="flex mb-2 sm:mb-6 md:mb-12 justify-center md:justify-start">
                                 <Link to={currentBanner?.buttonLink || "/products"} className="w-auto">
                                     <button className="bg-[#e6a27a] hover:bg-[#d99268] text-white font-medium text-[12px] md:text-[15px] px-5 md:px-8 py-2 md:py-3.5 rounded-full flex items-center justify-center gap-2 md:gap-3 transition-colors shadow-sm">
                                         {currentBanner?.buttonText || "Shop Now"} <span className="bg-white text-[#e6a27a] rounded-full w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex items-center justify-center text-[9px] sm:text-[10px] md:text-sm">→</span>
@@ -417,45 +451,45 @@ const Dashboard = () => {
                         </div>
 
                         {/* Right Image */}
-                        <div className="w-[45%] md:w-1/2 relative flex justify-end items-center">
-                            <div className="absolute -top-2 right-1 sm:top-2 sm:right-2 md:top-10 md:right-10 bg-[#fdfaf7] rounded-full w-[65px] h-[65px] sm:w-[90px] sm:h-[90px] md:w-[130px] md:h-[130px] flex flex-col items-center justify-center shadow-md z-20 transition-opacity duration-500">
+                        <div className="w-full md:w-1/2 relative flex justify-center md:justify-end items-center">
+                            <div className="absolute -top-2 right-4 sm:top-2 sm:right-10 md:top-10 md:right-10 bg-[#fdfaf7] rounded-full w-[80px] h-[80px] sm:w-[90px] sm:h-[90px] md:w-[130px] md:h-[130px] flex flex-col items-center justify-center shadow-md z-20 transition-opacity duration-500">
                                 <span className="text-[6.5px] sm:text-[9px] md:text-[12px] font-medium text-[#8b7e7c]">For Every</span>
                                 <span className="text-[8.5px] sm:text-[13px] md:text-[18px] font-serif text-[#3d3130] leading-tight text-center">Little<br />Adventure</span>
                                 <span className="text-[#e6a27a] text-[6px] md:text-[10px] mt-0.5 md:mt-1">♡</span>
                             </div>
-                            <div className="w-full relative z-10 rounded-2xl md:rounded-3xl overflow-hidden group/hero-image cursor-pointer shadow-lg">
-                                <img key={currentBanner?._id} src={currentBanner ? (currentBanner.image.startsWith('http') || currentBanner.image.startsWith('data:') ? currentBanner.image : `http://localhost:5000${currentBanner.image}`) : "/baby-hero-new.png"} alt={currentBanner?.title || "Hero"} onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80' }} className="w-full h-full object-cover animate-[fadeIn_0.5s_ease-in-out] transition-transform duration-700 ease-out group-hover/hero-image:scale-105 aspect-[4/5] sm:aspect-square md:aspect-[3/2]" />
+                            <div className="w-full relative z-10 rounded-none md:rounded-3xl overflow-hidden group/hero-image cursor-pointer shadow-none md:shadow-lg mx-auto md:mx-0">
+                                <img key={currentBanner?._id} src={currentBanner ? (currentBanner.image.startsWith('http') || currentBanner.image.startsWith('data:') ? currentBanner.image : `http://localhost:5000${currentBanner.image}`) : "/baby-hero-new.png"} alt={currentBanner?.title || "Hero"} onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80' }} className="w-full h-full object-cover animate-[fadeIn_0.5s_ease-in-out] transition-transform duration-700 ease-out group-hover/hero-image:scale-105 aspect-[1080/720] md:aspect-[3/2]" />
                             </div>
                         </div>
                     </div>
 
                     {/* Mobile Badges Row - Bottom */}
-                    <div className="sm:hidden w-full flex flex-row items-center justify-between gap-1 mt-6 pt-5 border-t border-[#3d3130]/10 text-[#5e504f] z-10 relative">
-                        <div className="flex flex-col items-center gap-1.5 text-center flex-1">
-                            <div className="w-7 h-7 rounded-full bg-white/60 flex items-center justify-center text-[#93b38c] shadow-sm">
-                                <Leaf className="w-3.5 h-3.5" />
+                    <div className="sm:hidden w-full grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-[#3d3130]/10 text-[#5e504f] z-10 relative px-1">
+                        <div className="flex flex-col items-center gap-1.5 text-center">
+                            <div className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center text-[#93b38c] shadow-sm mb-1">
+                                <Leaf className="w-4 h-4" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="font-bold text-[#3d3130] text-[10.5px] leading-tight mb-0.5">Safe Materials</span>
-                                <span className="text-[8.5px] text-[#8b7e7c] leading-tight">Non-toxic</span>
+                                <span className="font-bold text-[#3d3130] text-[10px] leading-tight mb-0.5">Safe Materials</span>
+                                <span className="text-[8px] text-[#8b7e7c] uppercase tracking-wider">Non-toxic</span>
                             </div>
                         </div>
-                        <div className="flex flex-col items-center gap-1.5 text-center flex-1">
-                            <div className="w-7 h-7 rounded-full bg-white/60 flex items-center justify-center text-[#e6a27a] shadow-sm">
-                                <Shield className="w-3.5 h-3.5" />
+                        <div className="flex flex-col items-center gap-1.5 text-center">
+                            <div className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center text-[#e6a27a] shadow-sm mb-1">
+                                <Shield className="w-4 h-4" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="font-bold text-[#3d3130] text-[10.5px] leading-tight mb-0.5">Trusted Quality</span>
-                                <span className="text-[8.5px] text-[#8b7e7c] leading-tight">Certified</span>
+                                <span className="font-bold text-[#3d3130] text-[10px] leading-tight mb-0.5">Trusted Quality</span>
+                                <span className="text-[8px] text-[#8b7e7c] uppercase tracking-wider">Certified</span>
                             </div>
                         </div>
-                        <div className="flex flex-col items-center gap-1.5 text-center flex-1">
-                            <div className="w-7 h-7 rounded-full bg-white/60 flex items-center justify-center text-[#e8b960] shadow-sm">
-                                <HeartIcon className="w-3.5 h-3.5" />
+                        <div className="flex flex-col items-center gap-1.5 text-center">
+                            <div className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center text-[#e8b960] shadow-sm mb-1">
+                                <HeartIcon className="w-4 h-4" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="font-bold text-[#3d3130] text-[10.5px] leading-tight mb-0.5">Made with Love</span>
-                                <span className="text-[8.5px] text-[#8b7e7c] leading-tight">For happy ones</span>
+                                <span className="font-bold text-[#3d3130] text-[10px] leading-tight mb-0.5">Made with Love</span>
+                                <span className="text-[8px] text-[#8b7e7c] uppercase tracking-wider">For happy ones</span>
                             </div>
                         </div>
                     </div>
@@ -666,7 +700,7 @@ const Dashboard = () => {
                     <div className="absolute bottom-0 left-0 w-32 h-32 md:w-64 md:h-64 bg-[#e6a27a]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
 
                     <div className="w-full lg:w-1/2 p-6 md:p-14 lg:p-20 flex flex-col justify-center relative z-10">
-                        <h2 className="text-[28px] md:text-[46px] font-black text-[#2e4053] mb-3 md:mb-4 leading-tight font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                        <h2 className="text-[28px] md:text-[46px] font-black text-[#2e4053] mb-3 md:mb-4 leading-tight font-serif">
                             Why Parents Choose Little Joys
                         </h2>
                         <p className="text-[#666666] text-[15px] md:text-[18px] mb-8 md:mb-12 font-medium">Because your baby deserves the very best.</p>

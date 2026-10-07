@@ -295,7 +295,7 @@ const ProductDetails = () => {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4 mb-10">
+                        <div className="fixed sm:relative bottom-0 left-0 w-full sm:w-auto bg-white sm:bg-transparent border-t border-[#f3eee7] sm:border-none p-4 sm:p-0 z-40 flex items-center justify-between sm:justify-start gap-3 sm:gap-4 mb-0 sm:mb-10 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:shadow-none transition-all">
                             {/* Quantity */}
                             <div className="flex items-center border border-slate-300 rounded-full h-12 overflow-hidden">
                                 <button

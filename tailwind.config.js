@@ -7,8 +7,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"Nunito"', 'sans-serif'],
-                serif: ['"Fraunces"', 'serif'],
+                sans: ['"DM Sans"', 'sans-serif'],
+                serif: ['"Lora"', 'serif'],
             },
             colors: {
                 gray: {

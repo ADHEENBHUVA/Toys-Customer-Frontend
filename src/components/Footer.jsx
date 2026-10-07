@@ -91,11 +91,11 @@ const Footer = () => {
                     </div>
 
                     <div className="relative z-10 w-full md:w-1/2 mb-8 md:mb-0">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#e6a27a] shadow-sm">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                        <div className="flex items-start sm:items-center gap-3 md:gap-4 mb-4">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center text-[#e6a27a] shadow-sm shrink-0 mt-1 sm:mt-0">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-6 sm:h-6"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
                             </div>
-                            <h3 className="text-[26px] md:text-[30px] font-serif text-[#3d3130]">Join Our Little Joys Family</h3>
+                            <h3 className="text-[24px] sm:text-[26px] md:text-[30px] font-serif text-[#3d3130] leading-[1.2]">Join Our Little Joys Family</h3>
                         </div>
                         <p className="text-[#8b7e7c] text-[15px] max-w-[400px]">
                             Get special offers, new arrivals, and parenting tips straight to your inbox.
@@ -103,12 +103,22 @@ const Footer = () => {
                     </div>
 
                     <div className="relative z-10 w-full md:w-1/2 flex md:justify-end">
-                        <form onSubmit={handleSubscribe} className="flex w-full max-w-[450px] bg-white rounded-full p-1.5 shadow-sm border border-[#f3eee7] focus-within:border-[#e6a27a] focus-within:ring-2 focus-within:ring-[#e6a27a]/20 transition-all overflow-hidden">
-                            <input type="email" placeholder="Enter your email address" className="flex-1 bg-transparent px-5 py-3 text-[15px] text-[#3d3130] outline-none rounded-l-full" style={{ WebkitBoxShadow: '0 0 0 50px white inset' }} value={email} onChange={(e) => setEmail(e.target.value)} pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Please enter a valid email address with @ and ." required />
+                        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row w-full max-w-[450px] bg-transparent sm:bg-white rounded-2xl sm:rounded-full p-0 sm:p-1.5 gap-3 sm:gap-0 focus-within:border-[#e6a27a] transition-all">
+                            <input 
+                                type="email" 
+                                placeholder="Enter your email address" 
+                                className="w-full sm:flex-1 bg-white px-5 py-3.5 sm:py-3 text-[15px] text-[#3d3130] outline-none rounded-2xl sm:rounded-l-full sm:rounded-r-none border border-white sm:border-none shadow-sm sm:shadow-none focus:ring-2 focus:ring-[#e6a27a]/20 sm:focus:ring-0" 
+                                style={{ WebkitBoxShadow: '0 0 0 50px white inset' }} 
+                                value={email} 
+                                onChange={(e) => setEmail(e.target.value)} 
+                                pattern="[^@\s]+@[^@\s]+\.[^@\s]+" 
+                                title="Please enter a valid email address with @ and ." 
+                                required 
+                            />
                             <button 
                                 type="submit" 
                                 disabled={isLoading}
-                                className="bg-[#93b38c] hover:bg-[#7a9a73] text-white font-semibold text-[15px] px-8 py-3 rounded-full transition-colors whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed"
+                                className="w-full sm:w-auto bg-[#93b38c] hover:bg-[#7a9a73] text-white font-semibold text-[15px] px-8 py-3.5 sm:py-3 rounded-2xl sm:rounded-full transition-colors whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed shadow-sm sm:shadow-none"
                             >
                                 {isLoading ? 'Subscribing...' : 'Subscribe'}
                             </button>
@@ -118,10 +128,10 @@ const Footer = () => {
             </div>
 
             <div className="max-w-[1400px] mx-auto px-4 md:px-6 pb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12 pt-8 border-t border-[#f3eee7]">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-x-4 gap-y-10 lg:gap-10 mb-12 pt-8 border-t border-[#f3eee7]">
 
                     {/* Brand Col */}
-                    <div className="lg:col-span-1">
+                    <div className="col-span-2 lg:col-span-1">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 rounded-full border-2 border-[#e6a27a] flex items-center justify-center text-[#e6a27a]">
                                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>
@@ -131,7 +141,7 @@ const Footer = () => {
                                 <span className="text-[9px] text-[#8b7e7c] tracking-wider">KIDS & BABY STORE</span>
                             </div>
                         </div>
-                        <p className="text-[13px] leading-relaxed mb-6">
+                        <p className="text-[13px] leading-relaxed mb-6 pr-4 sm:pr-0">
                             Thoughtfully chosen baby and kids products for every little adventure.
                         </p>
                         <div className="flex gap-4 text-[#3d3130]">
@@ -151,7 +161,7 @@ const Footer = () => {
                     </div>
 
                     {/* Links Cols */}
-                    <div>
+                    <div className="col-span-1 lg:col-span-1">
                         <h4 className="font-bold text-[#3d3130] text-[15px] mb-5">Shop</h4>
                         <ul className="space-y-3 text-[13px]">
                             <li><Link to="/products" className="hover:text-[#e6a27a] hover:scale-[1.03] origin-left transition-all duration-300 inline-block">All Products</Link></li>
@@ -161,7 +171,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    <div>
+                    <div className="col-span-1 lg:col-span-1">
                         <h4 className="font-bold text-[#3d3130] text-[15px] mb-5">Categories</h4>
                         <ul className="space-y-3 text-[13px]">
                             {topCategories.length > 0 ? (
@@ -183,7 +193,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    <div>
+                    <div className="col-span-1 lg:col-span-1">
                         <h4 className="font-bold text-[#3d3130] text-[15px] mb-5">Customer Care</h4>
                         <ul className="space-y-3 text-[13px]">
                             <li><Link to="/shipping" className="hover:text-[#e6a27a] hover:scale-[1.03] origin-left transition-all duration-300 inline-block">Shipping & Delivery</Link></li>
@@ -193,16 +203,16 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    <div>
+                    <div className="col-span-1 lg:col-span-1">
                         <h4 className="font-bold text-[#3d3130] text-[15px] mb-5">Contact Us</h4>
-                        <ul className="space-y-4 text-[13px]">
+                        <ul className="space-y-4 text-[13px] break-words">
                             <li className="flex gap-3 items-start">
                                 <svg className="w-4 h-4 mt-0.5 text-[#e6a27a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
                                 <a href="tel:+918347640423" className="hover:text-[#e6a27a] hover:scale-[1.03] origin-left transition-all duration-300 inline-block">+91 8347640423</a>
                             </li>
                             <li className="flex gap-3 items-start">
-                                <svg className="w-4 h-4 mt-0.5 text-[#e6a27a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
-                                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=adheenbhuva0007@gmail.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#e6a27a] hover:scale-[1.03] origin-left transition-all duration-300 inline-block">adheenbhuva0007@gmail.com</a>
+                                <svg className="w-4 h-4 mt-0.5 text-[#e6a27a] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=adheenbhuva0007@gmail.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#e6a27a] hover:scale-[1.03] origin-left transition-all duration-300 inline-block break-all">adheenbhuva0007@gmail.com</a>
                             </li>
                             <li className="flex gap-3 items-start">
                                 <svg className="w-4 h-4 mt-0.5 text-[#e6a27a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
@@ -215,12 +225,12 @@ const Footer = () => {
                 </div>
 
                 {/* Bottom */}
-                <div className="border-t border-[#f3eee7] pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[12px]">
+                <div className="border-t border-[#f3eee7] pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[12.5px] text-[#8b7e7c]">
                     <p>© 2026 Little Joys. All rights reserved.</p>
-                    <div className="flex gap-6">
-                        <Link to="/privacy" className="hover:text-[#e6a27a] hover:scale-[1.03] origin-left transition-all duration-300 inline-block">Privacy Policy</Link>
-                        <Link to="/terms" className="hover:text-[#e6a27a] hover:scale-[1.03] origin-left transition-all duration-300 inline-block">Terms of Service</Link>
-                        <Link to="/refund" className="hover:text-[#e6a27a] hover:scale-[1.03] origin-left transition-all duration-300 inline-block">Refund Policy</Link>
+                    <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+                        <Link to="/privacy" className="hover:text-[#e6a27a] hover:scale-[1.03] transition-all duration-300 inline-block">Privacy Policy</Link>
+                        <Link to="/terms" className="hover:text-[#e6a27a] hover:scale-[1.03] transition-all duration-300 inline-block">Terms of Service</Link>
+                        <Link to="/refund" className="hover:text-[#e6a27a] hover:scale-[1.03] transition-all duration-300 inline-block">Refund Policy</Link>
                     </div>
                 </div>
             </div>

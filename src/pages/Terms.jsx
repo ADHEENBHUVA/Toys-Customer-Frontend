@@ -1,34 +1,64 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { FileText, Tag, RefreshCcw, ShieldAlert } from 'lucide-react';
 
 const Terms = () => {
-    const navigate = useNavigate();
-
     return (
-        <div className="bg-slate-50 min-h-screen py-20 px-6">
-            <div className="max-w-4xl mx-auto bg-white rounded-[2rem] shadow-sm p-10 md:p-16 border border-slate-100">
-                <button onClick={() => navigate(-1)} className="mb-8 flex items-center text-blue-600 font-bold hover:text-blue-800 transition-colors">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                    Back
-                </button>
-                <div className="mb-12 text-center">
-                    <span className="text-blue-600 font-bold uppercase tracking-widest text-sm mb-2 block">Legal Information</span>
-                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight font-['Nunito'] font-serif">Terms of Service</h1>
+        <div className="max-w-[1200px] mx-auto px-4 py-10 font-['Outfit'] bg-white min-h-[60vh]">
+            {/* Breadcrumb */}
+            <div className="text-[14px] mb-8 font-medium">
+                <Link to="/" className="text-[#2e4053] font-bold hover:text-[#1282a2] transition-colors">Home</Link>
+                <span className="text-slate-400 mx-2">/</span>
+                <span className="text-[#1282a2]">Terms of Service</span>
+            </div>
+
+            {/* Title */}
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-[#2e4053] font-serif mb-2">
+                    Terms of Service
+                </h1>
+                <p className="text-[15px] text-[#666666]">Last updated: {new Date().toLocaleDateString('en-GB')}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
+                    <div className="bg-[#1282a2]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                        <FileText className="w-7 h-7 text-[#1282a2]" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">1. Acceptance of Terms</h3>
+                    <p className="text-[#666666] leading-relaxed text-[15px]">
+                        By accessing and using Little Joys, you accept and agree to be bound by the terms and provision of this agreement. When using this website's services, you shall be subject to any posted guidelines or rules applicable to such services.
+                    </p>
                 </div>
-                <div className="prose prose-slate max-w-none prose-headings:font-black prose-headings:font-['Nunito'] prose-a:text-blue-600 hover:prose-a:text-blue-500">
-                    <p className="text-lg text-slate-500 mb-8 font-medium">Last updated: {new Date().toLocaleDateString('en-GB')}</p>
-                    
-                    <h3>1. Acceptance of Terms</h3>
-                    <p>By accessing and using Appifly Toys, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using this website's particular services, you shall be subject to any posted guidelines or rules applicable to such services.</p>
 
-                    <h3>2. Products and Pricing</h3>
-                    <p>All prices are subject to change without notice. We reserve the right at any time to modify or discontinue the Service (or any part or content thereof) without notice at any time.</p>
+                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
+                    <div className="bg-[#e6a27a]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                        <Tag className="w-7 h-7 text-[#e6a27a]" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">2. Products and Pricing</h3>
+                    <p className="text-[#666666] leading-relaxed text-[15px]">
+                        All prices are subject to change without notice. We reserve the right at any time to modify or discontinue the Service (or any part or content thereof) without notice at any time.
+                    </p>
+                </div>
 
-                    <h3>3. Return Policy</h3>
-                    <p>Our return policy lasts 30 days. If 30 days have gone by since your purchase, unfortunately, we cannot offer you a refund or exchange. To be eligible for a return, your item must be unused and in the same condition that you received it.</p>
+                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
+                    <div className="bg-[#f4a261]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                        <RefreshCcw className="w-7 h-7 text-[#f4a261]" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">3. Return Policy</h3>
+                    <p className="text-[#666666] leading-relaxed text-[15px]">
+                        Our return policy lasts 30 days. If 30 days have gone by since your purchase, unfortunately, we cannot offer you a refund or exchange. To be eligible for a return, your item must be unused and in original condition.
+                    </p>
+                </div>
 
-                    <h3>4. Limitation of Liability</h3>
-                    <p>In no case shall Appifly Toys, our directors, officers, employees, affiliates, agents, contractors, interns, suppliers, service providers or licensors be liable for any injury, loss, claim, or any direct, indirect, incidental, punitive, special, or consequential damages of any kind.</p>
+                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
+                    <div className="bg-[#2a9d8f]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                        <ShieldAlert className="w-7 h-7 text-[#2a9d8f]" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">4. Limitation of Liability</h3>
+                    <p className="text-[#666666] leading-relaxed text-[15px]">
+                        In no case shall Little Joys, our directors, officers, employees, affiliates, or suppliers be liable for any injury, loss, claim, or any direct, indirect, incidental, or consequential damages of any kind.
+                    </p>
                 </div>
             </div>
         </div>

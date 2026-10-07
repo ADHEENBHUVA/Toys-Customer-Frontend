@@ -13,7 +13,7 @@ const Returns = () => {
             </div>
 
             {/* Title */}
-            <h1 className="text-3xl font-bold text-[#2e4053] mb-8 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+            <h1 className="text-3xl font-bold text-[#2e4053] mb-8 font-serif">
                 Returns & Exchanges
             </h1>
 

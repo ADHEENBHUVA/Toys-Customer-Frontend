@@ -91,6 +91,7 @@ function App() {
               <Route path="/faq" element={<FAQ />} />
               <Route path="/shipping" element={<Shipping />} />
               <Route path="/returns" element={<Returns />} />
+              <Route path="/refund" element={<Returns />} />
               <Route path="/track-order" element={<TrackOrder />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />

@@ -17,7 +17,7 @@ const Blog = () => {
                 <div className="lg:col-span-3 space-y-8">
                     
                     {/* Page Title */}
-                    <h1 className="text-3xl font-bold text-[#2e4053] mb-6 font-serif" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                    <h1 className="text-3xl font-bold text-[#2e4053] mb-6 font-serif">
                         Blog standard
                     </h1>
 
@@ -35,7 +35,7 @@ const Blog = () => {
 
                     {/* Categories */}
                     <div className="border border-slate-200 rounded-2xl p-6">
-                        <h3 className="font-bold text-[#2e4053] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                        <h3 className="font-bold text-[#2e4053] mb-6 font-serif">
                             Categories
                         </h3>
                         <ul className="space-y-4">
@@ -52,7 +52,7 @@ const Blog = () => {
 
                     {/* Recent Posts */}
                     <div className="border border-slate-200 rounded-2xl p-6">
-                        <h3 className="font-bold text-[#2e4053] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                        <h3 className="font-bold text-[#2e4053] mb-6 font-serif">
                             Recent Posts
                         </h3>
                         <div className="space-y-4">
@@ -79,7 +79,7 @@ const Blog = () => {
 
                     {/* Popular Tag */}
                     <div className="border border-slate-200 rounded-2xl p-6">
-                        <h3 className="font-bold text-[#2e4053] mb-6" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                        <h3 className="font-bold text-[#2e4053] mb-6 font-serif">
                             Popular Tag
                         </h3>
                         <div className="flex flex-wrap gap-2">
@@ -94,7 +94,7 @@ const Blog = () => {
                     {/* Promotional Banner */}
                     <div className="bg-[#ffa5ba] rounded-2xl p-6 text-center relative overflow-hidden flex flex-col h-[320px]">
                         <div className="relative z-10 pt-4">
-                            <h3 className="text-[22px] font-black text-[#1282a2] mb-3 leading-tight" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive' }}>
+                            <h3 className="text-[22px] font-black text-[#1282a2] mb-3 leading-tight font-serif">
                                 Dream Toys at <br/> Delightful Prices!
                             </h3>
                             <p className="text-[#1282a2] font-bold text-[13px] mb-6">
