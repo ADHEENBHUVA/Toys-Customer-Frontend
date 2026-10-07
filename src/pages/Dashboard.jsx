@@ -83,6 +83,9 @@ const Dashboard = () => {
     const [testimonialIdx, setTestimonialIdx] = useState(0);
     const [isTestimonialTransitioning, setIsTestimonialTransitioning] = useState(true);
 
+    // Promo Media
+    const [promoMedia, setPromoMedia] = useState([]);
+
     useEffect(() => {
         const fetchTrendingProducts = async () => {
             try {
@@ -154,6 +157,17 @@ const Dashboard = () => {
                 console.error('Error fetching brands:', error);
             }
         };
+        const fetchPromoMedia = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/promomedia`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setPromoMedia(data);
+                }
+            } catch (error) {
+                console.error('Error fetching promo media:', error);
+            }
+        };
 
         fetchTrendingProducts();
         fetchBanners();
@@ -161,6 +175,7 @@ const Dashboard = () => {
         fetchCategories();
         fetchTestimonials();
         fetchBrands();
+        fetchPromoMedia();
     }, []);
 
     // Testimonials auto-slider
@@ -383,137 +398,128 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Hero Section */}
-            <div className="max-w-[1400px] mx-auto p-0 md:p-6 group/hero">
-                <div className="w-full bg-gradient-to-br from-[#fcf3ea] via-[#f7e6d8] to-[#f0ccb6] rounded-none md:rounded-[2.5rem] relative overflow-hidden flex flex-col items-center pt-0 pb-6 px-0 md:py-16 md:px-16 min-h-0 md:min-h-[600px]">
+            {/* Hero Section - Classic Carousel Slider (Standard E-Commerce) */}
+            <div className="w-full bg-[#fcfaf7] pt-4 md:pt-8 pb-12">
+                <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative group/hero">
+                    
+                    {/* Main Slider Container */}
+                    <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] rounded-[20px] md:rounded-[30px] overflow-hidden shadow-[0_15px_40px_-10px_rgba(61,49,48,0.15)] border border-[#f3eee7] bg-white">
+                        
+                        {/* The Image */}
+                        <img 
+                            key={currentBanner?._id} 
+                            src={currentBanner ? (currentBanner.image.startsWith('http') || currentBanner.image.startsWith('data:') ? currentBanner.image : `http://localhost:5000${currentBanner.image}`) : "/baby-hero-new.png"} 
+                            alt={currentBanner?.title || "Hero"} 
+                            onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80' }} 
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2000ms] group-hover/hero:scale-105" 
+                        />
+                        
+                        {/* Gradient Overlay for Text Readability (Bottom Heavy) */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent md:bg-gradient-to-r md:from-black/70 md:via-black/40 md:to-transparent"></div>
 
-                    {/* Navigation Arrows */}
-                    <button onClick={prevBanner} className="absolute left-2 md:left-4 top-[40%] md:top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/70 hover:bg-white rounded-full flex items-center justify-center text-[#3d3130] shadow-md backdrop-blur-sm transition-all opacity-0 group-hover/hero:opacity-100">
-                        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                    </button>
-                    <button onClick={nextBanner} className="absolute right-2 md:right-4 top-[40%] md:top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/70 hover:bg-white rounded-full flex items-center justify-center text-[#3d3130] shadow-md backdrop-blur-sm transition-all opacity-0 group-hover/hero:opacity-100">
-                        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                    </button>
+                        {/* Navigation Arrows */}
+                        <button onClick={prevBanner} className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-14 md:h-14 bg-white/40 backdrop-blur-md hover:bg-white rounded-full flex items-center justify-center text-white hover:text-[#3d3130] transition-all hover:scale-110 opacity-100 md:opacity-0 md:group-hover/hero:opacity-100 shadow-lg">
+                            <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" strokeWidth={2.5} />
+                        </button>
+                        <button onClick={nextBanner} className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-14 md:h-14 bg-white/40 backdrop-blur-md hover:bg-white rounded-full flex items-center justify-center text-white hover:text-[#3d3130] transition-all hover:scale-110 opacity-100 md:opacity-0 md:group-hover/hero:opacity-100 shadow-lg">
+                            <ChevronRight className="w-6 h-6 md:w-8 md:h-8" strokeWidth={2.5} />
+                        </button>
 
-                    {/* Decorative Elements */}
-                    <div className="absolute top-4 left-4 md:top-10 md:left-10 text-[#e9b896] opacity-50 text-2xl md:text-4xl">✦</div>
-                    <div className="absolute top-12 left-[45%] text-[#e9b896] opacity-50 text-xl md:text-2xl">✦</div>
-
-                    <div className="flex flex-col-reverse md:flex-row w-full items-center justify-between z-10 flex-1 gap-6 md:gap-0 mt-0 md:mt-0">
-                        {/* Left Content */}
-                        <div className="w-full md:w-1/2 px-5 md:px-0 md:pr-4 flex flex-col items-center md:items-start text-center md:text-left">
-                            <h1 className="text-[32px] sm:text-4xl md:text-[50px] lg:text-[70px] leading-[1.15] font-serif text-[#3d3130] mb-3 md:mb-6 tracking-tight transition-opacity duration-500">
-                                {currentBanner ? currentBanner.title : 'Little Things, Big Joys'}
-                                <span className="inline-block ml-1 sm:ml-2 md:ml-4 text-[#e6a27a]">♡</span>
+                        {/* Text Content overlaying the image */}
+                        <div className="absolute inset-0 z-20 flex flex-col justify-end md:justify-center p-6 md:p-16 w-full md:w-[60%]">
+                            
+                            <h1 className="text-[32px] sm:text-[40px] md:text-[50px] lg:text-[60px] leading-[1.1] font-black text-white mb-3 md:mb-5 font-['Nunito'] tracking-tight drop-shadow-md">
+                                {currentBanner ? currentBanner.title : 'Discover the Best Toys.'}
                             </h1>
-                            <p className="text-[14px] sm:text-[15px] md:text-[20px] text-[#5e504f] mb-6 md:mb-10 max-w-[400px] leading-relaxed transition-opacity duration-500">
-                                {currentBanner ? currentBanner.subtitle : 'Thoughtfully chosen essentials for every precious moment.'}
+                            
+                            <p className="text-[15px] sm:text-[18px] md:text-[20px] text-white/90 mb-6 md:mb-8 leading-[1.5] font-medium font-['Nunito'] max-w-[500px] drop-shadow-md">
+                                {currentBanner ? currentBanner.subtitle : 'Shop our wide range of premium, safe, and wildly fun toys for kids of all ages.'}
                             </p>
 
-                            <div className="flex mb-2 sm:mb-6 md:mb-12 justify-center md:justify-start">
-                                <Link to={currentBanner?.buttonLink || "/products"} className="w-auto">
-                                    <button className="bg-[#e6a27a] hover:bg-[#d99268] text-white font-medium text-[12px] md:text-[15px] px-5 md:px-8 py-2 md:py-3.5 rounded-full flex items-center justify-center gap-2 md:gap-3 transition-colors shadow-sm">
-                                        {currentBanner?.buttonText || "Shop Now"} <span className="bg-white text-[#e6a27a] rounded-full w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex items-center justify-center text-[9px] sm:text-[10px] md:text-sm">→</span>
-                                    </button>
-                                </Link>
-                            </div>
-
-                            {/* Badges row - Desktop */}
-                            <div className="hidden sm:flex flex-row flex-nowrap items-center justify-start gap-3 md:gap-10 text-[12px] font-medium text-[#5e504f] mt-8">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/50 flex items-center justify-center text-[#93b38c]">
-                                        <Leaf className="w-3 h-3 md:w-4 md:h-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-[#3d3130] text-[10px] md:text-[12px]">Safe Materials</span>
-                                        <span className="text-[9px] md:text-[11px] text-[#8b7e7c] whitespace-nowrap">Non-toxic & baby-safe</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/50 flex items-center justify-center text-[#e6a27a]">
-                                        <Shield className="w-3 h-3 md:w-4 md:h-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-[#3d3130] text-[10px] md:text-[12px]">Trusted Quality</span>
-                                        <span className="text-[9px] md:text-[11px] text-[#8b7e7c] whitespace-nowrap">Tested & certified</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/50 flex items-center justify-center text-[#e8b960]">
-                                        <HeartIcon className="w-3 h-3 md:w-4 md:h-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-[#3d3130] text-[10px] md:text-[12px]">Made with Love</span>
-                                        <span className="text-[9px] md:text-[11px] text-[#8b7e7c] whitespace-nowrap">For happy ones</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <Link to={currentBanner?.buttonLink || "/products"} className="group/btn inline-block">
+                                <button className="bg-[#e6a27a] text-white font-bold text-[15px] md:text-[18px] px-8 py-3.5 md:py-4 rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:bg-[#d99268] hover:shadow-[0_10px_30px_rgba(230,162,122,0.5)] hover:-translate-y-1 w-fit whitespace-nowrap">
+                                    {currentBanner?.buttonText || "Shop Now"} 
+                                    <ChevronRight className="w-5 h-5 transition-transform group-hover/btn:translate-x-1 flex-shrink-0" strokeWidth={3} />
+                                </button>
+                            </Link>
+                        </div>
+                        
+                        {/* Slide Indicators (Dots) */}
+                        <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+                            <div className="w-8 h-1.5 bg-white rounded-full"></div>
+                            <div className="w-2 h-1.5 bg-white/50 rounded-full"></div>
+                            <div className="w-2 h-1.5 bg-white/50 rounded-full"></div>
                         </div>
 
-                        {/* Right Image */}
-                        <div className="w-full md:w-1/2 relative flex justify-center md:justify-end items-center">
-                            <div className="absolute -top-2 right-4 sm:top-2 sm:right-10 md:top-10 md:right-10 bg-[#fdfaf7] rounded-full w-[80px] h-[80px] sm:w-[90px] sm:h-[90px] md:w-[130px] md:h-[130px] flex flex-col items-center justify-center shadow-md z-20 transition-opacity duration-500">
-                                <span className="text-[6.5px] sm:text-[9px] md:text-[12px] font-medium text-[#8b7e7c]">For Every</span>
-                                <span className="text-[8.5px] sm:text-[13px] md:text-[18px] font-serif text-[#3d3130] leading-tight text-center">Little<br />Adventure</span>
-                                <span className="text-[#e6a27a] text-[6px] md:text-[10px] mt-0.5 md:mt-1">♡</span>
-                            </div>
-                            <div className="w-full relative z-10 rounded-none md:rounded-3xl overflow-hidden group/hero-image cursor-pointer shadow-none md:shadow-lg mx-auto md:mx-0">
-                                <img key={currentBanner?._id} src={currentBanner ? (currentBanner.image.startsWith('http') || currentBanner.image.startsWith('data:') ? currentBanner.image : `http://localhost:5000${currentBanner.image}`) : "/baby-hero-new.png"} alt={currentBanner?.title || "Hero"} onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80' }} className="w-full h-full object-cover animate-[fadeIn_0.5s_ease-in-out] transition-transform duration-700 ease-out group-hover/hero-image:scale-105 aspect-[1080/720] md:aspect-[3/2]" />
-                            </div>
-                        </div>
                     </div>
-
-                    {/* Mobile Badges Row - Bottom */}
-                    <div className="sm:hidden w-full grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-[#3d3130]/10 text-[#5e504f] z-10 relative px-1">
-                        <div className="flex flex-col items-center gap-1.5 text-center">
-                            <div className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center text-[#93b38c] shadow-sm mb-1">
-                                <Leaf className="w-4 h-4" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="font-bold text-[#3d3130] text-[10px] leading-tight mb-0.5">Safe Materials</span>
-                                <span className="text-[8px] text-[#8b7e7c] uppercase tracking-wider">Non-toxic</span>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center gap-1.5 text-center">
-                            <div className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center text-[#e6a27a] shadow-sm mb-1">
-                                <Shield className="w-4 h-4" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="font-bold text-[#3d3130] text-[10px] leading-tight mb-0.5">Trusted Quality</span>
-                                <span className="text-[8px] text-[#8b7e7c] uppercase tracking-wider">Certified</span>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center gap-1.5 text-center">
-                            <div className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center text-[#e8b960] shadow-sm mb-1">
-                                <HeartIcon className="w-4 h-4" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="font-bold text-[#3d3130] text-[10px] leading-tight mb-0.5">Made with Love</span>
-                                <span className="text-[8px] text-[#8b7e7c] uppercase tracking-wider">For happy ones</span>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
+            {/* Promo Media (Videos & Images) */}
+            {promoMedia && promoMedia.length > 0 && (
+                <div className="w-full bg-[#fcfaf7] pb-12">
+                    <div className="max-w-[1400px] mx-auto px-4 md:px-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {promoMedia.map((media) => (
+                                <Link 
+                                    to={media.link || "/products"} 
+                                    key={media._id} 
+                                    className="block group relative rounded-[20px] overflow-hidden shadow-[0_10px_30px_-10px_rgba(61,49,48,0.1)] border border-[#f3eee7] bg-white aspect-square md:aspect-video"
+                                >
+                                    {media.type === 'video' ? (
+                                        <video 
+                                            src={media.mediaUrl.startsWith('http') ? media.mediaUrl : `http://localhost:5001${media.mediaUrl}`} 
+                                            autoPlay 
+                                            muted 
+                                            loop 
+                                            playsInline
+                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <img 
+                                            src={media.mediaUrl.startsWith('http') ? media.mediaUrl : `http://localhost:5001${media.mediaUrl}`} 
+                                            alt={media.title} 
+                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                        />
+                                    )}
+                                    {/* Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                                    
+                                    {/* Content */}
+                                    <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                                        {media.title && (
+                                            <h3 className="text-2xl font-black mb-1 drop-shadow-md font-['Nunito']">{media.title}</h3>
+                                        )}
+                                        {media.subtitle && (
+                                            <p className="text-sm font-bold text-white/90 drop-shadow-md mb-4">{media.subtitle}</p>
+                                        )}
+                                        <div className="w-fit bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 group-hover:bg-white group-hover:text-[#e6a27a] transition-colors">
+                                            Explore Now <ChevronRight size={16} />
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Categories */}
-            <div className="w-full pt-16 pb-8 text-center">
+            <div className="w-full pt-16 pb-8 text-center bg-white">
                 <div className="max-w-[1400px] mx-auto px-4 md:px-6">
-                    <div className="mb-2 text-[#e6a27a]">♡</div>
-                    <h2 className="text-[32px] font-serif text-[#3d3130] mb-2">Shop by Categories</h2>
-                    <p className="text-[#8b7e7c] text-[15px] mb-12">Everything your little one needs, all in one place.</p>
+                    <h2 className="text-[28px] md:text-[36px] font-black text-[#111] mb-2 tracking-tight uppercase">Toy Categories</h2>
+                    <p className="text-[#555] text-[15px] mb-10 font-bold uppercase tracking-wider">Everything your little one needs</p>
                 </div>
 
                 <div
-                    className="relative w-full py-4 group/slider"
+                    className="relative w-full py-4 group/slider bg-white"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
                     {/* Left Arrow - Centered on Image */}
                     <button
                         onClick={() => handleManualScroll('left')}
-                        className="absolute left-4 top-[88px] -translate-y-1/2 z-20 bg-white/95 text-[#3d3130] p-3 rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.15)] opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-[#fcfaf7] hidden md:flex items-center justify-center cursor-pointer"
+                        className="absolute left-4 top-[88px] -translate-y-1/2 z-20 bg-white/95 text-[#111] p-3 shadow-md opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:bg-gray-100 hidden md:flex items-center justify-center cursor-pointer"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
@@ -521,7 +527,7 @@ const Dashboard = () => {
                     {/* Right Arrow - Centered on Image */}
                     <button
                         onClick={() => handleManualScroll('right')}
-                        className="absolute right-4 top-[88px] -translate-y-1/2 z-20 bg-white/95 text-[#3d3130] p-3 rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.15)] opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-[#fcfaf7] hidden md:flex items-center justify-center cursor-pointer"
+                        className="absolute right-4 top-[88px] -translate-y-1/2 z-20 bg-white/95 text-[#111] p-3 shadow-md opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:bg-gray-100 hidden md:flex items-center justify-center cursor-pointer"
                     >
                         <ChevronRight className="w-6 h-6" />
                     </button>
@@ -540,7 +546,7 @@ const Dashboard = () => {
                     </style>
                     <div
                         ref={categoryContainerRef}
-                        className={`flex overflow-x-auto hide-scrollbar pt-6 pb-6 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                        className={`flex overflow-x-auto hide-scrollbar pt-2 pb-6 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
                         style={{ gap: `${dynamicGap}px` }}
                         onMouseDown={handleMouseDown}
                         onMouseLeave={handleMouseLeaveDrag}
@@ -558,11 +564,10 @@ const Dashboard = () => {
                                     className="group flex flex-col items-center justify-start flex-shrink-0"
                                     style={{ width: '144px' }}
                                 >
-                                    <div className="w-36 h-36 mb-4 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex items-center justify-center overflow-hidden rounded-full border-[6px] border-white transition-all duration-500 transform group-hover:-translate-y-2 group-hover:shadow-[0_12px_40px_rgb(230,162,122,0.2)] bg-gray-50">
-                                        <img src={cat.image?.startsWith('http') || cat.image?.startsWith('data:') ? cat.image : `http://localhost:5000${cat.image}`} alt={cat.name} draggable="false" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
+                                    <div className="w-36 h-36 mb-4 shadow-sm flex items-center justify-center overflow-hidden rounded-full border-[2px] border-transparent transition-all duration-300 group-hover:border-[#e6a27a] bg-gray-50">
+                                        <img src={cat.image?.startsWith('http') || cat.image?.startsWith('data:') ? cat.image : `http://localhost:5000${cat.image}`} alt={cat.name} draggable="false" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none" />
                                     </div>
-                                    <span className="font-bold text-[#3d3130] text-[16px] text-center font-serif group-hover:text-[#e6a27a] transition-colors">{cat.name}</span>
-                                    <span className="text-[13px] text-[#8b7e7c] text-center mt-0.5">{productCount} products</span>
+                                    <span className="font-bold text-[#111] text-[15px] text-center uppercase tracking-wide group-hover:text-[#e6a27a] transition-colors">{cat.name}</span>
                                 </Link>
                             );
                         })}
@@ -571,60 +576,44 @@ const Dashboard = () => {
             </div>
 
             {/* Featured Products */}
-            <div className="max-w-[1400px] mx-auto pt-8 pb-8 px-4 md:px-6">
-                <div className="text-center mb-14">
-                    <div className="mb-2 text-[#e6a27a] text-lg">♡</div>
-                    <h2 className="text-[36px] font-serif text-[#3d3130] mb-2">Featured Products</h2>
-                    <p className="text-[#8b7e7c] text-[16px]">Carefully selected favorites for your little ones.</p>
-                </div>
+            <div className="w-full bg-[#F5E6E6] pt-16 pb-20">
+                <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+                    <div className="flex flex-col items-center justify-center text-center mb-10">
+                        <span className="text-[#B35959] text-[13px] font-bold uppercase tracking-[0.2em] mb-2">EXPLORE</span>
+                        <h2 className="text-[32px] md:text-[40px] font-black text-[#222E42] leading-tight mb-2">
+                            Explore Popular Toy Set
+                        </h2>
+                        <p className="text-[#555] text-[15px] md:text-[18px]">Smart, Fun & Creative Toys for Every Little Adventure</p>
+                    </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 px-2 md:px-0">
-                    {[...allProducts]
-                        .filter(product => product.status !== 'Out of Stock')
-                        .sort((a, b) => {
-                            if (a.bestSeller && !b.bestSeller) return -1;
-                            if (!a.bestSeller && b.bestSeller) return 1;
-                            return (b.reviewCount || 0) - (a.reviewCount || 0);
-                        })
-                        .slice(0, visibleCount)
-                        .map((product, idx) => (
-                            <div key={product._id} className="flex flex-col bg-white rounded-3xl overflow-hidden border border-[#f3eee7] transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(230,162,122,0.15)] group cursor-pointer">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 px-2 md:px-0">
+                        {[...allProducts]
+                            .filter(product => product.status !== 'Out of Stock')
+                            .sort((a, b) => {
+                                if (a.bestSeller && !b.bestSeller) return -1;
+                                if (!a.bestSeller && b.bestSeller) return 1;
+                                return (b.reviewCount || 0) - (a.reviewCount || 0);
+                            })
+                            .slice(0, visibleCount)
+                            .map((product, idx) => (
+                                <div key={product._id} className="flex flex-col group cursor-pointer relative bg-transparent">
 
-                                {/* Image Container - Premium gradient background */}
-                                <div className="relative w-full aspect-[5/4] overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white to-[#fdfaf7] p-4">
-                                    {/* Badges */}
-                                    <div className="absolute top-2 left-2 md:top-4 md:left-4 z-20 flex flex-col gap-1.5 md:gap-2 items-start">
-                                        {idx === 0 && <span className="bg-[#e6a27a] text-white text-[8px] md:text-[10px] font-bold px-2 py-1 md:px-3 md:py-1.5 rounded-full uppercase tracking-wider shadow-sm">Best Seller</span>}
-                                        {idx === 1 && <span className="bg-[#93b38c] text-white text-[8px] md:text-[10px] font-bold px-2 py-1 md:px-3 md:py-1.5 rounded-full uppercase tracking-wider shadow-sm">New</span>}
-
-                                        {product.originalPrice > product.price && (
-                                            <span className="bg-[#e8b960] text-white text-[8px] md:text-[10px] font-bold px-2 py-1 md:px-3 md:py-1.5 rounded-full uppercase tracking-wider shadow-sm">
-                                                {(product.discountDisplayType || websiteSettings?.discountDisplayType) === 'percentage'
-                                                    ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
-                                                    : `Save ₹${Math.round(product.originalPrice - product.price)}`}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
-                                        <span className="absolute bottom-4 left-4 z-20 bg-orange-100 border border-orange-200 text-orange-600 text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-sm flex items-center gap-1 animate-pulse">
-                                            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path></svg>
-                                            Only {product.stockQuantity} Left!
-                                        </span>
-                                    )}
-
-                                    {/* Waitlist Heart (Top Right inside Square Box) */}
+                                    {/* Image Container */}
+                                <div className="relative w-full aspect-square md:aspect-[4/3] overflow-hidden bg-[#e0efdf] rounded-[24px] md:rounded-[32px]">
+                                    
+                                    {/* Waitlist Heart (Bottom Right) */}
                                     <button
                                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                                        className="absolute top-2 right-2 md:top-4 md:right-4 z-20 bg-white/95 p-1.5 md:p-2.5 rounded-full shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-110"
-                                        title="Join Waitlist"
+                                        className="absolute bottom-3 right-3 z-20"
+                                        title="Wishlist"
                                     >
-                                        <Heart
-                                            className={`w-4 h-4 md:w-5 md:h-5 text-red-500 transition-colors ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'fill-red-500' : 'hover:fill-red-500/30'}`}
-                                        />
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="12" cy="12" r="12" fill="white" fillOpacity="0.9"/>
+                                            <path d="M12 17.5l-1.45-1.32C5.4 11.53 2 8.44 2 4.67 2 2.5 3.67 0.83 5.83 0.83c1.23 0 2.42.58 3.17 1.5.75-.92 1.94-1.5 3.17-1.5 2.16 0 3.83 1.67 3.83 3.84 0 3.77-3.4 6.86-8.55 11.51L12 17.5z" fill={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#999"} transform="translate(4,4) scale(0.66)"/>
+                                        </svg>
                                     </button>
 
-                                    <Link to={`/product/${product._id}`} className="absolute inset-4 z-10 flex items-center justify-center">
+                                    <Link to={`/product/${product._id}`} className="absolute inset-2 z-10 flex items-center justify-center mix-blend-multiply">
                                         <ProductCardImageCarousel
                                             images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])}
                                             productName={product.name}
@@ -633,51 +622,36 @@ const Dashboard = () => {
                                 </div>
 
                                 {/* Content Section */}
-                                <div className="p-3 md:p-5 flex flex-col flex-grow">
-                                    <Link to={`/product/${product._id}`} className="font-medium font-serif text-[#3d3130] text-[13px] md:text-[17px] mb-1 hover:text-[#e6a27a] transition-colors truncate">
+                                <div className="pt-3 pb-1 flex flex-col flex-grow text-left">
+                                    <Link to={`/product/${product._id}`} className="font-bold text-[#111] text-[15px] md:text-[17px] mb-1 hover:text-[#E51A22] transition-colors truncate">
                                         {product.name}
                                     </Link>
 
-                                    <div className="scale-90 origin-left md:scale-100">
-                                        <StarRating rating={Math.round(product.rating || 5)} count={product.reviewCount || 0} />
-                                    </div>
-
-                                    <div className="hidden md:block text-[12px] text-[#8b7e7c] mt-1 mb-2 leading-relaxed">
-                                        <p className="line-clamp-1">
-                                            {product.shortDescription || (product.description?.replace(/<[^>]+>/g, ' ')?.replace(product.name, '')?.trim()) || "A wonderful and safe toy for your little ones to play, learn, and grow."}
-                                        </p>
-                                        <Link to={`/product/${product._id}`} className="text-[#e6a27a] hover:text-[#d38b60] font-bold text-[11px] mt-1 inline-block">
-                                            View more
-                                        </Link>
-                                    </div>
-
-                                    <div className="mt-auto pt-2 md:pt-3 border-t border-[#f3eee7] flex flex-col gap-2">
-                                        <div className="flex items-end gap-1 md:gap-2 h-[20px] md:h-[24px]">
+                                    <div className="flex flex-col gap-1 mt-1">
+                                        <div className="flex items-center gap-2">
                                             {product.status === 'Out of Stock' ? (
-                                                <span className="font-bold text-slate-400 text-[14px] md:text-[18px] leading-none">Out of Stock</span>
+                                                <span className="font-bold text-gray-500 text-[16px]">Out of Stock</span>
                                             ) : (
                                                 <>
-                                                    <span className="font-bold text-[#e6a27a] text-[16px] md:text-[20px] leading-none">₹{`${(product.price || 0).toFixed(2)}`}</span>
+                                                    <span className="font-bold text-[#E51A22] text-[16px] md:text-[18px]">₹{`${(product.price || 0).toFixed(2)}`}</span>
                                                     {product.originalPrice > (product.price || 0) && (
-                                                        <span className="text-[11px] md:text-[13px] text-[#b3a8a6] line-through font-medium leading-none">₹{`${(product.originalPrice || 0).toFixed(2)}`}</span>
+                                                        <span className="text-[12px] md:text-[13px] text-gray-400 line-through font-medium">₹{`${(product.originalPrice || 0).toFixed(2)}`}</span>
+                                                    )}
+                                                    {product.originalPrice > product.price && (
+                                                        <span className="text-[#0E9050] text-[12px] font-bold">
+                                                            [{(product.discountDisplayType || websiteSettings?.discountDisplayType) === 'percentage'
+                                                                ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
+                                                                : `Save ₹${Math.round(product.originalPrice - product.price)}`}]
+                                                        </span>
                                                     )}
                                                 </>
                                             )}
                                         </div>
-
-                                        {/* Action Buttons */}
-                                        {product.status === 'Out of Stock' ? (
-                                            <button disabled className="w-full bg-slate-50 text-slate-400 border border-slate-200 py-2 md:py-3 rounded-full cursor-not-allowed font-bold text-[12px] md:text-[14px] flex items-center justify-center gap-1 md:gap-2" title="Out of Stock">
-                                                <svg width="14" height="14" className="md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"></path></svg> Out of Stock
-                                            </button>
-                                        ) : (
-                                            <button onClick={() => addToCart(product, 1)} className="w-full bg-white text-[#3d3130] border border-[#ebe5df] py-2 md:py-3 rounded-full shadow-sm hover:shadow-md hover:bg-[#e6a27a] hover:text-white hover:border-[#e6a27a] transition-all duration-300 font-bold text-[12px] md:text-[14px] flex items-center justify-center gap-1 md:gap-2 group/btn" title="Add to Cart">
-                                                <ShoppingCart className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover/btn:scale-110 transition-transform" /> Add to Cart
-                                            </button>
-                                        )}
+                                        <span className="text-[#0E9050] font-bold text-[14px]">
+                                            Club Price: ₹{`${Math.round((product.price || 0) * 0.95).toFixed(2)}`}
+                                        </span>
                                     </div>
                                 </div>
-
                             </div>
                         ))}
                 </div>
@@ -685,11 +659,12 @@ const Dashboard = () => {
                 {/* View More Products Button */}
                 {visibleCount < allProducts.length && (
                     <div className="flex justify-center mt-12">
-                        <button onClick={() => setVisibleCount(prev => prev + 8)} className="bg-[#118AB2] text-white px-8 py-3.5 rounded-full font-bold shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-[#0a5c78] transition-all duration-300">
-                            View More
+                        <button onClick={() => setVisibleCount(prev => prev + 8)} className="bg-white text-[#111] border-2 border-[#111] px-8 py-3 font-bold uppercase tracking-widest hover:bg-[#111] hover:text-white transition-all duration-300">
+                            View All Products
                         </button>
                     </div>
                 )}
+                </div>
             </div>
 
             {/* Why Parents Choose */}

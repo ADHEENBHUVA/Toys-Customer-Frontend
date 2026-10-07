@@ -381,96 +381,71 @@ const Products = () => {
                                 <div className={viewMode === 'grid' ? "grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6" : "flex flex-col gap-6"}>
                                     {displayedProducts.map((product) => (
                                         viewMode === 'grid' ? (
-                                            // Grid View Card
-                                            <div key={product._id} className="flex flex-col group bg-white border-2 border-slate-200 shadow-sm rounded-2xl sm:rounded-3xl p-2.5 sm:p-4 hover:shadow-[0_20px_50px_-12px_rgba(17,138,178,0.2)] hover:border-[#118AB2]/40 transition-all duration-500 hover:-translate-y-1">
+                                            <div key={product._id} className="flex flex-col group cursor-pointer relative bg-transparent hover:scale-[1.02] transition-transform duration-300">
                                                 {/* Image Container */}
-                                                <div className="relative mb-4 bg-slate-50 rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-slate-100">
-                                                    {/* Sale Badge */}
-                                                    {product.originalPrice > (product.price || 0) && (
-                                                        <span className="absolute top-4 left-4 bg-[#e8b960] text-white text-[10px] font-black px-2.5 py-1 rounded-2xl uppercase tracking-wider z-20 shadow-sm">
-                                                            {(product.discountDisplayType || websiteSettings?.discountDisplayType) === 'percentage' 
-                                                                ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
-                                                                : `Save ₹${Math.round(product.originalPrice - product.price)}`}
-                                                        </span>
-                                                    )}
+                                                <div className="relative w-full aspect-square overflow-hidden bg-[#e0efdf] rounded-[24px] md:rounded-[32px]">
+                                                    {/* Waitlist Heart (Bottom Right) */}
+                                                    <button
+                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                                                        className="absolute bottom-3 right-3 z-20"
+                                                        title="Wishlist"
+                                                    >
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <circle cx="12" cy="12" r="12" fill="white" fillOpacity="0.9"/>
+                                                            <path d="M12 17.5l-1.45-1.32C5.4 11.53 2 8.44 2 4.67 2 2.5 3.67 0.83 5.83 0.83c1.23 0 2.42.58 3.17 1.5.75-.92 1.94-1.5 3.17-1.5 2.16 0 3.83 1.67 3.83 3.84 0 3.77-3.4 6.86-8.55 11.51L12 17.5z" fill={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#999"} transform="translate(4,4) scale(0.66)"/>
+                                                        </svg>
+                                                    </button>
 
-                                                    {/* Product Image */}
-                                                    <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center">
-                                                        {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
-                                                            <div className="absolute bottom-2 left-2 bg-orange-100/90 backdrop-blur-sm border border-orange-200 text-orange-600 px-2.5 py-1 rounded-md text-[10px] font-black tracking-widest shadow-sm z-20 uppercase flex items-center gap-1 animate-pulse">
-                                                                <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path></svg>
-                                                                Only {product.stockQuantity} Left!
-                                                            </div>
-                                                        )}
+                                                    <Link to={`/product/${product._id}`} className="absolute inset-2 z-10 flex items-center justify-center mix-blend-multiply">
                                                         <ProductCardImageCarousel 
                                                             images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])} 
                                                             productName={product.name} 
                                                         />
                                                     </Link>
-
-                                                    {/* Floating Waitlist Button */}
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                                                        className={`absolute top-2 right-2 sm:top-3 sm:right-3 z-30 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm hover:scale-110 ${(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'bg-red-50 text-red-500 border border-red-200' : 'bg-white/80 backdrop-blur-sm text-slate-400 border border-white hover:text-red-500 hover:border-red-200 hover:bg-red-50'}`}
-                                                    >
-                                                        <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" fill={(Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id)) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                                    </button>
                                                 </div>
 
-                                                {/* Product Details */}
-                                                <div className="flex flex-col flex-1 px-1">
-                                                    <Link to={`/product/${product._id}`} className="hover:text-[#118AB2] mb-1.5 transition-colors">
-                                                        <h3 className="font-bold text-[#3d3130] text-[13px] sm:text-[17.5px] leading-tight line-clamp-2 tracking-tight">
-                                                            {product.name}
-                                                        </h3>
+                                                {/* Content Section */}
+                                                <div className="pt-3 pb-1 flex flex-col flex-grow text-left px-1">
+                                                    <Link to={`/product/${product._id}`} className="font-bold text-[#111] text-[15px] md:text-[17px] mb-1 hover:text-[#E51A22] transition-colors line-clamp-1">
+                                                        {product.name}
                                                     </Link>
 
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <div className="flex text-[#fbdf14] text-[12px] tracking-widest">
-                                                            {[1, 2, 3, 4, 5].map(s => (
-                                                                <span key={s}>{s <= Math.round(product.rating || 5) ? '★' : '☆'}</span>
-                                                            ))}
-                                                        </div>
-                                                        <span className="text-[12px] font-bold text-slate-500">{(product.rating || 5.0).toFixed(1)} ({product.reviewCount || 0})</span>
-                                                    </div>
-
-                                                    {/* Price and Action Buttons Row */}
-                                                    <div className="flex items-center justify-between mt-auto pt-3">
-                                                        <div className="flex flex-col">
+                                                    <div className="flex flex-col gap-1 mt-1">
+                                                        <div className="flex items-center gap-2 flex-wrap">
                                                             {product.status === 'Out of Stock' ? (
-                                                                <span className="font-black text-slate-400 text-[16px] leading-none">Out of Stock</span>
+                                                                <span className="font-bold text-gray-500 text-[16px]">Out of Stock</span>
                                                             ) : (
                                                                 <>
+                                                                    <span className="font-bold text-[#E51A22] text-[16px] md:text-[18px]">₹{`${(product.price || 0).toFixed(2)}`}</span>
                                                                     {product.originalPrice > (product.price || 0) && (
-                                                                        <span className="text-[12px] text-slate-400 font-bold line-through mb-[-4px]">₹{(product.originalPrice || 0).toFixed(2)}</span>
+                                                                        <span className="text-[12px] md:text-[13px] text-gray-400 line-through font-medium">₹{`${(product.originalPrice || 0).toFixed(2)}`}</span>
                                                                     )}
-                                                                    <span className="font-black text-[#22c55e] text-[15px] sm:text-[20px] leading-none">₹{(product.price || 0).toFixed(2)}</span>
+                                                                    {product.originalPrice > product.price && (
+                                                                        <span className="text-[#0E9050] text-[12px] font-bold whitespace-nowrap">
+                                                                            [{(product.discountDisplayType || websiteSettings?.discountDisplayType) === 'percentage'
+                                                                                ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
+                                                                                : `Save ₹${Math.round(product.originalPrice - product.price)}`}]
+                                                                        </span>
+                                                                    )}
                                                                 </>
                                                             )}
                                                         </div>
-
-                                                        <div className="flex shrink-0 ml-2">
-                                                            {product.status === 'Out of Stock' ? (
-                                                                <button
-                                                                    type="button"
-                                                                    disabled
-                                                                    className="w-9 h-9 sm:w-11 sm:h-11 bg-slate-300 text-white rounded-full flex items-center justify-center cursor-not-allowed shadow-sm"
-                                                                    title="Out of Stock"
-                                                                >
-                                                                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"></path></svg>
-                                                                </button>
-                                                            ) : (
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
-                                                                    className="w-9 h-9 sm:w-11 sm:h-11 bg-[#118AB2] hover:bg-[#0f7a9e] text-white rounded-full flex items-center justify-center transition-all duration-300 shadow-md shadow-[#118AB2]/30 hover:shadow-lg hover:shadow-[#118AB2]/40 hover:scale-110"
-                                                                >
-                                                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
-                                                                </button>
-                                                            )}
-                                                        </div>
+                                                        <span className="text-[#0E9050] font-bold text-[14px]">
+                                                            Club Price: ₹{`${Math.round((product.price || 0) * 0.95).toFixed(2)}`}
+                                                        </span>
                                                     </div>
+                                                    
+                                                    {/* Hidden Add to Cart button (Appears on Hover or can just be standard design) */}
+                                                    {product.status !== 'Out of Stock' && (
+                                                        <div className="mt-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+                                                            <button
+                                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
+                                                                className="w-full bg-[#E51A22] hover:bg-[#cc141c] text-white py-2 rounded-full text-[13px] font-bold transition-colors"
+                                                            >
+                                                                Add to Cart
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ) : (
@@ -504,7 +479,7 @@ const Products = () => {
                                                 {/* Content side */}
                                                 <div className="flex-1 flex flex-col justify-center py-2">
                                                     <Link to={`/product/${product._id}`}>
-                                                        <h3 className="font-black text-[18px] text-slate-800 leading-tight mb-3 hover:text-[#118AB2] transition-colors font-['Nunito']">
+                                                        <h3 className="font-serif font-semibold text-[19px] text-[#3d3130] leading-tight mb-3 hover:text-[#e6a27a] transition-colors">
                                                             {product.name}
                                                         </h3>
                                                     </Link>
