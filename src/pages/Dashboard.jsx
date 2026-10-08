@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, Shield, Leaf, Heart as HeartIcon, Bell } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, Shield, Leaf, Heart as HeartIcon, Bell, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ProductCardImageCarousel from '../components/ProductCardImageCarousel';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 const Dashboard = () => {
     const { addToCart, waitlistItems, toggleWaitlist, shippingSettings, websiteSettings } = useCart();
     const [trendingProducts, setTrendingProducts] = useState([]);
-    const [visibleCount, setVisibleCount] = useState(8);
+    const [visibleCount, setVisibleCount] = useState(10);
+    const [hasLoadedMore, setHasLoadedMore] = useState(false);
     const [allProducts, setAllProducts] = useState([]);
     const [dbCategories, setDbCategories] = useState([]);
 
@@ -398,115 +404,72 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Hero Section - Classic Carousel Slider (Standard E-Commerce) */}
-            <div className="w-full bg-[#fcfaf7] pt-4 md:pt-8 pb-12">
-                <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative group/hero">
-                    
-                    {/* Main Slider Container */}
-                    <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] rounded-[20px] md:rounded-[30px] overflow-hidden shadow-[0_15px_40px_-10px_rgba(61,49,48,0.15)] border border-[#f3eee7] bg-white">
-                        
-                        {/* The Image */}
-                        <img 
-                            key={currentBanner?._id} 
-                            src={currentBanner ? (currentBanner.image.startsWith('http') || currentBanner.image.startsWith('data:') ? currentBanner.image : `http://localhost:5000${currentBanner.image}`) : "/baby-hero-new.png"} 
-                            alt={currentBanner?.title || "Hero"} 
-                            onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80' }} 
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2000ms] group-hover/hero:scale-105" 
-                        />
-                        
-                        {/* Gradient Overlay for Text Readability (Bottom Heavy) */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent md:bg-gradient-to-r md:from-black/70 md:via-black/40 md:to-transparent"></div>
+            {/* Hero Section - Multi-Banner Carousel */}
+            <div className="w-full bg-[#FDFBF7] pt-4 md:pt-8 pb-2 overflow-hidden">
+                <div className="w-full mx-auto px-4 relative group/hero">
+                    <Swiper
+                        modules={[Navigation, Pagination, Autoplay]}
+                        spaceBetween={20}
+                        slidesPerView={1}
+                        breakpoints={{
+                            640: {
+                                slidesPerView: 2,
+                            },
+                            1024: {
+                                slidesPerView: 3,
+                            },
+                        }}
+                        navigation={{
+                            prevEl: '.hero-prev',
+                            nextEl: '.hero-next',
+                        }}
+                        autoplay={{ delay: 5000, disableOnInteraction: false }}
+                        loop={activeBanners.length > 3}
+                        className="!pb-6" // Space for pagination
+                    >
+                        {activeBanners.length > 0 ? activeBanners.map((banner, idx) => (
+                            <SwiperSlide key={idx} className="h-full">
+                                <Link to={banner.buttonLink || "/products"} className="block relative w-full aspect-[4/3] sm:aspect-[4/3] rounded-[24px] overflow-hidden shadow-sm group">
+                                    <img 
+                                        src={banner.image.startsWith('http') || banner.image.startsWith('data:') ? banner.image : `http://localhost:5000${banner.image}`} 
+                                        alt={banner.title || "Hero"} 
+                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80' }} 
+                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105" 
+                                    />
+                                </Link>
+                            </SwiperSlide>
+                        )) : (
+                            // Fallback slides if no active banners
+                            [1, 2, 3].map((_, idx) => (
+                                <SwiperSlide key={idx} className="h-full">
+                                    <div className="block relative w-full aspect-[4/3] sm:aspect-[4/3] rounded-[24px] overflow-hidden shadow-sm">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80"
+                                            alt="Hero" 
+                                            className="absolute inset-0 w-full h-full object-cover" 
+                                        />
+                                    </div>
+                                </SwiperSlide>
+                            ))
+                        )}
+                    </Swiper>
 
-                        {/* Navigation Arrows */}
-                        <button onClick={prevBanner} className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-14 md:h-14 bg-white/40 backdrop-blur-md hover:bg-white rounded-full flex items-center justify-center text-white hover:text-[#3d3130] transition-all hover:scale-110 opacity-100 md:opacity-0 md:group-hover/hero:opacity-100 shadow-lg">
-                            <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" strokeWidth={2.5} />
-                        </button>
-                        <button onClick={nextBanner} className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-14 md:h-14 bg-white/40 backdrop-blur-md hover:bg-white rounded-full flex items-center justify-center text-white hover:text-[#3d3130] transition-all hover:scale-110 opacity-100 md:opacity-0 md:group-hover/hero:opacity-100 shadow-lg">
-                            <ChevronRight className="w-6 h-6 md:w-8 md:h-8" strokeWidth={2.5} />
-                        </button>
+                    {/* Navigation Arrows */}
+                    <button className="hero-prev absolute left-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white rounded-full flex items-center justify-center text-gray-700 hover:text-[#111] transition-all hover:scale-105 shadow-lg hidden md:flex cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed opacity-0 group-hover/hero:opacity-100">
+                        <ChevronLeft className="w-6 h-6" strokeWidth={2.5} />
+                    </button>
+                    <button className="hero-next absolute right-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white rounded-full flex items-center justify-center text-gray-700 hover:text-[#111] transition-all hover:scale-105 shadow-lg hidden md:flex cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed opacity-0 group-hover/hero:opacity-100">
+                        <ChevronRight className="w-6 h-6" strokeWidth={2.5} />
+                    </button>
 
-                        {/* Text Content overlaying the image */}
-                        <div className="absolute inset-0 z-20 flex flex-col justify-end md:justify-center p-6 md:p-16 w-full md:w-[60%]">
-                            
-                            <h1 className="text-[32px] sm:text-[40px] md:text-[50px] lg:text-[60px] leading-[1.1] font-black text-white mb-3 md:mb-5 font-['Nunito'] tracking-tight drop-shadow-md">
-                                {currentBanner ? currentBanner.title : 'Discover the Best Toys.'}
-                            </h1>
-                            
-                            <p className="text-[15px] sm:text-[18px] md:text-[20px] text-white/90 mb-6 md:mb-8 leading-[1.5] font-medium font-['Nunito'] max-w-[500px] drop-shadow-md">
-                                {currentBanner ? currentBanner.subtitle : 'Shop our wide range of premium, safe, and wildly fun toys for kids of all ages.'}
-                            </p>
-
-                            <Link to={currentBanner?.buttonLink || "/products"} className="group/btn inline-block">
-                                <button className="bg-[#e6a27a] text-white font-bold text-[15px] md:text-[18px] px-8 py-3.5 md:py-4 rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:bg-[#d99268] hover:shadow-[0_10px_30px_rgba(230,162,122,0.5)] hover:-translate-y-1 w-fit whitespace-nowrap">
-                                    {currentBanner?.buttonText || "Shop Now"} 
-                                    <ChevronRight className="w-5 h-5 transition-transform group-hover/btn:translate-x-1 flex-shrink-0" strokeWidth={3} />
-                                </button>
-                            </Link>
-                        </div>
-                        
-                        {/* Slide Indicators (Dots) */}
-                        <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-                            <div className="w-8 h-1.5 bg-white rounded-full"></div>
-                            <div className="w-2 h-1.5 bg-white/50 rounded-full"></div>
-                            <div className="w-2 h-1.5 bg-white/50 rounded-full"></div>
-                        </div>
-
-                    </div>
                 </div>
             </div>
 
-            {/* Promo Media (Videos & Images) */}
-            {promoMedia && promoMedia.length > 0 && (
-                <div className="w-full bg-[#fcfaf7] pb-12">
-                    <div className="max-w-[1400px] mx-auto px-4 md:px-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {promoMedia.map((media) => (
-                                <Link 
-                                    to={media.link || "/products"} 
-                                    key={media._id} 
-                                    className="block group relative rounded-[20px] overflow-hidden shadow-[0_10px_30px_-10px_rgba(61,49,48,0.1)] border border-[#f3eee7] bg-white aspect-square md:aspect-video"
-                                >
-                                    {media.type === 'video' ? (
-                                        <video 
-                                            src={media.mediaUrl.startsWith('http') ? media.mediaUrl : `http://localhost:5001${media.mediaUrl}`} 
-                                            autoPlay 
-                                            muted 
-                                            loop 
-                                            playsInline
-                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                        />
-                                    ) : (
-                                        <img 
-                                            src={media.mediaUrl.startsWith('http') ? media.mediaUrl : `http://localhost:5001${media.mediaUrl}`} 
-                                            alt={media.title} 
-                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                        />
-                                    )}
-                                    {/* Overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                                    
-                                    {/* Content */}
-                                    <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                                        {media.title && (
-                                            <h3 className="text-2xl font-black mb-1 drop-shadow-md font-['Nunito']">{media.title}</h3>
-                                        )}
-                                        {media.subtitle && (
-                                            <p className="text-sm font-bold text-white/90 drop-shadow-md mb-4">{media.subtitle}</p>
-                                        )}
-                                        <div className="w-fit bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 group-hover:bg-white group-hover:text-[#e6a27a] transition-colors">
-                                            Explore Now <ChevronRight size={16} />
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
+
 
             {/* Categories */}
             <div className="w-full pt-16 pb-8 text-center bg-white">
-                <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+                <div className="w-full mx-auto px-4 md:px-6">
                     <h2 className="text-[28px] md:text-[36px] font-black text-[#111] mb-2 tracking-tight uppercase">Toy Categories</h2>
                     <p className="text-[#555] text-[15px] mb-10 font-bold uppercase tracking-wider">Everything your little one needs</p>
                 </div>
@@ -519,17 +482,17 @@ const Dashboard = () => {
                     {/* Left Arrow - Centered on Image */}
                     <button
                         onClick={() => handleManualScroll('left')}
-                        className="absolute left-4 top-[88px] -translate-y-1/2 z-20 bg-white/95 text-[#111] p-3 shadow-md opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:bg-gray-100 hidden md:flex items-center justify-center cursor-pointer"
+                        className="absolute left-4 top-[88px] -translate-y-1/2 z-20 text-white p-2 opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-125 hidden md:flex items-center justify-center cursor-pointer drop-shadow-md"
                     >
-                        <ChevronLeft className="w-6 h-6" />
+                        <ChevronLeft className="w-8 h-8" strokeWidth={2.5} />
                     </button>
 
                     {/* Right Arrow - Centered on Image */}
                     <button
                         onClick={() => handleManualScroll('right')}
-                        className="absolute right-4 top-[88px] -translate-y-1/2 z-20 bg-white/95 text-[#111] p-3 shadow-md opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:bg-gray-100 hidden md:flex items-center justify-center cursor-pointer"
+                        className="absolute right-4 top-[88px] -translate-y-1/2 z-20 text-white p-2 opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-125 hidden md:flex items-center justify-center cursor-pointer drop-shadow-md"
                     >
-                        <ChevronRight className="w-6 h-6" />
+                        <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
                     </button>
 
 
@@ -576,17 +539,17 @@ const Dashboard = () => {
             </div>
 
             {/* Featured Products */}
-            <div className="w-full bg-[#F5E6E6] pt-16 pb-20">
-                <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+            <div className="w-full bg-[#FDFBF7] pt-8 pb-10">
+                <div className="w-full mx-auto px-4 md:px-6">
                     <div className="flex flex-col items-center justify-center text-center mb-10">
-                        <span className="text-[#B35959] text-[13px] font-bold uppercase tracking-[0.2em] mb-2">EXPLORE</span>
-                        <h2 className="text-[32px] md:text-[40px] font-black text-[#222E42] leading-tight mb-2">
+                        <span className="text-[#E51A22] text-[13px] font-bold uppercase tracking-[0.2em] mb-2">EXPLORE</span>
+                        <h2 className="text-[32px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2">
                             Explore Popular Toy Set
                         </h2>
                         <p className="text-[#555] text-[15px] md:text-[18px]">Smart, Fun & Creative Toys for Every Little Adventure</p>
                     </div>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 px-2 md:px-0">
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 px-2 md:px-0">
                         {[...allProducts]
                             .filter(product => product.status !== 'Out of Stock')
                             .sort((a, b) => {
@@ -601,17 +564,31 @@ const Dashboard = () => {
                                     {/* Image Container */}
                                 <div className="relative w-full aspect-square md:aspect-[4/3] overflow-hidden bg-[#e0efdf] rounded-[24px] md:rounded-[32px]">
                                     
-                                    {/* Waitlist Heart (Bottom Right) */}
-                                    <button
-                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                                        className="absolute bottom-3 right-3 z-20"
-                                        title="Wishlist"
-                                    >
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <circle cx="12" cy="12" r="12" fill="white" fillOpacity="0.9"/>
-                                            <path d="M12 17.5l-1.45-1.32C5.4 11.53 2 8.44 2 4.67 2 2.5 3.67 0.83 5.83 0.83c1.23 0 2.42.58 3.17 1.5.75-.92 1.94-1.5 3.17-1.5 2.16 0 3.83 1.67 3.83 3.84 0 3.77-3.4 6.86-8.55 11.51L12 17.5z" fill={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#999"} transform="translate(4,4) scale(0.66)"/>
-                                        </svg>
-                                    </button>
+                                    {/* Action Buttons (Visible on mobile, Hover on Desktop) */}
+                                    <div className="absolute bottom-3 right-3 z-30 flex flex-col gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 translate-y-0 lg:translate-y-2 lg:group-hover:translate-y-0">
+                                        {/* Waitlist Heart */}
+                                        <button
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                                            className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 transition-all border border-gray-100"
+                                            title="Wishlist"
+                                        >
+                                            <HeartIcon 
+                                                className="w-5 h-5 transition-colors" 
+                                                fill={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "transparent"} 
+                                                stroke={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#666"} 
+                                                strokeWidth={2}
+                                            />
+                                        </button>
+
+                                        {/* Add to Cart */}
+                                        <button
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
+                                            className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-green-50 hover:scale-110 transition-all border border-gray-100"
+                                            title="Add to Cart"
+                                        >
+                                            <ShoppingCart className="w-5 h-5 text-[#333]" strokeWidth={2.2} />
+                                        </button>
+                                    </div>
 
                                     <Link to={`/product/${product._id}`} className="absolute inset-2 z-10 flex items-center justify-center mix-blend-multiply">
                                         <ProductCardImageCarousel
@@ -656,19 +633,83 @@ const Dashboard = () => {
                         ))}
                 </div>
 
-                {/* View More Products Button */}
+                {/* Action Buttons */}
                 {visibleCount < allProducts.length && (
-                    <div className="flex justify-center mt-12">
-                        <button onClick={() => setVisibleCount(prev => prev + 8)} className="bg-white text-[#111] border-2 border-[#111] px-8 py-3 font-bold uppercase tracking-widest hover:bg-[#111] hover:text-white transition-all duration-300">
-                            View All Products
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-12 px-4 md:px-0">
+                        <button onClick={() => setVisibleCount(prev => prev + 10)} className="group bg-white text-[#3d3130] border border-[#e5d9cc] shadow-sm hover:shadow-md hover:border-[#e6a27a] px-10 py-3.5 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
+                            Load More
+                            <ChevronRight className="w-5 h-5 text-[#e6a27a] group-hover:translate-x-1 transition-transform" />
                         </button>
+                        <Link to="/products" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-10 py-3.5 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
+                            View All Products
+                            <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+                        </Link>
                     </div>
                 )}
                 </div>
             </div>
 
+            {/* Shop By Age - Premium Circular 'Story' Style */}
+            <div className="w-full bg-[#FDFBF7] pt-16 pb-24 border-y border-gray-100/50">
+                <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
+                    
+                    <div className="flex flex-col items-center justify-center text-center mb-16">
+                        <span className="text-[#E51A22] text-[13px] font-bold uppercase tracking-[0.2em] mb-3">CURATED FOR GROWTH</span>
+                        <h2 className="text-[32px] md:text-[44px] font-black text-[#1A1A24] leading-tight mb-4">
+                            Shop By Age
+                        </h2>
+                        <div className="w-16 h-1 bg-[#1A1A24] rounded-full mx-auto"></div>
+                    </div>
+
+                    <div className="flex flex-row flex-wrap justify-center gap-8 md:gap-12 lg:gap-20 px-2">
+                        {[
+                            { age: '0-12', label: 'Months', title: 'Infants', img: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=600&q=80', color: '#FF6B6B' },
+                            { age: '1-2', label: 'Years', title: 'Toddlers', img: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80', color: '#FFB84D' },
+                            { age: '3-4', label: 'Years', title: 'Preschool', img: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?auto=format&fit=crop&w=600&q=80', color: '#4ECDC4' },
+                            { age: '5-7', label: 'Years', title: 'Little Kids', img: 'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?auto=format&fit=crop&w=600&q=80', color: '#45B7D1' },
+                            { age: '8+', label: 'Years', title: 'Big Kids', img: 'https://images.unsplash.com/photo-1611604548018-d56bbd85d681?auto=format&fit=crop&w=600&q=80', color: '#9B59B6' },
+                        ].map((item, idx) => (
+                            <Link 
+                                to={`/products?age=${encodeURIComponent(item.age + ' ' + item.label)}`} 
+                                key={idx} 
+                                className="group flex flex-col items-center outline-none w-[140px] md:w-[180px]"
+                            >
+                                {/* Gradient Ring & Image */}
+                                <div className="relative w-32 h-32 md:w-44 md:h-44 mb-6 rounded-full p-[3px] transition-transform duration-500 group-hover:-translate-y-3" style={{ background: `linear-gradient(135deg, ${item.color}, transparent, ${item.color})` }}>
+                                    <div className="w-full h-full bg-white rounded-full p-1.5 shadow-lg relative z-10">
+                                        <div className="w-full h-full rounded-full overflow-hidden relative">
+                                            <img 
+                                                src={item.img} 
+                                                alt={`${item.age} ${item.label}`}
+                                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                            />
+                                            {/* Subtle overlay on hover */}
+                                            <div className="absolute inset-0 bg-[#1A1A24]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Floating Color Shadow */}
+                                    <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-40 blur-xl transition-all duration-500 -z-10" style={{ backgroundColor: item.color }}></div>
+                                </div>
+                                
+                                {/* Text Content */}
+                                <div className="text-center transform transition-transform duration-500 group-hover:-translate-y-1">
+                                    <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase mb-2 block" style={{ color: item.color }}>{item.title}</span>
+                                    <h3 className="text-[#1A1A24] text-[24px] md:text-[32px] font-black leading-none tracking-tight mb-1">
+                                        {item.age}
+                                    </h3>
+                                    <p className="text-gray-500 uppercase tracking-widest font-bold text-[10px] md:text-[12px]">
+                                        {item.label}
+                                    </p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
             {/* Why Parents Choose */}
-            <div className="max-w-[1400px] mx-auto py-10 md:py-16 px-4 md:px-6 font-['Outfit']">
+            <div className="w-full mx-auto py-10 md:py-16 px-4 md:px-6 font-['Outfit']">
                 <div className="bg-[#1282a2]/5 rounded-3xl md:rounded-[3rem] flex flex-col lg:flex-row overflow-hidden border border-[#1282a2]/10 relative">
                     {/* Decorative Elements */}
                     <div className="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-[#1282a2]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
@@ -735,12 +776,179 @@ const Dashboard = () => {
                 </div>
             </div>
 
+            {/* Promo Media (Videos & Images) - Limited Edition Style */}
+            {promoMedia && promoMedia.length > 0 && (
+                <div className="w-full bg-[#FDFBF7] pt-8 pb-8">
+                    <div className="w-full mx-auto px-4 md:px-8">
+                        <div className="mb-8 text-center md:text-left">
+                            <span className="text-[#E51A22] text-[12px] font-bold uppercase tracking-widest mb-1 block">EXCLUSIVE COLLECTIONS</span>
+                            <h2 className="text-[28px] md:text-[36px] font-black text-[#1A1A24] mb-2 font-['Outfit']">Limited-edition playtime drops</h2>
+                            <p className="text-[#555] text-[15px] max-w-2xl font-medium">Explore our limited-edition toy drops, crafted for unforgettable playtime moments and available only while exclusive stocks last.</p>
+                        </div>
+
+                        <div className="w-full relative group/promo">
+                            <Swiper
+                                modules={[Navigation, Pagination, Autoplay]}
+                                spaceBetween={16}
+                                slidesPerView={2}
+                                breakpoints={{
+                                    640: { slidesPerView: 3 },
+                                    768: { slidesPerView: 4 },
+                                    1024: { slidesPerView: 5 },
+                                    1280: { slidesPerView: 5 },
+                                }}
+                                navigation={{
+                                    prevEl: '.promo-prev',
+                                    nextEl: '.promo-next',
+                                }}
+                                autoplay={{ delay: 10000, disableOnInteraction: false }}
+                                loop={promoMedia.length > 3}
+                                className="w-full"
+                            >
+                                {promoMedia.map((media) => (
+                                    <SwiperSlide key={media._id}>
+                                        <div className="flex flex-col h-full bg-transparent">
+                                            <Link to={media.link || "/products"} className="relative w-full aspect-[4/5] rounded-t-[20px] overflow-hidden bg-gray-100 shadow-sm border-x border-t border-[#e2eccc] block">
+                                                {media.type === 'video' ? (
+                                                    <video 
+                                                        src={media.mediaUrl.startsWith('http') ? media.mediaUrl : `http://localhost:5001${media.mediaUrl}`} 
+                                                        autoPlay 
+                                                        muted 
+                                                        loop 
+                                                        playsInline
+                                                        className="absolute inset-0 w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <img 
+                                                        src={media.mediaUrl.startsWith('http') ? media.mediaUrl : `http://localhost:5001${media.mediaUrl}`} 
+                                                        alt={media.title} 
+                                                        className="absolute inset-0 w-full h-full object-cover"
+                                                    />
+                                                )}
+                                            </Link>
+                                            <Link to={media.link || "/products"} className="bg-[#e4f5cc] p-3 rounded-b-[20px] border border-[#d2e8b6] shadow-sm flex items-center gap-3 hover:bg-[#d8f0b3] transition-colors h-[70px]">
+                                                {media.type === 'image' && (
+                                                    <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-white border border-[#c4e09f]">
+                                                        <img src={media.mediaUrl.startsWith('http') ? media.mediaUrl : `http://localhost:5001${media.mediaUrl}`} alt="thumb" className="w-full h-full object-cover" />
+                                                    </div>
+                                                )}
+                                                {media.type === 'video' && (
+                                                    <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-white border border-[#c4e09f] flex items-center justify-center">
+                                                        <span className="text-[#8bb553] text-xl">▶</span>
+                                                    </div>
+                                                )}
+                                                <div className="flex flex-col justify-center overflow-hidden">
+                                                    <span className="font-bold text-[#2e4053] text-[13px] truncate w-full leading-tight">{media.title || 'Exclusive Toy'}</span>
+                                                    <span className="font-bold text-[#0E9050] text-[11px] truncate w-full leading-tight mt-0.5">{media.subtitle || 'Explore Now'}</span>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
+                            
+                            <button className="promo-prev absolute left-2 top-[40%] -translate-y-1/2 z-30 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-700 hover:text-[#111] transition-all hover:scale-105 shadow-md opacity-0 group-hover/promo:opacity-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
+                            </button>
+                            <button className="promo-next absolute right-2 top-[40%] -translate-y-1/2 z-30 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-700 hover:text-[#111] transition-all hover:scale-105 shadow-md opacity-0 group-hover/promo:opacity-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Top 10 Trending Products */}
+            <div className="w-full bg-white pt-8 pb-8">
+                <div className="w-full mx-auto px-4 md:px-6">
+                    <div className="flex flex-col items-center justify-center text-center mb-10">
+                        <span className="text-[#E51A22] text-[13px] font-bold uppercase tracking-[0.2em] mb-2">CURATED</span>
+                        <h2 className="text-[32px] md:text-[40px] font-black text-[#222E42] leading-tight mb-2">
+                            Best Selling Picks
+                        </h2>
+                        <p className="text-[#555] text-[15px] md:text-[18px]">Top-rated toys loved by parents and kids alike</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 px-2 md:px-0">
+                        {[...allProducts]
+                            .filter(product => product.status !== 'Out of Stock')
+                            .sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0))
+                            .slice(0, 10)
+                            .map((product) => (
+                                <div key={product._id} className="flex flex-col group cursor-pointer relative bg-transparent">
+                                    <div className="relative w-full aspect-square md:aspect-[4/3] overflow-hidden bg-[#e0efdf] rounded-[24px] md:rounded-[32px]">
+                                        <div className="absolute bottom-3 right-3 z-30 flex flex-col gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 translate-y-0 lg:translate-y-2 lg:group-hover:translate-y-0">
+                                            <button
+                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                                                className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 transition-all border border-gray-100"
+                                                title="Wishlist"
+                                            >
+                                                <HeartIcon 
+                                                    className="w-5 h-5 transition-colors" 
+                                                    fill={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "transparent"} 
+                                                    stroke={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#666"} 
+                                                    strokeWidth={2}
+                                                />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
+                                                className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-green-50 hover:scale-110 transition-all border border-gray-100"
+                                                title="Add to Cart"
+                                            >
+                                                <ShoppingCart className="w-5 h-5 text-[#333]" strokeWidth={2.2} />
+                                            </button>
+                                        </div>
+
+                                        <Link to={`/product/${product._id}`} className="absolute inset-2 z-10 flex items-center justify-center mix-blend-multiply">
+                                            <ProductCardImageCarousel
+                                                images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])}
+                                                productName={product.name}
+                                            />
+                                        </Link>
+                                    </div>
+
+                                    <div className="pt-3 pb-1 flex flex-col flex-grow text-left">
+                                        <Link to={`/product/${product._id}`} className="font-bold text-[#111] text-[15px] md:text-[17px] mb-1 hover:text-[#E51A22] transition-colors truncate">
+                                            {product.name}
+                                        </Link>
+                                        <div className="flex flex-col gap-1 mt-1">
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-bold text-[#E51A22] text-[16px] md:text-[18px]">₹{`${(product.price || 0).toFixed(2)}`}</span>
+                                                {product.originalPrice > (product.price || 0) && (
+                                                    <span className="text-[12px] md:text-[13px] text-gray-400 line-through font-medium">₹{`${(product.originalPrice || 0).toFixed(2)}`}</span>
+                                                )}
+                                                {product.originalPrice > product.price && (
+                                                    <span className="text-[#0E9050] text-[12px] font-bold">
+                                                        [{(product.discountDisplayType || websiteSettings?.discountDisplayType) === 'percentage'
+                                                            ? `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`
+                                                            : `Save ₹${Math.round(product.originalPrice - product.price)}`}]
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <span className="text-[#0E9050] font-bold text-[14px]">
+                                                Club Price: ₹{`${Math.round((product.price || 0) * 0.95).toFixed(2)}`}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+
+                    <div className="flex justify-center items-center mt-12 px-4 md:px-0">
+                        <Link to="/products" className="group bg-white text-[#3d3130] border border-[#e5d9cc] shadow-sm hover:shadow-md hover:border-[#e6a27a] px-10 py-3.5 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
+                            Load More
+                            <ChevronRight className="w-5 h-5 text-[#e6a27a] group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </div>
+                </div>
+            </div>
+
             {/* Brands Marquee */}
             {brands.length > 0 && (
-                <div className="w-full pt-12 md:pt-16 pb-8 overflow-hidden bg-slate-50/50">
+                <div className="w-full pt-4 md:pt-6 pb-6 overflow-hidden bg-[#FDFBF7]">
                     <div className="text-center mb-8 md:mb-10 px-4">
-                        <div className="mb-2 text-[#e6a27a]">✦</div>
-                        <h2 className="text-[28px] md:text-[32px] font-serif text-[#3d3130] mb-2">Our Premium Brands</h2>
+                        <div className="mb-2 text-[#E51A22]">✦</div>
+                        <h2 className="text-[28px] md:text-[32px] font-black text-[#1A1A24] mb-2">Our Premium Brands</h2>
                     </div>
 
                     <style>

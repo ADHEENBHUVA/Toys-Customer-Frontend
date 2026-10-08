@@ -12,6 +12,7 @@ const Products = () => {
 
     // Read from URL
     const selectedCategories = searchParams.getAll('category');
+    const selectedGenders = searchParams.getAll('gender');
     const selectedAges = searchParams.getAll('age');
     const maxPriceStr = searchParams.get('maxPrice');
     const selectedMaxPrice = maxPriceStr ? parseInt(maxPriceStr, 10) : 5000;
@@ -80,6 +81,11 @@ const Products = () => {
         // Filter by category
         if (selectedCategories.length > 0) {
             result = result.filter(p => selectedCategories.includes(p.category));
+        }
+
+        // Filter by gender
+        if (selectedGenders.length > 0) {
+            result = result.filter(p => selectedGenders.includes(p.gender) || p.gender === 'All');
         }
 
         // Filter by age group

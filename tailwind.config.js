@@ -7,7 +7,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"DM Sans"', 'sans-serif'],
+                sans: ['"Courier Prime"', 'monospace', 'sans-serif'],
                 serif: ['"Lora"', 'serif'],
             },
             colors: {

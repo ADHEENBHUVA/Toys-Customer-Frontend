@@ -73,42 +73,33 @@ const Footer = () => {
 
     return (
         <footer className="w-full bg-[#fcfaf7] border-t border-[#f3eee7] font-sans text-[#5e504f]">
-            {/* Integrated Full-Width Newsletter Section */}
+            {/* Integrated Full-Width Newsletter Section - Premium White Theme */}
             <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-12 pb-8">
-                <div className="bg-[#fef4ea] rounded-[2rem] p-8 md:p-12 lg:p-16 relative overflow-hidden flex flex-col md:flex-row items-center justify-between border border-[#fae5d3] shadow-sm">
-                    {/* Decorative Background Elements */}
+                <div className="bg-gradient-to-br from-[#FFF5F5] to-[#FFE4E6] rounded-[2rem] p-8 md:p-12 lg:p-16 relative overflow-hidden flex flex-col md:flex-row items-center justify-between shadow-sm border border-[#FFD1D6]">
+                    {/* Decorative Background Elements (Subtle Theme) */}
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                        <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full opacity-40 blur-2xl"></div>
-                        <div className="absolute -bottom-10 -right-10 w-60 h-60 bg-[#e6a27a] rounded-full opacity-10 blur-3xl"></div>
-
-                        {/* Cute aesthetic clouds positioned dynamically */}
-                        <div className="absolute top-10 right-20 w-16 h-8 bg-white/60 rounded-full hidden md:block"></div>
-                        <div className="absolute top-6 right-28 w-10 h-10 bg-white/60 rounded-full hidden md:block"></div>
-
-                        <div className="absolute bottom-10 right-40 w-24 h-10 bg-white/60 rounded-full hidden md:block"></div>
-                        <div className="absolute bottom-6 right-48 w-12 h-12 bg-white/60 rounded-full hidden md:block"></div>
-                        <div className="absolute bottom-12 right-36 w-12 h-12 bg-[#f8d070]/40 rounded-full hidden md:block"></div>
+                        <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full opacity-60 blur-2xl"></div>
+                        <div className="absolute -bottom-10 -right-10 w-60 h-60 bg-[#FFB3B3] rounded-full opacity-20 blur-3xl"></div>
                     </div>
 
                     <div className="relative z-10 w-full md:w-1/2 mb-8 md:mb-0">
                         <div className="flex items-start sm:items-center gap-3 md:gap-4 mb-4">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center text-[#e6a27a] shadow-sm shrink-0 mt-1 sm:mt-0">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-6 sm:h-6"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center text-[#E51A22] shadow-[0_4px_12px_rgba(229,26,34,0.1)] shrink-0 mt-1 sm:mt-0">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-6 sm:h-6"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
                             </div>
-                            <h3 className="text-[24px] sm:text-[26px] md:text-[30px] font-serif text-[#3d3130] leading-[1.2]">Join Our Little Joys Family</h3>
+                            <h3 className="text-[24px] sm:text-[28px] md:text-[34px] font-sans font-bold text-[#1A1A24] leading-tight tracking-tight">Join Our Little Joys Family</h3>
                         </div>
-                        <p className="text-[#8b7e7c] text-[15px] max-w-[400px]">
+                        <p className="font-sans text-gray-600 text-[15px] md:text-[16px] leading-relaxed max-w-[400px]">
                             Get special offers, new arrivals, and parenting tips straight to your inbox.
                         </p>
                     </div>
 
                     <div className="relative z-10 w-full md:w-1/2 flex md:justify-end">
-                        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row w-full max-w-[450px] bg-transparent sm:bg-white rounded-2xl sm:rounded-full p-0 sm:p-1.5 gap-3 sm:gap-0 focus-within:border-[#e6a27a] transition-all">
+                        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row w-full max-w-[480px] bg-transparent sm:bg-white rounded-2xl sm:rounded-full p-0 sm:p-1.5 gap-3 sm:gap-0 border-none sm:border sm:border-gray-200 shadow-none sm:shadow-sm focus-within:border-[#1A1A24] focus-within:ring-1 focus-within:ring-[#1A1A24] transition-all">
                             <input 
                                 type="email" 
                                 placeholder="Enter your email address" 
-                                className="w-full sm:flex-1 bg-white px-5 py-3.5 sm:py-3 text-[15px] text-[#3d3130] outline-none rounded-2xl sm:rounded-l-full sm:rounded-r-none border border-white sm:border-none shadow-sm sm:shadow-none focus:ring-2 focus:ring-[#e6a27a]/20 sm:focus:ring-0" 
-                                style={{ WebkitBoxShadow: '0 0 0 50px white inset' }} 
+                                className="w-full sm:flex-1 bg-gray-50 sm:bg-transparent px-6 py-4 sm:py-3 text-[15px] text-[#1A1A24] font-medium outline-none rounded-2xl sm:rounded-l-full sm:rounded-r-none border border-gray-200 sm:border-none shadow-sm sm:shadow-none focus:ring-2 focus:ring-gray-200 sm:focus:ring-0 placeholder:text-gray-400" 
                                 value={email} 
                                 onChange={(e) => setEmail(e.target.value)} 
                                 pattern="[^@\s]+@[^@\s]+\.[^@\s]+" 
@@ -118,7 +109,7 @@ const Footer = () => {
                             <button 
                                 type="submit" 
                                 disabled={isLoading}
-                                className="w-full sm:w-auto bg-[#93b38c] hover:bg-[#7a9a73] text-white font-semibold text-[15px] px-8 py-3.5 sm:py-3 rounded-2xl sm:rounded-full transition-colors whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed shadow-sm sm:shadow-none"
+                                className="w-full sm:w-auto bg-[#1A1A24] hover:bg-black text-white font-bold tracking-wide text-[15px] px-10 py-4 sm:py-3 rounded-2xl sm:rounded-full transition-colors whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed shadow-md"
                             >
                                 {isLoading ? 'Subscribing...' : 'Subscribe'}
                             </button>

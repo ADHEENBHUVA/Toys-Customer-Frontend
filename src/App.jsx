@@ -16,6 +16,7 @@ import ProductDetails from './pages/ProductDetails';
 import Orders from './pages/Orders';
 import Waitlist from './pages/Waitlist';
 import Blog from './pages/Blog';
+import Club from './pages/Club';
 
 // Footer Pages
 import Contact from './pages/Contact';
@@ -85,6 +86,7 @@ function App() {
               <Route path="/products" element={<Products />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/blog" element={<Blog />} />
+              <Route path="/club" element={<Club />} />
               
               {/* Footer Links */}
               <Route path="/contact" element={<Contact />} />
