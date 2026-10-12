@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Package, Calendar, CreditCard, ChevronRight, Star, Heart, Clock, CheckCircle2, Truck, XCircle } from 'lucide-react';
+import { Package, Calendar, CreditCard, ChevronRight, Star, Heart, Clock, CheckCircle2, Truck, XCircle, FileOutput } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Invoice from '../components/Invoice';
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [confirmAction, setConfirmAction] = useState(null); // { type: 'cancel' | 'return', orderId: '...' }
+    const [viewingInvoice, setViewingInvoice] = useState(null);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -117,7 +119,7 @@ const Orders = () => {
     const getStatusConfig = (status) => {
         switch (status) {
             case 'Pending': 
-                return { color: 'bg-[#fcf3ea] text-[#e6a27a] border-[#e6a27a]/30', icon: Clock };
+                return { color: 'bg-amber-50 text-amber-600 border-amber-200', icon: Clock };
             case 'Processing': 
                 return { color: 'bg-blue-50 text-blue-600 border-blue-200', icon: Package };
             case 'Shipped': 
@@ -125,67 +127,63 @@ const Orders = () => {
             case 'Delivered': 
             case 'Paid':
             case 'Confirmed':
-                return { color: 'bg-[#f0f7f4] text-[#71966a] border-[#93b38c]/40', icon: CheckCircle2 };
+                return { color: 'bg-green-50 text-green-600 border-green-200', icon: CheckCircle2 };
             case 'Cancelled': 
                 return { color: 'bg-red-50 text-red-600 border-red-200', icon: XCircle };
             default: 
-                return { color: 'bg-gray-50 text-gray-600 border-gray-200', icon: Package };
+                return { color: 'bg-slate-50 text-slate-600 border-slate-200', icon: Package };
         }
     };
 
     if (loading) {
         return (
-            <div className="min-h-[70vh] bg-gradient-to-br from-[#fcfaf7] to-[#f3eee7] flex flex-col items-center justify-center p-8">
+            <div className="min-h-[70vh] bg-slate-50 flex flex-col items-center justify-center p-8">
                 <div className="relative w-20 h-20">
-                    <div className="absolute inset-0 border-4 border-[#f3eee7] rounded-full"></div>
-                    <div className="absolute inset-0 border-4 border-[#e6a27a] border-t-transparent rounded-full animate-spin"></div>
-                    <Heart className="absolute inset-0 m-auto w-6 h-6 text-[#e6a27a] animate-pulse" />
+                    <div className="absolute inset-0 border-4 border-slate-200 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-[#E51A22] border-t-transparent rounded-full animate-spin"></div>
+                    <Heart className="absolute inset-0 m-auto w-6 h-6 text-[#E51A22] animate-pulse fill-current" />
                 </div>
-                <h2 className="mt-6 text-xl font-bold text-[#3d3130] font-serif">Finding your magical orders...</h2>
+                <h2 className="mt-6 text-xl font-bold text-[#1c274c]">Loading your orders...</h2>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-[#fcf3ea]/60 via-[#fcfaf7] to-[#fcfaf7] pb-20 relative">
+        <div className="min-h-screen bg-slate-50 pb-20 relative">
             
-            {/* Soft decorative background shapes */}
-            <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-br from-[#fcf3ea] via-[#f7e6d8]/30 to-transparent pointer-events-none -z-10"></div>
-            <div className="absolute top-20 right-0 w-96 h-96 bg-[#f0f7f4]/40 rounded-full blur-[80px] pointer-events-none -z-10"></div>
-
             {/* Elegant Header Section */}
-            <div className="pt-16 pb-20 px-4 relative overflow-hidden">
-                <div className="absolute top-8 left-[15%] text-[#e6a27a]/20"><Star className="w-12 h-12" /></div>
-                <div className="absolute bottom-4 right-[20%] text-[#93b38c]/20"><Heart className="w-16 h-16 fill-current" /></div>
+            <div className="pt-16 pb-20 px-4 relative overflow-hidden bg-white border-b border-slate-200">
+                <div className="absolute top-8 left-[15%] text-slate-100"><Star className="w-12 h-12 fill-current" /></div>
+                <div className="absolute bottom-4 right-[20%] text-slate-100"><Heart className="w-16 h-16 fill-current" /></div>
                 
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <h1 className="text-4xl md:text-5xl font-black text-[#3d3130] font-serif mb-4">
+                    <h1 className="text-4xl md:text-5xl font-black text-[#1c274c] mb-4">
                         My Orders
                     </h1>
-                    <p className="text-[#8b7e7c] font-medium text-lg max-w-xl mx-auto">
-                        Review your recent purchases and find your magical items here.
+                    <p className="text-slate-500 font-medium text-lg max-w-xl mx-auto">
+                        Review your recent purchases and find your orders here.
                     </p>
                 </div>
             </div>
 
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-10 relative z-20">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-8 relative z-20">
                 {orders.length === 0 ? (
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white rounded-[2rem] p-12 md:p-20 text-center shadow-[0_20px_60px_rgba(230,162,122,0.1)] border border-white"
+                        className="bg-white rounded-2xl p-12 md:p-20 text-center shadow-lg border border-slate-100"
                     >
-                        <div className="w-32 h-32 bg-[#fcf3ea] rounded-full flex items-center justify-center mx-auto mb-8 relative">
-                            <Package className="w-16 h-16 text-[#e6a27a]" />
-                            <Star className="absolute top-2 right-2 w-6 h-6 text-[#e8b960] animate-bounce" />
+                        <div className="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 relative">
+                            <Package className="w-16 h-16 text-[#1c274c]" />
+                            <Star className="absolute top-2 right-2 w-6 h-6 text-[#E51A22] animate-bounce fill-current" />
                         </div>
-                        <h2 className="text-3xl font-bold text-[#3d3130] mb-4 font-serif">No orders yet!</h2>
-                        <p className="text-[#8b7e7c] mb-10 max-w-md mx-auto text-lg">
+                        <h2 className="text-3xl font-bold text-[#1c274c] mb-4">No orders yet!</h2>
+                        <p className="text-slate-500 mb-10 max-w-md mx-auto text-lg">
                             Looks like your toy box is empty. Explore our collection and find something wonderful to bring home!
                         </p>
                         <Link 
                             to="/products" 
-                            className="inline-flex items-center gap-2 bg-[#e6a27a] hover:bg-[#d99268] text-white font-bold py-4 px-10 rounded-full shadow-[0_8px_20px_rgba(230,162,122,0.4)] transition-all hover:-translate-y-1"
+                            className="inline-flex items-center gap-2 bg-[#E51A22] hover:bg-[#c9161d] text-white font-bold py-4 px-10 rounded-xl shadow-[0_8px_20px_rgba(229,26,34,0.3)] transition-all hover:-translate-y-1"
                         >
                             Start Shopping
                             <ChevronRight className="w-5 h-5" />
@@ -203,47 +201,54 @@ const Orders = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.1 }}
                                     key={order._id} 
-                                    className="bg-white rounded-[2rem] shadow-sm hover:shadow-[0_20px_50px_rgba(230,162,122,0.08)] border border-[#f3eee7] overflow-hidden transition-all duration-300 group"
+                                    className="bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-200 overflow-hidden transition-all duration-300 group"
                                 >
                                     {/* Order Header */}
-                                    <div className="bg-white px-6 md:px-8 py-5 border-b border-[#f3eee7] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div className="bg-slate-50 px-6 md:px-8 py-5 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div className="flex flex-wrap items-center gap-6 md:gap-10">
                                             <div>
-                                                <p className="text-[11px] font-bold text-[#b5a8a6] uppercase tracking-widest mb-1 flex items-center gap-1">
+                                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 flex items-center gap-1">
                                                     <Package className="w-3 h-3" /> Order ID
                                                 </p>
-                                                <p className="text-[15px] font-bold text-[#3d3130]">#{order._id.slice(-8).toUpperCase()}</p>
+                                                <p className="text-[15px] font-bold text-[#1c274c]">#{order._id.slice(-8).toUpperCase()}</p>
                                             </div>
                                             <div>
-                                                <p className="text-[11px] font-bold text-[#b5a8a6] uppercase tracking-widest mb-1 flex items-center gap-1">
+                                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 flex items-center gap-1">
                                                     <Calendar className="w-3 h-3" /> Date Placed
                                                 </p>
-                                                <p className="text-[15px] font-bold text-[#3d3130]">
+                                                <p className="text-[15px] font-bold text-[#1c274c]">
                                                     {new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-[11px] font-bold text-[#b5a8a6] uppercase tracking-widest mb-1 flex items-center gap-1">
+                                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 flex items-center gap-1">
                                                     <CreditCard className="w-3 h-3" /> Total Amount
                                                 </p>
-                                                <p className="text-[15px] font-black text-[#e6a27a]">₹{order.totalAmount}</p>
+                                                <p className="text-[15px] font-black text-[#E51A22]">₹{order.totalAmount}</p>
                                             </div>
                                         </div>
                                         
-                                        <div className="flex shrink-0">
+                                        <div className="flex items-center gap-4 shrink-0">
                                             <div className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-full border flex items-center gap-2 ${status.color}`}>
                                                 <StatusIcon className="w-4 h-4" />
                                                 {order.orderStatus}
                                             </div>
+                                            <button 
+                                                onClick={() => setViewingInvoice(order)}
+                                                className="hidden sm:flex items-center gap-2 text-slate-500 hover:text-[#1c274c] bg-white border border-slate-200 hover:border-slate-300 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors shadow-sm"
+                                                title="View Invoice"
+                                            >
+                                                <FileOutput className="w-4 h-4" /> Invoice
+                                            </button>
                                         </div>
                                     </div>
 
                                     {/* Order Items */}
-                                    <div className="p-6 md:p-8">
+                                    <div className="p-6 md:p-8 bg-white">
                                         <ul className="space-y-6">
                                             {order.orderItems.map((item, index) => (
                                                 <li key={index} className="flex items-center gap-6">
-                                                    <div className="w-24 h-24 bg-[#fcfaf7] rounded-2xl border border-[#f3eee7] p-2 shrink-0 group-hover:border-[#e6a27a]/30 transition-colors relative overflow-hidden">
+                                                    <div className="w-24 h-24 bg-slate-50 rounded-xl border border-slate-100 p-2 shrink-0 group-hover:border-[#E51A22]/20 transition-colors relative overflow-hidden">
                                                         {item.product?.images && item.product.images.length > 0 ? (
                                                             <img src={item.product.images[0]} alt={item.product?.name} className="w-full h-full object-contain mix-blend-multiply" />
                                                         ) : (
@@ -253,27 +258,27 @@ const Orders = () => {
                                                     
                                                     <div className="flex-1 min-w-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                                         <div>
-                                                            <h4 className="text-lg font-bold text-[#3d3130] truncate font-serif">{item.product?.name || 'Magical Toy'}</h4>
-                                                            <div className="flex items-center gap-3 mt-1 text-[13px] font-medium text-[#8b7e7c]">
-                                                                <span className="bg-[#fcfaf7] px-2 py-1 rounded-md border border-[#f3eee7]">Qty: {item.quantity}</span>
+                                                            <h4 className="text-lg font-bold text-[#1c274c] truncate">{item.product?.name || 'Magical Toy'}</h4>
+                                                            <div className="flex items-center gap-3 mt-1 text-[13px] font-medium text-slate-500">
+                                                                <span className="bg-slate-50 px-2 py-1 rounded-md border border-slate-200 text-slate-700 font-semibold">Qty: {item.quantity}</span>
                                                                 <span>•</span>
                                                                 <span>₹{item.price} each</span>
                                                             </div>
                                                         </div>
                                                         
                                                         <div className="flex flex-col items-start md:items-end gap-3 shrink-0">
-                                                            <p className="text-xl font-black text-[#3d3130]">₹{item.price * item.quantity}</p>
+                                                            <p className="text-xl font-black text-[#1c274c]">₹{item.price * item.quantity}</p>
                                                             {item.product && order.orderStatus === 'Delivered' && (
                                                                 item.hasReviewed ? (
-                                                                    <span className="text-[12px] font-bold text-[#71966a] bg-[#f0f7f4] border border-[#93b38c]/30 px-4 py-1.5 rounded-full flex items-center gap-1.5">
+                                                                    <span className="text-[12px] font-bold text-green-700 bg-green-50 border border-green-200 px-4 py-1.5 rounded-lg flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5" /> Reviewed
                                                                     </span>
                                                                 ) : (
                                                                     <Link 
                                                                         to={`/product/${item.product._id}#reviews`} 
-                                                                        className="text-[12px] font-bold text-[#e6a27a] hover:text-white bg-white border-2 border-[#e6a27a] hover:bg-[#e6a27a] px-4 py-1.5 rounded-full transition-all flex items-center gap-1.5 shadow-sm hover:shadow-md"
+                                                                        className="text-[12px] font-bold text-[#E51A22] hover:text-white bg-white border-2 border-[#E51A22] hover:bg-[#E51A22] px-4 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shadow-sm hover:shadow-md"
                                                                     >
-                                                                        <Star className="w-3.5 h-3.5" /> Rate Product
+                                                                        <Star className="w-3.5 h-3.5 fill-current" /> Rate Product
                                                                     </Link>
                                                                 )
                                                             )}
@@ -285,11 +290,17 @@ const Orders = () => {
                                     </div>
                                     
                                     {/* Order Footer */}
-                                    <div className="bg-[#fcfaf7] px-6 md:px-8 py-5 border-t border-[#f3eee7] flex flex-wrap justify-between items-center gap-4">
-                                        <p className="text-sm font-medium text-[#8b7e7c]">
-                                            Paid via <span className="font-bold text-[#3d3130] capitalize">{order.paymentMethod}</span>
+                                    <div className="bg-slate-50 px-6 md:px-8 py-4 border-t border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                                        <p className="text-sm font-medium text-slate-600">
+                                            Paid via <span className="font-bold text-[#1c274c] capitalize">{order.paymentMethod}</span>
                                         </p>
                                         <div className="flex items-center gap-4">
+                                            <button 
+                                                onClick={() => setViewingInvoice(order)}
+                                                className="sm:hidden text-slate-500 hover:text-[#1c274c] text-sm font-bold transition-colors flex items-center gap-1"
+                                            >
+                                                <FileOutput className="w-4 h-4" /> Invoice
+                                            </button>
                                             {order.orderStatus === 'Pending' && (
                                                 <button 
                                                     onClick={() => setConfirmAction({ type: 'cancel', orderId: order._id })}
@@ -306,11 +317,11 @@ const Orders = () => {
                                                     <XCircle className="w-4 h-4" /> Return Order
                                                 </button>
                                             )}
-                                            <Link to="/contact" className="text-[#8b7e7c] hover:text-[#e6a27a] text-sm font-bold transition-colors">
+                                            <Link to="/contact" className="text-slate-500 hover:text-[#E51A22] text-sm font-bold transition-colors">
                                                 Need Help?
                                             </Link>
-                                            <div className="w-1.5 h-1.5 rounded-full bg-[#e8b960]"></div>
-                                            <Link to={`/products`} className="text-[#e6a27a] hover:text-[#d99268] text-sm font-bold transition-colors">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                                            <Link to={`/products`} className="text-[#E51A22] hover:text-[#c9161d] text-sm font-bold transition-colors">
                                                 Buy Again
                                             </Link>
                                         </div>
@@ -325,22 +336,22 @@ const Orders = () => {
             {confirmAction && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div 
-                        className="fixed inset-0 bg-[#3d3130]/40 backdrop-blur-sm"
+                        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
                         onClick={() => setConfirmAction(null)}
                     ></div>
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        className="bg-[#fcfaf7] w-full max-w-sm rounded-[2rem] shadow-2xl relative z-10 overflow-hidden border border-[#f3eee7]"
+                        className="bg-white w-full max-w-sm rounded-2xl shadow-2xl relative z-10 overflow-hidden border border-slate-200"
                     >
                         <div className="p-8 text-center">
                             <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-5 ${confirmAction.type === 'cancel' ? 'bg-red-50 text-red-500' : 'bg-orange-50 text-orange-500'}`}>
                                 <XCircle className="w-8 h-8" />
                             </div>
-                            <h3 className="text-2xl font-bold text-[#3d3130] font-serif mb-2">
+                            <h3 className="text-2xl font-bold text-[#1c274c] mb-2">
                                 {confirmAction.type === 'cancel' ? 'Cancel Order?' : 'Return Order?'}
                             </h3>
-                            <p className="text-[#8b7e7c] text-sm font-medium mb-8 leading-relaxed">
+                            <p className="text-slate-500 text-sm font-medium mb-8 leading-relaxed">
                                 {confirmAction.type === 'cancel' 
                                     ? "Are you sure you want to cancel this order? This action cannot be undone." 
                                     : "Are you sure you want to return this order? We'll guide you through the return process."}
@@ -348,13 +359,13 @@ const Orders = () => {
                             <div className="flex gap-3">
                                 <button 
                                     onClick={() => setConfirmAction(null)}
-                                    className="flex-1 py-3 px-4 rounded-xl font-bold text-[#3d3130] bg-white border-2 border-[#f3eee7] hover:bg-[#f3eee7] transition-colors"
+                                    className="flex-1 py-3 px-4 rounded-xl font-bold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors"
                                 >
                                     Keep It
                                 </button>
                                 <button 
                                     onClick={() => confirmAction.type === 'cancel' ? executeCancelOrder(confirmAction.orderId) : executeReturnOrder(confirmAction.orderId)}
-                                    className={`flex-1 py-3 px-4 rounded-xl font-bold text-white transition-colors shadow-lg ${confirmAction.type === 'cancel' ? 'bg-red-500 hover:bg-red-600 shadow-red-500/20' : 'bg-orange-500 hover:bg-orange-600 shadow-orange-500/20'}`}
+                                    className={`flex-1 py-3 px-4 rounded-xl font-bold text-white transition-colors shadow-sm ${confirmAction.type === 'cancel' ? 'bg-[#E51A22] hover:bg-[#c9161d]' : 'bg-orange-500 hover:bg-orange-600'}`}
                                 >
                                     Yes, {confirmAction.type === 'cancel' ? 'Cancel' : 'Return'}
                                 </button>
@@ -362,6 +373,14 @@ const Orders = () => {
                         </div>
                     </motion.div>
                 </div>
+            )}
+
+            {/* Invoice Modal */}
+            {viewingInvoice && (
+                <Invoice 
+                    order={viewingInvoice} 
+                    onClose={() => setViewingInvoice(null)} 
+                />
             )}
         </div>
     );

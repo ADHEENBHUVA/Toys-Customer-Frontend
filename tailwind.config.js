@@ -7,7 +7,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"Courier Prime"', 'monospace', 'sans-serif'],
+                sans: ['"Outfit"', 'sans-serif'],
                 serif: ['"Lora"', 'serif'],
             },
             colors: {

@@ -5,12 +5,7 @@ import { Search, Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 const Blog = () => {
     return (
         <div className="max-w-[1200px] mx-auto px-4 py-10 font-['Outfit'] bg-white">
-            {/* Breadcrumb */}
-            <div className="text-[14px] mb-8 font-medium">
-                <span className="text-[#2e4053] font-bold">Home</span>
-                <span className="text-slate-400 mx-2">/</span>
-                <span className="text-[#1282a2]">News</span>
-            </div>
+            
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 {/* Left Sidebar */}

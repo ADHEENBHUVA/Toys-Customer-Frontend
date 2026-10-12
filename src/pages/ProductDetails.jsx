@@ -186,12 +186,6 @@ const ProductDetails = () => {
         <div className="bg-white min-h-screen pt-6 pb-20 font-['Nunito']">
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Breadcrumbs */}
-                <div className="text-[13px] font-bold text-slate-800 mb-10 mt-4 flex items-center gap-2">
-                    <Link to="/" className="hover:text-[#2eb3a6]">Home</Link>
-                    <span className="text-slate-400">/</span>
-                    <span className="text-[#2eb3a6]">{product.name}</span>
-                </div>
-
                 <div className="flex flex-col lg:flex-row gap-12 mb-16">
                     {/* Left: Images */}
                     <div className="w-full lg:w-1/2">
@@ -498,9 +492,7 @@ const ProductDetails = () => {
                                     {/* Sale Badge */}
                                     {rp.originalPrice > (rp.price || 0) && (
                                         <span className="absolute top-3 left-3 bg-[#e8b960] text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm z-10">
-                                            {(rp.discountDisplayType || websiteSettings?.discountDisplayType) === 'percentage' 
-                                                ? `${Math.round(((rp.originalPrice - rp.price) / rp.originalPrice) * 100)}% OFF`
-                                                : `Save ₹${Math.round(rp.originalPrice - rp.price)}`}
+                                            {`${Math.round(((rp.originalPrice - rp.price) / rp.originalPrice) * 100)}% OFF`}
                                         </span>
                                     )}
 

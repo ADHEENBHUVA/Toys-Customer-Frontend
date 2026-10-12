@@ -1,74 +1,58 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { RefreshCcw, ShieldCheck, Banknote, HelpCircle } from 'lucide-react';
+import React, { useEffect } from 'react';
 
 const Returns = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
-        <div className="max-w-[1200px] mx-auto px-4 py-10 font-['Outfit'] bg-white min-h-[60vh]">
-            {/* Breadcrumb */}
-            <div className="text-[14px] mb-8 font-medium">
-                <Link to="/" className="text-[#2e4053] font-bold hover:text-[#1282a2] transition-colors">Home</Link>
-                <span className="text-slate-400 mx-2">/</span>
-                <span className="text-[#1282a2]">Returns & Exchanges</span>
-            </div>
+        <div className="bg-[#FDFBF7] min-h-screen py-16 px-4 md:px-8 font-['Outfit']">
+            <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 lg:p-16 shadow-[0_4px_30px_rgba(0,0,0,0.03)] border border-slate-100">
+                <div className="mb-10 text-center">
+                    <span className="text-[#E51A22] font-bold tracking-widest uppercase text-sm mb-3 block">Legal Information</span>
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#1A1A24] mb-4">Refund & Return Policy</h1>
+                    <p className="text-slate-500 font-medium">Last Updated: {new Date().toLocaleDateString('en-GB')}</p>
+                </div>
 
-            {/* Title */}
-            <h1 className="text-3xl font-bold text-[#2e4053] mb-8 font-serif">
-                Returns & Exchanges
-            </h1>
+                <div className="prose prose-slate max-w-none text-slate-600 leading-loose">
+                    <p className="mb-6">
+                        At <strong>Little Joys</strong>, we want you to be completely satisfied with your purchase. If you or your little ones are not entirely happy with our products, we are here to help. This Refund and Return Policy outlines the conditions under which you can return items and receive a refund.
+                    </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
-                    <div className="bg-[#1282a2]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
-                        <RefreshCcw className="w-7 h-7 text-[#1282a2]" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">Our 30-Day Guarantee</h3>
-                    <p className="text-[#666666] leading-relaxed text-[15px]">
-                        We want you to be completely satisfied with your purchase. If you or your little ones are not happy with the toys, you can return them within 30 days of receipt for a full refund or exchange.
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">1. Our 30-Day Guarantee</h2>
+                    <p className="mb-4">
+                        Our standard return policy lasts for 30 days. If 30 days have gone by since you received your order, unfortunately, we cannot offer you a refund or an exchange. To be eligible for a return, the item must be unused, in the same condition that you received it, and in its original, unopened packaging.
+                    </p>
+                    <p className="mb-6">
+                        Some types of goods are exempt from being returned, such as personalized toys, intimate or sanitary goods, hazardous materials, or flammable liquids or gases.
+                    </p>
+
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">2. Return Process</h2>
+                    <p className="mb-4">
+                        To initiate a return, please contact our support team with your receipt or proof of purchase. Please do not send your purchase back to the manufacturer directly. Once we receive your request, we will provide you with a return shipping address and instructions on how to send the package.
+                    </p>
+                    <p className="mb-6">
+                        You will be responsible for paying for your own shipping costs for returning your item unless the item received was damaged or defective. Shipping costs are non-refundable. If you receive a refund, the cost of return shipping may be deducted from your refund.
+                    </p>
+
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">3. Refunds</h2>
+                    <p className="mb-4">
+                        Once your return is received and inspected, we will send you an email to notify you that we have received your returned item. We will also notify you of the approval or rejection of your refund based on the condition of the item.
+                    </p>
+                    <p className="mb-6">
+                        If you are approved, then your refund will be processed, and a credit will automatically be applied to your credit card or original method of payment, usually within 5 to 7 business days depending on your bank's processing time.
+                    </p>
+
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">4. Late or Missing Refunds</h2>
+                    <p className="mb-6">
+                        If you haven't received a refund yet, first check your bank account again. Then contact your credit card company, it may take some time before your refund is officially posted. Next contact your bank. There is often some processing time before a refund is posted. If you've done all of this and you still have not received your refund yet, please contact our support team.
+                    </p>
+
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">5. Damaged or Defective Items</h2>
+                    <p className="mb-6">
+                        We only replace items if they are defective or damaged upon arrival. If you need to exchange it for the same item, send us an email immediately with photographic proof of the damage, and we will arrange a free replacement and cover all return shipping costs for the damaged item.
                     </p>
                 </div>
-
-                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
-                    <div className="bg-[#e6a27a]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
-                        <ShieldCheck className="w-7 h-7 text-[#e6a27a]" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">Return Conditions</h3>
-                    <ul className="text-[#666666] leading-relaxed space-y-2 text-[15px]">
-                        <li className="flex items-start"><span className="w-2 h-2 rounded-full bg-[#e6a27a] mt-2 mr-3 shrink-0"></span> Items must be unused and in the same condition that you received them.</li>
-                        <li className="flex items-start"><span className="w-2 h-2 rounded-full bg-[#e6a27a] mt-2 mr-3 shrink-0"></span> Items must be in the original intact packaging.</li>
-                        <li className="flex items-start"><span className="w-2 h-2 rounded-full bg-[#e6a27a] mt-2 mr-3 shrink-0"></span> A receipt or proof of purchase is required.</li>
-                    </ul>
-                </div>
-
-                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
-                    <div className="bg-[#f4a261]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
-                        <Banknote className="w-7 h-7 text-[#f4a261]" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">Refund Process</h3>
-                    <p className="text-[#666666] leading-relaxed text-[15px]">
-                        Once your return is received and inspected, we will send you an email to notify you. If approved, your refund will be processed and a credit will automatically be applied to your original method of payment within 5-7 business days.
-                    </p>
-                </div>
-
-                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
-                    <div className="bg-[#2a9d8f]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
-                        <HelpCircle className="w-7 h-7 text-[#2a9d8f]" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">Damaged or Defective Items</h3>
-                    <p className="text-[#666666] leading-relaxed text-[15px]">
-                        If you receive a defective or damaged product, please contact our support team immediately. We will arrange a free replacement and cover all return shipping costs.
-                    </p>
-                </div>
-            </div>
-            
-            <div className="bg-[#1282a2]/5 rounded-2xl p-8 border border-[#1282a2]/20">
-                <h3 className="text-xl font-bold text-[#2e4053] mb-3">Want to Start a Return?</h3>
-                <p className="text-[#666666] mb-4 text-[15px]">
-                    Have your order number ready and click below to contact our friendly support team. We'll guide you through the quick and easy return process!
-                </p>
-                <Link to="/contact" className="inline-block bg-[#1282a2] text-white px-6 py-2.5 rounded-full font-medium hover:bg-[#0f6c87] transition-colors">
-                    Start a Return
-                </Link>
             </div>
         </div>
     );

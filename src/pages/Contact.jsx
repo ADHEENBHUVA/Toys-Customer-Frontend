@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Mail, MapPin, Send, CheckCircle2, Loader2 } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, CheckCircle2, Loader2, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Contact = () => {
@@ -15,7 +15,6 @@ const Contact = () => {
     const [error, setError] = useState(null);
 
     const handleChange = (e) => {
-        // If it's the phone field, only allow numbers and max 10 chars
         if (e.target.name === 'phone') {
             const value = e.target.value.replace(/\D/g, '').slice(0, 10);
             setFormData({ ...formData, phone: value });
@@ -27,7 +26,6 @@ const Contact = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Final validation for 10 digits
         if (formData.phone && formData.phone.length !== 10) {
             setError('Phone number must be exactly 10 digits.');
             return;
@@ -67,122 +65,103 @@ const Contact = () => {
     };
 
     return (
-        <div className="font-['Outfit'] bg-white min-h-screen">
+        <div className="font-['Outfit'] bg-[#FDFBF7] min-h-screen">
             {/* Header Banner */}
-            <div className="bg-gradient-to-b from-[#fcf3ea]/50 to-white pt-8 pb-12 relative overflow-hidden">
+            <div className="bg-gradient-to-b from-gray-50 to-[#FDFBF7] pt-20 pb-28 relative overflow-hidden border-b border-gray-100">
                 {/* Decorative Elements */}
-                <div className="absolute top-8 left-8 text-[#e9b896] opacity-50 text-2xl">✦</div>
-                <div className="absolute top-16 right-16 text-[#93b38c] opacity-30 text-xl">✦</div>
-                <div className="absolute bottom-8 left-1/4 text-[#e8b960] opacity-40 text-lg">✦</div>
+                <div className="absolute top-10 left-10 w-48 h-48 bg-[#E51A22]/5 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-10 right-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
 
-                <div className="max-w-[1000px] mx-auto px-4 md:px-6 relative z-10">
-                    {/* Breadcrumb */}
-                    <div className="flex items-center gap-2 text-[12px] font-medium mb-4">
-                        <Link to="/" className="text-slate-500 hover:text-[#e6a27a] transition-colors">Home</Link>
-                        <span className="text-slate-300">/</span>
-                        <span className="text-[#e6a27a] font-bold">Contact</span>
-                    </div>
-
-                    <div className="max-w-xl">
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif text-[#3d3130] mb-3 leading-tight">
-                            Let's Get in <span className="text-[#e6a27a] italic">Touch</span>
-                        </h1>
-                        <p className="text-slate-500 text-[14px] md:text-[15px] leading-relaxed">
-                            Have a question about our toys, your order, or just want to say hello? We'd love to hear from you. Our team is always here to help.
-                        </p>
-                    </div>
+                <div className="max-w-[1200px] mx-auto px-4 md:px-6 relative z-10 text-center">
+                    <span className="inline-block bg-white text-[#E51A22] border border-gray-100 font-bold tracking-[0.2em] uppercase text-xs px-4 py-2 rounded-full mb-6 shadow-sm">Reach Out To Us</span>
+                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-[#1A1A24] mb-6 leading-tight">
+                        Let's Get In <span className="text-[#E51A22]">Touch</span>
+                    </h1>
+                    <p className="text-[#555] text-lg max-w-2xl mx-auto leading-relaxed">
+                        Have a question about our toys, your order, or just want to say hello? We'd love to hear from you. Our team is always here to help.
+                    </p>
                 </div>
             </div>
 
-            <div className="max-w-[1000px] mx-auto px-4 md:px-6 pb-16 -mt-4 relative z-20">
-                <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+            <div className="max-w-[1200px] mx-auto px-4 md:px-6 pb-20 -mt-12 relative z-20">
+                <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
                     
                     {/* Left Section: Info Cards (Vertical) */}
-                    <div className="lg:w-[35%] flex flex-col gap-4">
+                    <div className="lg:w-[35%] flex flex-col gap-6">
                         {/* Phone Card */}
-                        <a href="tel:1234567868" className="block bg-white rounded-3xl p-6 border border-[#f3eee7] shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center cursor-pointer">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#fcf3ea] to-transparent opacity-50 rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
-                            <div className="w-12 h-12 rounded-full bg-[#fcf3ea] flex items-center justify-center text-[#e6a27a] mb-4 group-hover:scale-110 group-hover:bg-[#e6a27a] group-hover:text-white transition-all duration-300 shadow-sm">
-                                <Phone className="w-5 h-5" strokeWidth={2} />
+                        <a href="tel:8347640423" className="block bg-white rounded-3xl p-8 border border-gray-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden flex flex-col items-start cursor-pointer">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#E51A22]/5 to-transparent opacity-50 rounded-bl-[100px] pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
+                            <div className="w-14 h-14 rounded-2xl bg-[#E51A22]/10 flex items-center justify-center text-[#E51A22] mb-6 group-hover:scale-110 group-hover:bg-[#E51A22] group-hover:text-white transition-all duration-300 shadow-sm">
+                                <Phone className="w-6 h-6" strokeWidth={2.5} />
                             </div>
-                            <h3 className="font-bold text-[#3d3130] text-[16px] mb-1 font-serif">Phone Support</h3>
-                            <p className="text-slate-500 text-[13px] leading-relaxed">
-                                Mon - Fri, 9am to 6pm<br />
-                                <span className="text-[#e6a27a] font-bold mt-1 inline-block">123-456-7868</span>
-                            </p>
+                            <h3 className="font-black text-[#1A1A24] text-xl mb-2">Phone Support</h3>
+                            <p className="text-[#555] leading-relaxed mb-1">Mon - Sat, 9am to 7pm</p>
+                            <p className="text-[#E51A22] font-bold text-lg">8347640423</p>
                         </a>
                         
                         {/* Email Card */}
-                        <a href="mailto:hello@littlejoys.com" className="block bg-white rounded-3xl p-6 border border-[#f3eee7] shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center cursor-pointer">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#eef4ed] to-transparent opacity-50 rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
-                            <div className="w-12 h-12 rounded-full bg-[#eef4ed] flex items-center justify-center text-[#93b38c] mb-4 group-hover:scale-110 group-hover:bg-[#93b38c] group-hover:text-white transition-all duration-300 shadow-sm">
-                                <Mail className="w-5 h-5" strokeWidth={2} />
+                        <a href="mailto:hello@littlejoys.com" className="block bg-white rounded-3xl p-8 border border-gray-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden flex flex-col items-start cursor-pointer">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#1A1A24]/5 to-transparent opacity-50 rounded-bl-[100px] pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
+                            <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center text-[#1A1A24] mb-6 group-hover:scale-110 group-hover:bg-[#1A1A24] group-hover:text-white transition-all duration-300 shadow-sm">
+                                <Mail className="w-6 h-6" strokeWidth={2.5} />
                             </div>
-                            <h3 className="font-bold text-[#3d3130] text-[16px] mb-1 font-serif">Email Us</h3>
-                            <p className="text-slate-500 text-[13px] leading-relaxed">
-                                We'll reply within 24 hours<br />
-                                <span className="text-[#93b38c] font-bold mt-1 inline-block">hello@littlejoys.com</span>
-                            </p>
+                            <h3 className="font-black text-[#1A1A24] text-xl mb-2">Email Us</h3>
+                            <p className="text-[#555] leading-relaxed mb-1">We'll reply within 24 hours</p>
+                            <p className="text-[#1A1A24] font-bold text-lg">hello@littlejoys.com</p>
                         </a>
                         
                         {/* Address Card */}
-                        <a href="https://www.google.com/maps/place/Tulsi+Arcade/@21.2395209,72.8755431,812m/data=!3m1!1e3!4m10!1m2!2m1!1sTulsi+Arcade,+Mota+Varachha,+Surat!3m6!1s0x3be04f705dffe915:0x1fc83e2ebcf890f5!8m2!3d21.2389143!4d72.8801442!15sCiJUdWxzaSBBcmNhZGUsIE1vdGEgVmFyYWNoaGEsIFN1cmF0WiIiIHR1bHNpIGFyY2FkZSBtb3RhIHZhcmFjaGhhIHN1cmF0kgEPc2hvcHBpbmdfY2VudGVy4AEA!16s%2Fg%2F11rjyphkmm?entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="block bg-white rounded-3xl p-6 border border-[#f3eee7] shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center cursor-pointer">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#fef5e7] to-transparent opacity-50 rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
-                            <div className="w-12 h-12 rounded-full bg-[#fef5e7] flex items-center justify-center text-[#e8b960] mb-4 group-hover:scale-110 group-hover:bg-[#e8b960] group-hover:text-white transition-all duration-300 shadow-sm">
-                                <MapPin className="w-5 h-5" strokeWidth={2} />
+                        <a href="https://www.google.com/maps/place/Tulsi+Arcade" target="_blank" rel="noopener noreferrer" className="block bg-white rounded-3xl p-8 border border-gray-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden flex flex-col items-start cursor-pointer">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-50 to-transparent opacity-50 rounded-bl-[100px] pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
+                            <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 mb-6 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                                <MapPin className="w-6 h-6" strokeWidth={2.5} />
                             </div>
-                            <h3 className="font-bold text-[#3d3130] text-[16px] mb-1 font-serif">Our Store</h3>
-                            <p className="text-slate-500 text-[13px] leading-relaxed">
-                                Come visit us in person<br />
-                                <span className="text-[#3d3130] font-medium mt-1 inline-block">Tulsi Arcade, Mota Varachha, Surat</span>
-                            </p>
+                            <h3 className="font-black text-[#1A1A24] text-xl mb-2">Our Store</h3>
+                            <p className="text-[#555] leading-relaxed mb-1">Come visit us in person</p>
+                            <p className="text-[#1A1A24] font-bold text-[15px]">Tulsi Arcade, Mota Varachha, Surat</p>
                         </a>
                     </div>
 
                     {/* Right Section: Contact Form */}
                     <div className="lg:w-[65%] flex flex-col">
-                        <div className="h-full bg-gradient-to-br from-[#fcfaf7] to-white rounded-3xl border border-[#f3eee7] shadow-sm overflow-hidden relative">
-                            {/* Background Decor */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#fcf3ea]/80 to-transparent rounded-bl-full pointer-events-none"></div>
-                            <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#eef4ed]/80 to-transparent rounded-tr-full pointer-events-none"></div>
-                            
-                            <div className="p-6 md:p-8 relative z-10 flex flex-col justify-center h-full">
+                        <div className="h-full bg-white rounded-[2.5rem] border border-gray-100 shadow-xl overflow-hidden relative">
+                            <div className="p-8 md:p-12 relative z-10 flex flex-col justify-center h-full">
                                 {isSubmitted ? (
-                                    <div className="text-center py-8 px-4">
-                                        <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-sm border border-green-100">
-                                            <CheckCircle2 className="w-8 h-8" />
+                                    <div className="text-center py-12 px-4">
+                                        <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-green-100">
+                                            <CheckCircle2 className="w-10 h-10" strokeWidth={2.5} />
                                         </div>
-                                        <h3 className="text-2xl font-bold text-[#3d3130] font-serif mb-3">Message Sent!</h3>
-                                        <p className="text-slate-500 text-[14px] max-w-sm mx-auto mb-6">
+                                        <h3 className="text-3xl font-black text-[#1A1A24] mb-4">Message Sent!</h3>
+                                        <p className="text-[#555] text-lg max-w-md mx-auto mb-8">
                                             Thank you for reaching out to us. Our team will get back to you as soon as possible.
                                         </p>
                                         <button 
                                             onClick={() => setIsSubmitted(false)}
-                                            className="text-[#e6a27a] font-bold text-[14px] hover:underline"
+                                            className="bg-gray-100 text-[#1A1A24] hover:bg-[#E51A22] hover:text-white px-8 py-3 rounded-full font-bold transition-all duration-300"
                                         >
                                             Send another message
                                         </button>
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="mb-6">
-                                            <h2 className="text-2xl md:text-3xl font-bold text-[#3d3130] mb-2 font-serif">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-black text-[#1A1A24] mb-3">
                                                 Send a Message
                                             </h2>
-                                            <p className="text-slate-500 text-[14px]">
+                                            <p className="text-[#555] text-lg">
                                                 Fill out the form below and we will get back to you as soon as possible.
                                             </p>
                                             {error && (
-                                                <div className="mt-4 p-3 bg-red-50 border border-red-100 text-red-600 rounded-lg text-sm">
+                                                <div className="mt-4 p-4 bg-red-50 border border-red-100 text-[#E51A22] rounded-xl text-sm font-medium">
                                                     {error}
                                                 </div>
                                             )}
                                         </div>
                                         
-                                        <form className="space-y-5" onSubmit={handleSubmit}>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        <form className="space-y-6" onSubmit={handleSubmit}>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div>
-                                                    <label className="block text-[12px] font-bold text-[#3d3130] mb-1.5">First Name</label>
+                                                    <label className="block text-sm font-bold text-[#1A1A24] mb-2 uppercase tracking-wide">First Name</label>
                                                     <input 
                                                         type="text" 
                                                         name="firstName"
@@ -190,11 +169,11 @@ const Contact = () => {
                                                         onChange={handleChange}
                                                         placeholder="Jane" 
                                                         required
-                                                        className="w-full bg-white border border-[#f3eee7] rounded-lg px-4 py-3 text-[13px] text-[#3d3130] focus:outline-none focus:border-[#e6a27a] focus:ring-4 focus:ring-[#e6a27a]/10 transition-all placeholder-slate-300 shadow-sm"
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1A1A24] font-medium focus:outline-none focus:border-[#E51A22] focus:bg-white focus:ring-4 focus:ring-[#E51A22]/10 transition-all placeholder-gray-400"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-[12px] font-bold text-[#3d3130] mb-1.5">Last Name</label>
+                                                    <label className="block text-sm font-bold text-[#1A1A24] mb-2 uppercase tracking-wide">Last Name</label>
                                                     <input 
                                                         type="text" 
                                                         name="lastName"
@@ -202,14 +181,14 @@ const Contact = () => {
                                                         onChange={handleChange}
                                                         placeholder="Doe" 
                                                         required
-                                                        className="w-full bg-white border border-[#f3eee7] rounded-lg px-4 py-3 text-[13px] text-[#3d3130] focus:outline-none focus:border-[#e6a27a] focus:ring-4 focus:ring-[#e6a27a]/10 transition-all placeholder-slate-300 shadow-sm"
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1A1A24] font-medium focus:outline-none focus:border-[#E51A22] focus:bg-white focus:ring-4 focus:ring-[#E51A22]/10 transition-all placeholder-gray-400"
                                                     />
                                                 </div>
                                             </div>
                                             
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div>
-                                                    <label className="block text-[12px] font-bold text-[#3d3130] mb-1.5">Email Address</label>
+                                                    <label className="block text-sm font-bold text-[#1A1A24] mb-2 uppercase tracking-wide">Email Address</label>
                                                     <input 
                                                         type="email" 
                                                         name="email"
@@ -217,13 +196,12 @@ const Contact = () => {
                                                         onChange={handleChange}
                                                         placeholder="jane@example.com" 
                                                         required
-                                                        className="w-full bg-white border border-[#f3eee7] rounded-lg px-4 py-3 text-[13px] text-[#3d3130] focus:outline-none focus:border-[#e6a27a] focus:ring-4 focus:ring-[#e6a27a]/10 transition-all placeholder-slate-300 shadow-sm" 
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1A1A24] font-medium focus:outline-none focus:border-[#E51A22] focus:bg-white focus:ring-4 focus:ring-[#E51A22]/10 transition-all placeholder-gray-400" 
                                                         pattern="[^@\s]+@[^@\s]+\.[^@\s]+" 
-                                                        title="Please enter a valid email address with @ and ." 
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-[12px] font-bold text-[#3d3130] mb-1.5">Phone Number</label>
+                                                    <label className="block text-sm font-bold text-[#1A1A24] mb-2 uppercase tracking-wide">Phone Number</label>
                                                     <input 
                                                         type="tel" 
                                                         name="phone"
@@ -232,13 +210,13 @@ const Contact = () => {
                                                         placeholder="9876543210" 
                                                         required
                                                         maxLength={10}
-                                                        className="w-full bg-white border border-[#f3eee7] rounded-lg px-4 py-3 text-[13px] text-[#3d3130] focus:outline-none focus:border-[#e6a27a] focus:ring-4 focus:ring-[#e6a27a]/10 transition-all placeholder-slate-300 shadow-sm"
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1A1A24] font-medium focus:outline-none focus:border-[#E51A22] focus:bg-white focus:ring-4 focus:ring-[#E51A22]/10 transition-all placeholder-gray-400"
                                                     />
                                                 </div>
                                             </div>
                                             
                                             <div>
-                                                <label className="block text-[12px] font-bold text-[#3d3130] mb-1.5">Message</label>
+                                                <label className="block text-sm font-bold text-[#1A1A24] mb-2 uppercase tracking-wide">Message</label>
                                                 <textarea 
                                                     name="message"
                                                     value={formData.message}
@@ -246,27 +224,27 @@ const Contact = () => {
                                                     placeholder="How can we help you today?" 
                                                     rows="4"
                                                     required
-                                                    className="w-full bg-white border border-[#f3eee7] rounded-lg px-4 py-3 text-[13px] text-[#3d3130] focus:outline-none focus:border-[#e6a27a] focus:ring-4 focus:ring-[#e6a27a]/10 transition-all placeholder-slate-300 resize-none shadow-sm"
+                                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1A1A24] font-medium focus:outline-none focus:border-[#E51A22] focus:bg-white focus:ring-4 focus:ring-[#E51A22]/10 transition-all placeholder-gray-400 resize-none"
                                                 ></textarea>
                                             </div>
                                             
-                                            <div className="pt-1">
+                                            <div className="pt-2">
                                                 <button 
                                                     type="submit" 
                                                     disabled={isSubmitting}
-                                                    className={`w-full sm:w-auto min-w-[160px] inline-flex items-center justify-center gap-2 text-white font-bold text-[14px] px-6 py-3 rounded-lg transition-all shadow-sm ${
-                                                        isSubmitting ? "bg-[#d99268] opacity-80 cursor-not-allowed" : "bg-[#e6a27a] hover:bg-[#d99268] hover:shadow-md hover:-translate-y-0.5"
+                                                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-8 py-4 rounded-xl transition-all ${
+                                                        isSubmitting ? "bg-[#E51A22]/70 cursor-not-allowed" : "bg-[#E51A22] hover:bg-[#c9161d] hover:shadow-lg hover:shadow-[#E51A22]/20 hover:-translate-y-1"
                                                     }`}
                                                 >
                                                     {isSubmitting ? (
                                                         <>
                                                             <span>Sending...</span>
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                            <Loader2 className="w-5 h-5 animate-spin" />
                                                         </>
                                                     ) : (
                                                         <>
                                                             <span>Send Message</span>
-                                                            <Send className="w-4 h-4" />
+                                                            <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
                                                         </>
                                                     )}
                                                 </button>
@@ -280,21 +258,15 @@ const Contact = () => {
                 </div>
 
                 {/* Map Section */}
-                <div className="mt-16 relative">
-                    {/* Decorative Background blob for Map */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[800px] h-full bg-[#fef5e7] opacity-40 blur-3xl rounded-[100%] pointer-events-none"></div>
-                    
-                    <div className="relative bg-white p-4 md:p-6 lg:p-8 rounded-[2rem] border border-[#f3eee7] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                        <div className="mb-6 md:mb-8 text-center flex flex-col items-center">
-                            <div className="w-12 h-12 bg-gradient-to-br from-[#fcf3ea] to-white rounded-full flex items-center justify-center text-[#e6a27a] mb-3 shadow-sm border border-[#fae5d3]">
-                                <MapPin className="w-5 h-5" />
-                            </div>
-                            <h2 className="text-2xl md:text-3xl font-serif font-bold text-[#3d3130] mb-2">Find Us Here</h2>
-                            <p className="text-slate-500 text-[14px] max-w-[400px]">We're located in the heart of Surat. Come visit our store in person, we'd love to see you!</p>
+                <div className="mt-20">
+                    <div className="relative bg-white p-6 md:p-8 rounded-[2.5rem] border border-gray-100 shadow-xl">
+                        <div className="mb-8 text-center flex flex-col items-center">
+                            <h2 className="text-3xl font-black text-[#1A1A24] mb-3">Find Us Here</h2>
+                            <p className="text-[#555] text-lg max-w-lg">We're located in the heart of Surat. Come visit our store in person, we'd love to see you!</p>
                         </div>
-                        <div className="w-full h-[350px] md:h-[450px] rounded-[1.5rem] overflow-hidden border border-[#f3eee7] shadow-inner relative group">
+                        <div className="w-full h-[400px] md:h-[500px] rounded-3xl overflow-hidden border border-gray-100 shadow-inner relative group">
                             {/* Overlay that fades out on hover to make it feel interactive */}
-                            <div className="absolute inset-0 bg-[#e6a27a]/5 pointer-events-none transition-opacity duration-300 group-hover:opacity-0"></div>
+                            <div className="absolute inset-0 bg-[#1A1A24]/5 pointer-events-none transition-opacity duration-300 group-hover:opacity-0 z-10"></div>
                             
                             <iframe 
                                 src="https://maps.google.com/maps?q=Tulsi%20Arcade,%20Mota%20Varachha,%20Surat&t=&z=15&ie=UTF8&iwloc=&output=embed" 
@@ -305,7 +277,7 @@ const Contact = () => {
                                 loading="lazy" 
                                 referrerPolicy="no-referrer-when-downgrade"
                                 title="Google Maps Location of Tulsi Arcade, Surat"
-                                className="w-full h-full grayscale-[20%] contrast-[95%] opacity-90 transition-all duration-500 group-hover:grayscale-0 group-hover:contrast-100 group-hover:opacity-100"
+                                className="w-full h-full relative z-0 transition-all duration-500"
                             ></iframe>
                         </div>
                     </div>

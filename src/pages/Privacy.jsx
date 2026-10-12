@@ -1,63 +1,63 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Database, Activity, Share2, Lock } from 'lucide-react';
+import React, { useEffect } from 'react';
 
 const Privacy = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
-        <div className="max-w-[1200px] mx-auto px-4 py-10 font-['Outfit'] bg-white min-h-[60vh]">
-            {/* Breadcrumb */}
-            <div className="text-[14px] mb-8 font-medium">
-                <Link to="/" className="text-[#2e4053] font-bold hover:text-[#1282a2] transition-colors">Home</Link>
-                <span className="text-slate-400 mx-2">/</span>
-                <span className="text-[#1282a2]">Privacy Policy</span>
-            </div>
-
-            {/* Title */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-[#2e4053] font-serif mb-2">
-                    Privacy Policy
-                </h1>
-                <p className="text-[15px] text-[#666666]">Last updated: {new Date().toLocaleDateString('en-GB')}</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
-                    <div className="bg-[#1282a2]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
-                        <Database className="w-7 h-7 text-[#1282a2]" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">1. Information We Collect</h3>
-                    <p className="text-[#666666] leading-relaxed text-[15px]">
-                        At Little Joys, we collect information to provide better services to our users. This includes personal information such as your name, email address, phone number, and shipping details when you create an account or make a purchase.
-                    </p>
+        <div className="bg-[#FDFBF7] min-h-screen py-16 px-4 md:px-8 font-['Outfit']">
+            <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 lg:p-16 shadow-[0_4px_30px_rgba(0,0,0,0.03)] border border-slate-100">
+                <div className="mb-10 text-center">
+                    <span className="text-[#E51A22] font-bold tracking-widest uppercase text-sm mb-3 block">Legal Information</span>
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#1A1A24] mb-4">Privacy Policy</h1>
+                    <p className="text-slate-500 font-medium">Last Updated: {new Date().toLocaleDateString('en-GB')}</p>
                 </div>
 
-                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
-                    <div className="bg-[#e6a27a]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
-                        <Activity className="w-7 h-7 text-[#e6a27a]" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">2. How We Use Information</h3>
-                    <p className="text-[#666666] leading-relaxed text-[15px]">
-                        We use the information we collect to process transactions, deliver your purchases, communicate with you about your order, and send promotional offers if you have opted in to our newsletter.
+                <div className="prose prose-slate max-w-none text-slate-600 leading-loose">
+                    <p className="mb-6">
+                        At <strong>Little Joys</strong>, your privacy and the security of your personal information are our highest priority. This Privacy Policy outlines how we collect, use, and protect the data you provide to us when you use our website and services.
                     </p>
-                </div>
 
-                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
-                    <div className="bg-[#f4a261]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
-                        <Share2 className="w-7 h-7 text-[#f4a261]" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">3. Information Sharing</h3>
-                    <p className="text-[#666666] leading-relaxed text-[15px]">
-                        We do not sell, trade, or otherwise transfer your personally identifiable information to outside parties. This does not include trusted third parties who assist us in operating our website, conducting our business, or servicing you.
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">1. We Do Not Sell Your Data (Zero Data Selling Policy)</h2>
+                    <p className="mb-6 text-[#1A1A24] font-semibold bg-red-50 p-6 rounded-2xl border border-red-100">
+                        Ame amara customers no koi pan data (jem ke naam, number, email, ke address) koi ne pan sell (vechata) nathi, ane koi ne pan vaprva aaptu nathi. We absolutely do not sell, rent, or trade your personal information to third parties for their marketing or any other purposes. Your data is solely used to process your orders and improve your shopping experience with us.
                     </p>
-                </div>
 
-                <div className="border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow bg-slate-50">
-                    <div className="bg-[#2a9d8f]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
-                        <Lock className="w-7 h-7 text-[#2a9d8f]" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#2e4053] mb-3">4. Data Security</h3>
-                    <p className="text-[#666666] leading-relaxed text-[15px]">
-                        We implement a variety of security measures to maintain the safety of your personal information when you place an order or access your personal information online.
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">2. Information We Collect</h2>
+                    <p className="mb-4">
+                        We collect information that you voluntarily provide to us when registering on the website, expressing an interest in obtaining information about us or our products, or otherwise contacting us.
+                    </p>
+                    <ul className="list-disc pl-6 mb-6 space-y-2">
+                        <li><strong>Personal Information:</strong> Name, email address, phone number, and billing/shipping addresses.</li>
+                        <li><strong>Payment Information:</strong> We collect payment data necessary to process your purchase. (Note: All payment data is handled securely by our certified payment processors. We do not store your credit card numbers on our servers).</li>
+                        <li><strong>Account Details:</strong> Order history, wishlists, and preferences.</li>
+                    </ul>
+
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">3. How We Use Your Information</h2>
+                    <p className="mb-4">
+                        The information we collect is used strictly for fulfilling our services to you. We use your data to:
+                    </p>
+                    <ul className="list-disc pl-6 mb-6 space-y-2">
+                        <li>Process and deliver your orders efficiently.</li>
+                        <li>Send you important updates regarding your order status and shipping tracking.</li>
+                        <li>Respond to your customer service inquiries and support requests.</li>
+                        <li>Improve our website design, product offerings, and user experience.</li>
+                    </ul>
+
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">4. Data Security</h2>
+                    <p className="mb-6">
+                        We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process. However, please also remember that we cannot guarantee that the internet itself is 100% secure. Although we will do our best to protect your personal information, transmission of personal information to and from our website is at your own risk.
+                    </p>
+
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">5. Cookies and Tracking Technologies</h2>
+                    <p className="mb-6">
+                        We may use cookies and similar tracking technologies (like web beacons and pixels) to access or store information. You can set your browser to refuse all or some browser cookies, or to alert you when websites set or access cookies. If you disable or refuse cookies, please note that some parts of this website may become inaccessible or not function properly.
+                    </p>
+
+                    <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">6. Contact Us</h2>
+                    <p className="mb-6">
+                        If you have questions or comments about this Privacy Policy, please contact us at our customer support email or through the Contact Us page on our website.
                     </p>
                 </div>
             </div>

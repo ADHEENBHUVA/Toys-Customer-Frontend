@@ -16,8 +16,8 @@ import ProductDetails from './pages/ProductDetails';
 import Orders from './pages/Orders';
 import Waitlist from './pages/Waitlist';
 import Blog from './pages/Blog';
-import Club from './pages/Club';
-
+import AllCategories from './pages/AllCategories';
+import AllCollections from './pages/AllCollections';
 // Footer Pages
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
@@ -85,9 +85,9 @@ function App() {
               <Route path="/waitlist" element={<Waitlist />} />
               <Route path="/products" element={<Products />} />
               <Route path="/product/:id" element={<ProductDetails />} />
+              <Route path="/categories" element={<AllCategories />} />
+              <Route path="/collections" element={<AllCollections />} />
               <Route path="/blog" element={<Blog />} />
-              <Route path="/club" element={<Club />} />
-              
               {/* Footer Links */}
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
@@ -105,11 +105,11 @@ function App() {
                   <Route path="/order-success" element={<OrderSuccess />} />
                   <Route path="/orders" element={<Orders />} />
               </Route>
+              
+              {/* Full-screen Routes without Navbar - Moved inside Layout to keep Navbar */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Login />} /> {/* Placeholder pointing to login */}
           </Route>
-          
-          {/* Full-screen Routes without Navbar */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Login />} /> {/* Placeholder pointing to login */}
       </Routes>
       
       </BrowserRouter>

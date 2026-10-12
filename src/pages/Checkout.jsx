@@ -133,7 +133,7 @@ const Checkout = () => {
                         if (verifyData.success) {
                             toast.success('Payment successful! Order placed.');
                             clearCart();
-                            navigate('/order-success');
+                            navigate('/order-success', { state: { orderId: verifyData.orderId } });
                         } else {
                             toast.error('Payment verification failed');
                         }
@@ -178,17 +178,17 @@ const Checkout = () => {
     }
 
     return (
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-10 md:py-16 font-sans">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-10 md:py-16 font-['Outfit']">
             <div className="flex items-center gap-2 mb-8 text-sm font-bold tracking-wide">
-                <Link to="/" className="text-slate-400 hover:text-[#2eb3a6] transition-colors">HOME</Link>
+                <Link to="/" className="text-slate-400 hover:text-[#E51A22] transition-colors">HOME</Link>
                 <span className="text-slate-300">/</span>
-                <Link to="/cart" className="text-slate-400 hover:text-[#2eb3a6] transition-colors">CART</Link>
+                <Link to="/cart" className="text-slate-400 hover:text-[#E51A22] transition-colors">CART</Link>
                 <span className="text-slate-300">/</span>
                 <span className="text-slate-800">CHECKOUT</span>
             </div>
 
             <div className="mb-10 flex items-center justify-between">
-                <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight">Secure Checkout</h1>
+                <h1 className="text-4xl md:text-5xl font-black text-[#1A1A24] tracking-tight">Secure Checkout</h1>
                 <div className="hidden md:flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-full border border-green-200">
                     <ShieldCheck className="w-5 h-5" />
                     <span className="text-sm font-bold">SSL Encrypted</span>
@@ -198,9 +198,9 @@ const Checkout = () => {
             <div className="flex flex-col lg:flex-row gap-10 xl:gap-14">
                 {/* Left Column - Forms */}
                 <div className="w-full lg:w-[60%]">
-                    <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-10 mb-8 shadow-sm">
-                        <h2 className="text-2xl font-black text-slate-800 mb-8 flex items-center gap-3">
-                            <MapPin className="w-6 h-6 text-[#2eb3a6]" /> 
+                    <div className="bg-white border border-slate-100 rounded-3xl p-6 md:p-10 mb-8 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                        <h2 className="text-2xl font-black text-[#1A1A24] mb-8 flex items-center gap-3">
+                            <MapPin className="w-6 h-6 text-[#E51A22]" /> 
                             Shipping Details
                         </h2>
                         
@@ -209,14 +209,14 @@ const Checkout = () => {
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">First Name *</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><User className="w-4 h-4 text-slate-400" /></div>
-                                    <input type="text" name="firstName" value={address.firstName} onChange={handleInputChange} placeholder="John" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2eb3a6]/20 focus:border-[#2eb3a6] font-medium transition-all" />
+                                    <input type="text" name="firstName" value={address.firstName} onChange={handleInputChange} placeholder="John" className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-3.5 text-[#1A1A24] focus:outline-none focus:ring-2 focus:ring-[#E51A22]/20 focus:border-[#E51A22] font-medium transition-all" />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Last Name *</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><User className="w-4 h-4 text-slate-400" /></div>
-                                    <input type="text" name="lastName" value={address.lastName} onChange={handleInputChange} placeholder="Doe" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2eb3a6]/20 focus:border-[#2eb3a6] font-medium transition-all" />
+                                    <input type="text" name="lastName" value={address.lastName} onChange={handleInputChange} placeholder="Doe" className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-3.5 text-[#1A1A24] focus:outline-none focus:ring-2 focus:ring-[#E51A22]/20 focus:border-[#E51A22] font-medium transition-all" />
                                 </div>
                             </div>
                             
@@ -224,7 +224,7 @@ const Checkout = () => {
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Email Address *</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Mail className="w-4 h-4 text-slate-400" /></div>
-                                    <input type="email" name="email" value={address.email} onChange={handleInputChange} placeholder="john@example.com" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2eb3a6]/20 focus:border-[#2eb3a6] font-medium transition-all" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Please enter a valid email address with @ and ." />
+                                    <input type="email" name="email" value={address.email} onChange={handleInputChange} placeholder="john@example.com" className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-3.5 text-[#1A1A24] focus:outline-none focus:ring-2 focus:ring-[#E51A22]/20 focus:border-[#E51A22] font-medium transition-all" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Please enter a valid email address with @ and ." />
                                 </div>
                             </div>
 
@@ -232,7 +232,7 @@ const Checkout = () => {
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Phone Number *</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Phone className="w-4 h-4 text-slate-400" /></div>
-                                    <input type="text" name="phone" value={address.phone} onChange={handleInputChange} placeholder="+91 9876543210" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2eb3a6]/20 focus:border-[#2eb3a6] font-medium transition-all" pattern="[0-9]{10}" maxLength="10" minLength="10" title="Please enter exactly 10 digits" onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }} />
+                                    <input type="text" name="phone" value={address.phone} onChange={handleInputChange} placeholder="+91 9876543210" className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-3.5 text-[#1A1A24] focus:outline-none focus:ring-2 focus:ring-[#E51A22]/20 focus:border-[#E51A22] font-medium transition-all" pattern="[0-9]{10}" maxLength="10" minLength="10" title="Please enter exactly 10 digits" onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }} />
                                 </div>
                             </div>
 
@@ -240,7 +240,7 @@ const Checkout = () => {
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">ZIP Code *</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Map className="w-4 h-4 text-slate-400" /></div>
-                                    <input type="text" name="zipCode" value={address.zipCode} onChange={handleInputChange} maxLength="6" placeholder="380015" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2eb3a6]/20 focus:border-[#2eb3a6] font-medium transition-all" />
+                                    <input type="text" name="zipCode" value={address.zipCode} onChange={handleInputChange} maxLength="6" placeholder="380015" className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-3.5 text-[#1A1A24] focus:outline-none focus:ring-2 focus:ring-[#E51A22]/20 focus:border-[#E51A22] font-medium transition-all" />
                                 </div>
                             </div>
 
@@ -248,41 +248,41 @@ const Checkout = () => {
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Street Address *</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Building2 className="w-4 h-4 text-slate-400" /></div>
-                                    <input type="text" name="streetAddress" value={address.streetAddress} onChange={handleInputChange} placeholder="House number and street name" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2eb3a6]/20 focus:border-[#2eb3a6] font-medium transition-all" />
+                                    <input type="text" name="streetAddress" value={address.streetAddress} onChange={handleInputChange} placeholder="House number and street name" className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-3.5 text-[#1A1A24] focus:outline-none focus:ring-2 focus:ring-[#E51A22]/20 focus:border-[#E51A22] font-medium transition-all" />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Town / City *</label>
-                                <input type="text" name="city" value={address.city} onChange={handleInputChange} placeholder="City" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2eb3a6]/20 focus:border-[#2eb3a6] font-medium transition-all" />
+                                <input type="text" name="city" value={address.city} onChange={handleInputChange} placeholder="City" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3.5 text-[#1A1A24] focus:outline-none focus:ring-2 focus:ring-[#E51A22]/20 focus:border-[#E51A22] font-medium transition-all" />
                             </div>
 
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">State *</label>
-                                <input type="text" name="state" value={address.state} onChange={handleInputChange} placeholder="State" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2eb3a6]/20 focus:border-[#2eb3a6] font-medium transition-all" />
+                                <input type="text" name="state" value={address.state} onChange={handleInputChange} placeholder="State" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3.5 text-[#1A1A24] focus:outline-none focus:ring-2 focus:ring-[#E51A22]/20 focus:border-[#E51A22] font-medium transition-all" />
                             </div>
 
                             <div className="space-y-2 md:col-span-2">
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Order Notes (Optional)</label>
-                                <textarea name="orderNotes" value={address.orderNotes} onChange={handleInputChange} placeholder="Special notes for delivery..." rows="3" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2eb3a6]/20 focus:border-[#2eb3a6] font-medium transition-all resize-none"></textarea>
+                                <textarea name="orderNotes" value={address.orderNotes} onChange={handleInputChange} placeholder="Special notes for delivery..." rows="3" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3.5 text-[#1A1A24] focus:outline-none focus:ring-2 focus:ring-[#E51A22]/20 focus:border-[#E51A22] font-medium transition-all resize-none"></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-10 shadow-sm">
-                        <h2 className="text-2xl font-black text-slate-800 mb-8 flex items-center gap-3">
-                            <CreditCard className="w-6 h-6 text-[#2eb3a6]" /> 
+                    <div className="bg-white border border-slate-100 rounded-3xl p-6 md:p-10 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                        <h2 className="text-2xl font-black text-[#1A1A24] mb-8 flex items-center gap-3">
+                            <CreditCard className="w-6 h-6 text-[#E51A22]" /> 
                             Payment Method
                         </h2>
                         
-                        <div className={`border-2 rounded-2xl p-5 mb-8 cursor-pointer transition-all ${paymentMethod === 'razorpay' ? 'border-[#2eb3a6] bg-[#2eb3a6]/5' : 'border-slate-200 hover:border-slate-300'}`} onClick={() => setPaymentMethod('razorpay')}>
+                        <div className={`border-2 rounded-2xl p-5 mb-8 cursor-pointer transition-all ${paymentMethod === 'razorpay' ? 'border-[#E51A22] bg-red-50' : 'border-slate-100 hover:border-slate-300'}`} onClick={() => setPaymentMethod('razorpay')}>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'razorpay' ? 'border-[#2eb3a6]' : 'border-slate-300'}`}>
-                                        {paymentMethod === 'razorpay' && <div className="w-3 h-3 bg-[#2eb3a6] rounded-full"></div>}
+                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'razorpay' ? 'border-[#E51A22]' : 'border-slate-300'}`}>
+                                        {paymentMethod === 'razorpay' && <div className="w-3 h-3 bg-[#E51A22] rounded-full"></div>}
                                     </div>
                                     <div>
-                                        <span className="font-bold text-slate-800 block text-lg">Pay with Razorpay</span>
+                                        <span className="font-bold text-[#1A1A24] block text-lg">Pay with Razorpay</span>
                                         <span className="text-sm text-slate-500 font-medium block">Cards, UPI, NetBanking, Wallets</span>
                                     </div>
                                 </div>
@@ -302,8 +302,8 @@ const Checkout = () => {
 
                 {/* Right Column - Summary */}
                 <div className="w-full lg:w-[40%]">
-                    <div className="bg-slate-50/80 border border-slate-100 rounded-3xl p-6 lg:p-8 sticky top-32">
-                        <h2 className="text-2xl font-black text-slate-800 mb-6 tracking-tight">Order Summary</h2>
+                    <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 lg:p-8 sticky top-32">
+                        <h2 className="text-2xl font-black text-[#1A1A24] mb-6 tracking-tight">Order Summary</h2>
                         
                         <div className="flex flex-col gap-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                             {cartItems.map(item => (
@@ -319,8 +319,8 @@ const Checkout = () => {
                                         />
                                     </div>
                                     <div className="flex-1">
-                                        <h4 className="text-[15px] font-bold text-slate-800 line-clamp-2 leading-tight mb-1">{item.name}</h4>
-                                        <div className="text-sm font-black text-slate-800">
+                                        <h4 className="text-[15px] font-bold text-[#1A1A24] line-clamp-2 leading-tight mb-1">{item.name}</h4>
+                                        <div className="text-sm font-black text-[#1A1A24]">
                                             ₹{(item.price * item.quantity).toFixed(2)}
                                         </div>
                                     </div>
@@ -331,7 +331,7 @@ const Checkout = () => {
                         <div className="space-y-4 mb-8 pt-6 border-t border-slate-200/80">
                             <div className="flex justify-between items-center">
                                 <span className="text-slate-500 font-medium text-[15px]">Subtotal</span>
-                                <span className="font-bold text-slate-800 text-[15px]">₹{subTotal.toFixed(2)}</span>
+                                <span className="font-bold text-[#1A1A24] text-[15px]">₹{subTotal.toFixed(2)}</span>
                             </div>
                             {appliedCoupon && (
                                 <div className="flex justify-between items-center text-green-600">
@@ -341,21 +341,21 @@ const Checkout = () => {
                             )}
                             <div className="flex justify-between items-center">
                                 <span className="text-slate-500 font-medium text-[15px]">Shipping</span>
-                                <span className="font-bold text-slate-800 text-[15px]">
-                                    {shippingCharge === 0 ? <span className="text-[#2eb3a6]">Free</span> : `₹${shippingCharge.toFixed(2)}`}
+                                <span className="font-bold text-[#1A1A24] text-[15px]">
+                                    {shippingCharge === 0 ? <span className="text-[#E51A22] bg-red-50 px-2 border border-red-100 py-0.5 rounded-md text-xs uppercase tracking-wider">Free</span> : `₹${shippingCharge.toFixed(2)}`}
                                 </span>
                             </div>
                             
                             <div className="pt-4 mt-4 border-t border-slate-200/80 flex justify-between items-center">
-                                <span className="text-lg font-bold text-slate-800">Total</span>
-                                <span className="text-2xl font-black text-[#2eb3a6]">₹{totalAmount.toFixed(2)}</span>
+                                <span className="text-lg font-bold text-[#1A1A24]">Total</span>
+                                <span className="text-3xl font-black text-[#1A1A24]">₹{totalAmount.toFixed(2)}</span>
                             </div>
                         </div>
 
                         <button 
                             onClick={handlePayment} 
                             disabled={loading}
-                            className="w-full bg-[#2eb3a6] hover:bg-[#26978c] text-white py-4 rounded-2xl font-bold text-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-[#2eb3a6]/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                            className="w-full bg-[#1A1A24] hover:bg-[#E51A22] text-white py-4 rounded-xl font-bold text-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-[0_8px_30px_rgba(229,26,34,0.2)] hover:-translate-y-1 flex items-center justify-center gap-2 group"
                         >
                             {loading ? (
                                 <span className="flex items-center gap-2">
