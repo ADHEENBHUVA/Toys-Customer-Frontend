@@ -917,7 +917,7 @@ const Dashboard = () => {
                             transform: translateY(0px) rotate(-10deg) scale(1);
                         }
                         50% {
-                            transform: translateY(-7px) rotate(-14deg) scale(1.12);
+                            transform: translateY(-6px) rotate(-14deg) scale(1.1);
                         }
                     }
                     @keyframes decoBounceRight {
@@ -925,7 +925,7 @@ const Dashboard = () => {
                             transform: translateY(0px) rotate(10deg) scale(1);
                         }
                         50% {
-                            transform: translateY(-7px) rotate(14deg) scale(1.12);
+                            transform: translateY(-6px) rotate(14deg) scale(1.1);
                         }
                     }
                     /* On PC: Icons sit completely still by default */
@@ -995,10 +995,10 @@ const Dashboard = () => {
                                     {item.decoLeft && (
                                         <div className={`absolute ${item.posLeft} pointer-events-none transition-transform duration-500 z-30`}>
                                             <div
-                                                className="age-deco-left bg-white/95 backdrop-blur-md rounded-2xl p-2 lg:p-2.5 flex items-center justify-center shadow-md border"
+                                                className="age-deco-left bg-white/95 backdrop-blur-md rounded-2xl w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center shadow-md border"
                                                 style={{ borderColor: `${item.border}50` }}
                                             >
-                                                <span className="text-xl lg:text-2xl select-none leading-none">{item.decoLeft}</span>
+                                                <span className="text-[17px] lg:text-[19px] select-none leading-none">{item.decoLeft}</span>
                                             </div>
                                         </div>
                                     )}
@@ -1007,10 +1007,10 @@ const Dashboard = () => {
                                     {item.decoRight && (
                                         <div className={`absolute ${item.posRight} pointer-events-none transition-transform duration-500 z-30`}>
                                             <div
-                                                className="age-deco-right bg-white/95 backdrop-blur-md rounded-2xl p-2 lg:p-2.5 flex items-center justify-center shadow-md border"
+                                                className="age-deco-right bg-white/95 backdrop-blur-md rounded-2xl w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center shadow-md border"
                                                 style={{ borderColor: `${item.border}50` }}
                                             >
-                                                <span className="text-xl lg:text-2xl select-none leading-none">{item.decoRight}</span>
+                                                <span className="text-[17px] lg:text-[19px] select-none leading-none">{item.decoRight}</span>
                                             </div>
                                         </div>
                                     )}
@@ -1100,10 +1100,10 @@ const Dashboard = () => {
                                             {item.decoLeft && (
                                                 <div className={`absolute ${item.posLeft} pointer-events-none transition-transform duration-500 z-30`}>
                                                     <div
-                                                        className="bg-white/95 backdrop-blur-md rounded-xl p-1.5 flex items-center justify-center rotate-[-10deg] shadow-md border"
+                                                        className="bg-white/95 backdrop-blur-md rounded-xl w-8 h-8 flex items-center justify-center rotate-[-10deg] shadow-md border"
                                                         style={{ borderColor: `${item.border}50` }}
                                                     >
-                                                        <span className="text-base select-none leading-none">{item.decoLeft}</span>
+                                                        <span className="text-[14px] select-none leading-none">{item.decoLeft}</span>
                                                     </div>
                                                 </div>
                                             )}
@@ -1112,10 +1112,10 @@ const Dashboard = () => {
                                             {item.decoRight && (
                                                 <div className={`absolute ${item.posRight} pointer-events-none transition-transform duration-500 z-30`}>
                                                     <div
-                                                        className="bg-white/95 backdrop-blur-md rounded-xl p-1.5 flex items-center justify-center rotate-[10deg] shadow-md border"
+                                                        className="bg-white/95 backdrop-blur-md rounded-xl w-8 h-8 flex items-center justify-center rotate-[10deg] shadow-md border"
                                                         style={{ borderColor: `${item.border}50` }}
                                                     >
-                                                        <span className="text-base select-none leading-none">{item.decoRight}</span>
+                                                        <span className="text-[14px] select-none leading-none">{item.decoRight}</span>
                                                     </div>
                                                 </div>
                                             )}
