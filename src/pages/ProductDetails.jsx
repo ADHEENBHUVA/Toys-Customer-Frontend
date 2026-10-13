@@ -322,9 +322,21 @@ const ProductDetails = () => {
                                 ({product.reviewCount || 0} Customer Reviews)
                             </a>
                             {product.category && (
-                                <span className="hidden sm:inline-flex bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                                <Link
+                                    to={`/products?category=${encodeURIComponent(product.category)}`}
+                                    className="hidden sm:inline-flex bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-bold px-2.5 py-0.5 rounded-full transition-colors cursor-pointer"
+                                >
                                     {product.category}
-                                </span>
+                                </Link>
+                            )}
+                            {product.brand && (
+                                <Link 
+                                    to={`/products?brand=${encodeURIComponent(typeof product.brand === 'object' ? product.brand.name : product.brand)}`}
+                                    className="inline-flex items-center gap-1 bg-red-50 text-[#E51A22] hover:bg-red-100 border border-red-100 text-xs font-bold px-2.5 py-0.5 rounded-full transition-colors cursor-pointer"
+                                    title="View all products from this brand"
+                                >
+                                    🏷️ {typeof product.brand === 'object' ? product.brand.name : product.brand}
+                                </Link>
                             )}
                         </div>
 

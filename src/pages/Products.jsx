@@ -14,6 +14,7 @@ const Products = () => {
 
     // Read from URL
     const selectedCategories = searchParams.getAll('category');
+    const selectedBrands = searchParams.getAll('brand');
     const selectedGenders = searchParams.getAll('gender');
     const selectedAges = searchParams.getAll('age');
     const maxPriceStr = searchParams.get('maxPrice');
@@ -23,6 +24,7 @@ const Products = () => {
     const [allProducts, setAllProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [categoriesList, setCategoriesList] = useState([]);
+    const [brandsList, setBrandsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
@@ -62,9 +64,10 @@ const Products = () => {
                 if (isNewArrivals) endpoint = '/products/new-arrivals';
                 if (isBestSellers) endpoint = '/products/best-sellers';
 
-                const [prodRes, catRes] = await Promise.all([
+                const [prodRes, catRes, brandRes] = await Promise.all([
                     fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}${endpoint}`),
-                    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/categories`)
+                    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/categories`),
+                    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/brands`)
                 ]);
 
                 const prodData = await prodRes.json();
@@ -78,6 +81,11 @@ const Products = () => {
                 const catData = await catRes.json();
                 if (catData && catData.success && Array.isArray(catData.data)) {
                     setCategoriesList(catData.data.map(c => c.name));
+                }
+
+                const brandData = await brandRes.json();
+                if (Array.isArray(brandData)) {
+                    setBrandsList(brandData);
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -115,6 +123,23 @@ const Products = () => {
         // Filter by category
         if (selectedCategories.length > 0) {
             result = result.filter(p => selectedCategories.includes(p.category));
+        }
+
+        // Filter by brand
+        if (selectedBrands.length > 0) {
+            result = result.filter(p => {
+                const pBrandName = (typeof p.brand === 'object' && p.brand !== null) ? p.brand.name : (p.brand || '');
+                const pBrandId = (typeof p.brand === 'object' && p.brand !== null) ? p.brand._id?.toString() : (p.brand?.toString() || '');
+                return selectedBrands.some(b => {
+                    const bLower = b.toLowerCase();
+                    return (
+                        (pBrandName && pBrandName.toLowerCase() === bLower) ||
+                        pBrandId === b ||
+                        (p.name && p.name.toLowerCase().includes(bLower)) ||
+                        (p.description && p.description.toLowerCase().includes(bLower))
+                    );
+                });
+            });
         }
 
         // Filter by gender
@@ -204,6 +229,20 @@ const Products = () => {
         setVisibleCount(8);
     };
 
+    const handleBrandClick = (brandName) => {
+        const newParams = new URLSearchParams(searchParams);
+        const currentBrands = newParams.getAll('brand');
+        newParams.delete('brand');
+
+        if (currentBrands.includes(brandName)) {
+            currentBrands.filter(b => b !== brandName).forEach(b => newParams.append('brand', b));
+        } else {
+            [...currentBrands, brandName].forEach(b => newParams.append('brand', b));
+        }
+        setSearchParams(newParams);
+        setVisibleCount(8);
+    };
+
     const handlePriceChange = (e) => {
         const newParams = new URLSearchParams(searchParams);
         newParams.set('maxPrice', e.target.value);
@@ -233,11 +272,13 @@ const Products = () => {
         displayTitle = 'New Arrivals';
     } else if (filterParamTitle === 'best-sellers') {
         displayTitle = 'Best Sellers';
-    } else if (selectedCategories.length === 1 && selectedAges.length === 0) {
+    } else if (selectedBrands.length === 1 && selectedCategories.length === 0 && selectedAges.length === 0) {
+        displayTitle = `${selectedBrands[0]} Toys`;
+    } else if (selectedCategories.length === 1 && selectedAges.length === 0 && selectedBrands.length === 0) {
         displayTitle = selectedCategories[0];
-    } else if (selectedAges.length === 1 && selectedCategories.length === 0) {
+    } else if (selectedAges.length === 1 && selectedCategories.length === 0 && selectedBrands.length === 0) {
         displayTitle = selectedAges[0];
-    } else if (selectedCategories.length > 0 || selectedAges.length > 0) {
+    } else if (selectedCategories.length > 0 || selectedAges.length > 0 || selectedBrands.length > 0) {
         displayTitle = 'Filtered Results';
     }
 
@@ -248,7 +289,9 @@ const Products = () => {
         const collectionId = searchParams.get('collection');
         const searchQuery = searchParams.get('search');
         
-        if (selectedCategories.length === 1) {
+        if (selectedBrands.length === 1) {
+            items.push({ label: `Brand: ${selectedBrands[0]}`, link: null });
+        } else if (selectedCategories.length === 1) {
             items.push({ label: 'Categories', link: '/categories' });
             items.push({ label: selectedCategories[0], link: null });
         } else if (collectionId) {
@@ -277,10 +320,10 @@ const Products = () => {
                         {/* Filters Header (Clear All) */}
                         <div className="flex items-center justify-between px-1">
                             <h2 className="text-[20px] font-black text-slate-800">Filters</h2>
-                            {(selectedCategories.length > 0 || selectedMaxPrice < 5000 || selectedAges.length > 0 || searchParams.get('search')) && (
+                            {(selectedCategories.length > 0 || selectedBrands.length > 0 || selectedMaxPrice < 5000 || selectedAges.length > 0 || searchParams.get('search')) && (
                                 <button
                                     onClick={clearFilters}
-                                    className="text-[14px] font-bold text-[#ff6b6b] hover:text-[#ff5252] hover:underline transition-all"
+                                    className="text-[14px] font-bold text-[#ff6b6b] hover:text-[#ff5252] hover:underline transition-all cursor-pointer"
                                 >
                                     Clear all
                                 </button>
@@ -293,7 +336,7 @@ const Products = () => {
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#E51A22]"><path d="M4 6h16M4 12h16M4 18h7" /></svg>
                                 Categories
                             </h3>
-                            <ul className="space-y-3">
+                            <ul className="space-y-3 max-h-56 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
                                 {categoriesList.map(cat => {
                                     const isSelected = selectedCategories.includes(cat);
                                     return (
@@ -313,6 +356,35 @@ const Products = () => {
                                 })}
                             </ul>
                         </div>
+
+                        {/* Box 1.5: Brands */}
+                        {brandsList.length > 0 && (
+                            <div className="bg-white p-6 rounded-3xl border-2 border-transparent shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] mb-6">
+                                <h3 className="text-[18px] font-black text-[#1A1A24] mb-5 flex items-center gap-2">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#E51A22]"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                                    Brands
+                                </h3>
+                                <ul className="space-y-3 max-h-56 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
+                                    {brandsList.map(b => {
+                                        const isSelected = selectedBrands.includes(b.name);
+                                        return (
+                                            <li
+                                                key={b._id || b.name}
+                                                onClick={() => handleBrandClick(b.name)}
+                                                className="flex items-center gap-3 group cursor-pointer"
+                                            >
+                                                <div className={`w-5 h-5 rounded flex items-center justify-center transition-all ${isSelected ? 'bg-[#E51A22] shadow-[0_2px_8px_rgba(229,26,34,0.3)] border-transparent' : 'bg-white border-2 border-gray-200 group-hover:border-[#E51A22]'}`}>
+                                                    {isSelected && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>}
+                                                </div>
+                                                <span className={`font-bold transition-colors text-[15px] ${isSelected ? 'text-[#1A1A24]' : 'text-gray-500 group-hover:text-[#1A1A24]'}`}>
+                                                    {b.name}
+                                                </span>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        )}
 
                         {/* Box 2: Filter by price */}
                         <div className="bg-white p-6 rounded-3xl border-2 border-transparent shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
@@ -377,18 +449,46 @@ const Products = () => {
                     <div className="flex-1">
 
                         {/* Top Bar */}
-                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
                             <h1 className="text-3xl font-black text-slate-800 tracking-tight">
                                 {displayTitle}
                             </h1>
                             <button
                                 onClick={() => setIsMobileFilterOpen(true)}
-                                className="lg:hidden w-full md:w-auto bg-slate-100 text-slate-700 py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors"
+                                className="lg:hidden w-full md:w-auto bg-slate-100 text-slate-700 py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors cursor-pointer"
                             >
                                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                                 Filters
                             </button>
                         </div>
+
+                        {/* Active Filter Chips */}
+                        {(selectedCategories.length > 0 || selectedBrands.length > 0 || selectedAges.length > 0 || searchParams.get('search')) && (
+                            <div className="flex flex-wrap items-center gap-2 mb-6">
+                                <span className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Active:</span>
+                                {selectedBrands.map(b => (
+                                    <span key={`chip-b-${b}`} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#E51A22] text-xs font-bold border border-red-200/80 shadow-2xs">
+                                        Brand: {b}
+                                        <button onClick={() => handleBrandClick(b)} className="hover:text-red-800 font-extrabold cursor-pointer ml-0.5">×</button>
+                                    </span>
+                                ))}
+                                {selectedCategories.map(c => (
+                                    <span key={`chip-c-${c}`} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 shadow-2xs">
+                                        {c}
+                                        <button onClick={() => handleCategoryClick(c)} className="hover:text-slate-900 font-extrabold cursor-pointer ml-0.5">×</button>
+                                    </span>
+                                ))}
+                                {selectedAges.map(a => (
+                                    <span key={`chip-a-${a}`} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200/80 shadow-2xs">
+                                        Age: {a}
+                                        <button onClick={() => handleAgeClick(a)} className="hover:text-amber-950 font-extrabold cursor-pointer ml-0.5">×</button>
+                                    </span>
+                                ))}
+                                <button onClick={clearFilters} className="text-xs font-bold text-red-500 hover:underline ml-1 cursor-pointer">
+                                    Clear all
+                                </button>
+                            </div>
+                        )}
 
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-slate-100 gap-4">
                             <div className="flex items-center justify-between w-full sm:w-auto gap-4">
@@ -696,6 +796,32 @@ const Products = () => {
                                     })}
                                 </ul>
                             </div>
+
+                            {/* Brands in Mobile Drawer */}
+                            {brandsList.length > 0 && (
+                                <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm mb-6">
+                                    <h4 className="font-bold text-[#1A1A24] mb-4 uppercase tracking-wider text-xs">Brands</h4>
+                                    <ul className="space-y-3 max-h-56 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
+                                        {brandsList.map(b => {
+                                            const isSelected = selectedBrands.includes(b.name);
+                                            return (
+                                                <li
+                                                    key={b._id || b.name}
+                                                    onClick={() => handleBrandClick(b.name)}
+                                                    className="flex items-center gap-3 group cursor-pointer"
+                                                >
+                                                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-all ${isSelected ? 'bg-[#E51A22] shadow-[0_2px_8px_rgba(229,26,34,0.3)] border-transparent' : 'bg-white border-2 border-gray-200 group-hover:border-[#E51A22]'}`}>
+                                                        {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>}
+                                                    </div>
+                                                    <span className={`font-semibold transition-colors text-sm ${isSelected ? 'text-[#1A1A24]' : 'text-gray-500 group-hover:text-[#1A1A24]'}`}>
+                                                        {b.name}
+                                                    </span>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </div>
+                            )}
 
                             {/* Age Groups */}
                             <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm mb-6">

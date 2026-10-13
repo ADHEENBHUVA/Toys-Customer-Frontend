@@ -1445,7 +1445,11 @@ const Dashboard = () => {
 
                                 return (
                                 <div key={`brand-${idx}-${brand._id}`} className="flex items-center justify-center px-4 md:px-6 py-6">
-                                    <div className="relative w-[150px] h-[150px] md:w-[170px] md:h-[170px] flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-2 cursor-pointer group">
+                                    <Link
+                                        to={`/products?brand=${encodeURIComponent(brand.name)}`}
+                                        title={`Shop ${brand.name} toys`}
+                                        className="relative w-[150px] h-[150px] md:w-[170px] md:h-[170px] flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-2 cursor-pointer group select-none block"
+                                    >
                                         {/* Floating Toy Emojis on hover */}
                                         <div className={`absolute ${style.pos1} z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:-translate-y-2 group-hover:-rotate-12 pointer-events-none`}>
                                             <div className="bg-white/95 backdrop-blur-md rounded-xl p-1.5 shadow-md border border-slate-100 animate-bounce">
@@ -1481,7 +1485,7 @@ const Dashboard = () => {
                                                 />
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 </div>
                                 );
                             })}
