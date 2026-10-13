@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, Shield, Leaf, Heart as HeartIcon, Bell, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -12,7 +12,7 @@ import 'swiper/css/pagination';
 const Dashboard = () => {
     const { addToCart, waitlistItems, toggleWaitlist, shippingSettings, websiteSettings } = useCart();
     const [trendingProducts, setTrendingProducts] = useState([]);
-    const [visibleCount, setVisibleCount] = useState(10);
+    const [visibleCount, setVisibleCount] = useState(12);
     const [hasLoadedMore, setHasLoadedMore] = useState(false);
     const [allProducts, setAllProducts] = useState([]);
     const [dbCategories, setDbCategories] = useState([]);
@@ -26,10 +26,44 @@ const Dashboard = () => {
     const [scrollLeftPos, setScrollLeftPos] = useState(0);
     const [dragDistance, setDragDistance] = useState(0);
     const [dynamicGap, setDynamicGap] = useState(32);
+
+    // Shop By Age Continuous Scroll & Drag states ("aekdhari line")
+    const ageContainerRef = React.useRef(null);
+    const ageAnimationRef = React.useRef(null);
+    const [isAgeDragging, setIsAgeDragging] = useState(false);
+    const [isAgeHovered, setIsAgeHovered] = useState(false);
+    const [ageStartX, setAgeStartX] = useState(0);
+    const [ageScrollLeftPos, setAgeScrollLeftPos] = useState(0);
+    const [ageDragDistance, setAgeDragDistance] = useState(0);
     // Banners
     const [banners, setBanners] = useState([]);
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [expandedProductDescIds, setExpandedProductDescIds] = useState({});
+
+    const toggleProductDesc = (productId) => {
+        setExpandedProductDescIds(prev => ({
+            ...prev,
+            [productId]: !prev[productId]
+        }));
+    };
+
+    const getCleanCardDescription = (product) => {
+        if (!product) return "A wonderful toy designed for fun and learning.";
+        if (product.shortDescription) return product.shortDescription;
+        if (!product.description) return "A wonderful toy designed for fun and learning.";
+        let text = product.description;
+        text = text.replace(/^\s*<b>.*?<\/b>\s*(<br\s*\/?>\s*)*/i, '');
+        text = text.replace(/<br\s*\/?>\s*<i>Category:.*?<\/i>/i, '');
+        text = text.replace(/Category:.*?Brand:.*$/i, '');
+        text = text.replace(/<[^>]+>/g, ' ');
+        if (product.name) {
+            const escaped = product.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            text = text.replace(new RegExp(`^\\s*${escaped}\\s*`, 'i'), '');
+        }
+        text = text.replace(/\s+/g, ' ').trim();
+        return text || "A wonderful toy designed for fun and learning.";
+    };
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -65,8 +99,7 @@ const Dashboard = () => {
 
     // Testimonials
     const [testimonials, setTestimonials] = useState([]);
-    const [testimonialIdx, setTestimonialIdx] = useState(0);
-    const [isTestimonialTransitioning, setIsTestimonialTransitioning] = useState(true);
+    const testimonialSwiperRef = useRef(null);
 
     // Promo Media
     const [promoMedia, setPromoMedia] = useState([]);
@@ -118,17 +151,63 @@ const Dashboard = () => {
                 console.error('Error fetching categories:', error);
             }
         };
+        const defaultStories = [
+            {
+                name: 'Sophia M.',
+                location: 'DENVER, CO',
+                rating: 5,
+                text: 'Fast shipping, beautiful packaging, and excellent customer service. This is my go-to store for all baby essentials! The attention to detail is truly impressive.',
+                avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80',
+                badge: 'Verified Buyer'
+            },
+            {
+                name: 'Emily R.',
+                location: 'AUSTIN, TX',
+                rating: 5,
+                text: 'The quality is amazing! Everything feels so safe and thoughtfully made. My baby absolutely loves the toys. Highly recommended for any new parent looking for premium products.',
+                avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80',
+                badge: 'Mother of 2'
+            },
+            {
+                name: 'Jessica L.',
+                location: 'PORTLAND, OR',
+                rating: 5,
+                text: 'I love that the products are eco-friendly and non-toxic. It gives me peace of mind as a mom. The sustainable packaging and durability are a huge plus!',
+                avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80',
+                badge: 'Verified Buyer'
+            },
+            {
+                name: 'David K.',
+                location: 'CHICAGO, IL',
+                rating: 5,
+                text: 'My toddler has been hooked on the Montessori puzzle sets for weeks! Superb craftsmanship and smooth edges. Will definitely purchase again.',
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+                badge: 'Verified Buyer'
+            },
+            {
+                name: 'Ananya P.',
+                location: 'MUMBAI, IN',
+                rating: 5,
+                text: 'Super fast delivery and adorable toy collection. The educational toys have helped my 3-year-old learn while having so much fun!',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+                badge: 'Happy Parent'
+            }
+        ];
+
         const fetchTestimonials = async () => {
             try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/testimonials`);
                 if (res.ok) {
                     const json = await res.json();
-                    if (json.success) {
+                    if (json.success && json.data && json.data.length > 0) {
                         setTestimonials(json.data);
+                        return;
                     }
                 }
+                setTestimonials(defaultStories);
             } catch (error) {
-                console.error('Error fetching testimonials:', error);
+                console.error('Error fetching testimonials, using default stories:', error);
+                setTestimonials(defaultStories);
             }
         };
         const fetchBrands = async () => {
@@ -163,22 +242,15 @@ const Dashboard = () => {
         fetchPromoMedia();
     }, []);
 
-    // Testimonials auto-slider
-    useEffect(() => {
-        if (testimonials.length <= 3 && window.innerWidth >= 768) return;
-        if (testimonials.length <= 1 && window.innerWidth < 768) return;
+    const handlePrevTestimonial = () => {
+        if (testimonialSwiperRef.current) {
+            testimonialSwiperRef.current.slidePrev();
+        }
+    };
 
-        const interval = setInterval(() => {
-            setIsTestimonialTransitioning(true);
-            setTestimonialIdx(prev => prev + 1);
-        }, 10000); // 10 seconds
-        return () => clearInterval(interval);
-    }, [testimonials.length]);
-
-    const handleTestimonialTransitionEnd = () => {
-        if (testimonialIdx >= testimonials.length) {
-            setIsTestimonialTransitioning(false);
-            setTestimonialIdx(0);
+    const handleNextTestimonial = () => {
+        if (testimonialSwiperRef.current) {
+            testimonialSwiperRef.current.slideNext();
         }
     };
 
@@ -229,6 +301,55 @@ const Dashboard = () => {
         { name: 'Baby Gear', count: 30, img: catImages[3] },
         { name: 'Clothing', count: 40, img: catImages[4] },
         { name: 'Bath & Care', count: 25, img: catImages[5] }
+    ];
+
+    // Shop By Age Milestones Data (2 small icons per card: decoLeft and decoRight)
+    const ageMilestones = [
+        {
+            age: '0-12', label: 'Months', title: 'Infants',
+            img: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=600&q=80',
+            path: "M 50 5 A 16 16 0 0 1 72 12 A 16 16 0 0 1 90 32 A 16 16 0 0 1 95 56 A 16 16 0 0 1 83 78 A 16 16 0 0 1 61 93 A 16 16 0 0 1 39 93 A 16 16 0 0 1 17 78 A 16 16 0 0 1 5 56 A 16 16 0 0 1 10 32 A 16 16 0 0 1 28 12 A 16 16 0 0 1 50 5 Z",
+            border: '#DFA32B', textPrimary: '#224B9C', textSecondary: '#6B87B6', icon: '✨',
+            decoLeft: '💧', decoRight: '🧡',
+            posLeft: 'top-1 -left-2 md:top-2 md:-left-4',
+            posRight: 'bottom-4 -right-2 md:bottom-6 md:-right-4'
+        },
+        {
+            age: '1-2', label: 'Years', title: 'Toddlers',
+            img: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80',
+            path: "M 50 98 A 43 43 0 0 0 90 38 A 18 18 0 0 0 65 15 A 43 43 0 0 0 35 15 A 18 18 0 0 0 10 38 A 43 43 0 0 0 50 98 Z",
+            border: '#C1888B', textPrimary: '#224B9C', textSecondary: '#6B87B6', icon: '🛁',
+            decoLeft: '🧸', decoRight: '🧩',
+            posLeft: 'bottom-8 -left-2 md:bottom-12 md:-left-4',
+            posRight: '-top-1 -right-2 md:-top-2 md:-right-3'
+        },
+        {
+            age: '3-4', label: 'Years', title: 'Preschool',
+            img: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?auto=format&fit=crop&w=600&q=80',
+            path: "M 50 5 A 45 45 0 1 1 49.99 5 Z",
+            border: '#90B4EB', textPrimary: '#224B9C', textSecondary: '#6B87B6', icon: '☁️',
+            decoLeft: '☂️', decoRight: '🛡️',
+            posLeft: '-top-2 -left-1 md:-top-3 md:-left-2',
+            posRight: 'top-1/2 -right-2 md:top-1/2 md:-right-4 -translate-y-1/2'
+        },
+        {
+            age: '5-7', label: 'Years', title: 'Little Kids',
+            img: 'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?auto=format&fit=crop&w=600&q=80',
+            path: "M 50 5 C 85 5 95 15 95 50 C 95 85 85 95 50 95 C 15 95 5 85 5 50 C 5 15 15 5 50 5 Z",
+            border: '#8F5A40', textPrimary: '#224B9C', textSecondary: '#6B87B6', icon: '🌙',
+            decoLeft: '🌙', decoRight: '✨',
+            posLeft: 'top-1/2 -left-2 md:top-1/2 md:-left-4 -translate-y-1/2',
+            posRight: 'bottom-1 -right-2 md:bottom-1 md:-right-3'
+        },
+        {
+            age: '8+', label: 'Years', title: 'Big Kids',
+            img: 'https://images.unsplash.com/photo-1611604548018-d56bbd85d681?auto=format&fit=crop&w=600&q=80',
+            path: "M 5 50 A 45 45 0 0 1 95 50 L 95 85 Q 95 98 80 98 L 20 98 Q 5 98 5 85 Z",
+            border: '#86EFAC', textPrimary: '#224B9C', textSecondary: '#6B87B6', icon: '🌿',
+            decoLeft: '☀️', decoRight: '🐞',
+            posLeft: '-top-2 left-4 md:-top-3 md:left-6',
+            posRight: '-top-1 right-0 md:-top-2 md:right-0'
+        }
     ];
 
     // Calculate perfect dynamic gap to ensure exactly whole categories fit on screen
@@ -321,6 +442,82 @@ const Dashboard = () => {
         setDragDistance(Math.abs(walk));
         categoryContainerRef.current.scrollLeft = scrollLeftPos - walk;
     };
+
+    // Shop By Age Continuous smooth auto-scroll ("aekdhari line") - Mobile Only
+    useEffect(() => {
+        const animate = () => {
+            const container = ageContainerRef.current;
+            if (container && container.offsetParent !== null && !isAgeHovered && !isAgeDragging) {
+                container.scrollLeft += 0.8; // Smooth 60fps continuous line
+
+                // Seamless infinite loop: reset when halfway through duplicated content
+                if (container.scrollLeft >= container.scrollWidth / 2) {
+                    container.scrollLeft = 0;
+                }
+            }
+            ageAnimationRef.current = requestAnimationFrame(animate);
+        };
+
+        ageAnimationRef.current = requestAnimationFrame(animate);
+
+        return () => {
+            if (ageAnimationRef.current) cancelAnimationFrame(ageAnimationRef.current);
+        };
+    }, [isAgeHovered, isAgeDragging]);
+
+    const handleAgeManualScroll = (direction) => {
+        const container = ageContainerRef.current;
+        if (!container) return;
+        const stride = window.innerWidth < 768 ? 200 : 260;
+        const currentScroll = container.scrollLeft;
+        const targetScroll = direction === 'left' ? currentScroll - stride : currentScroll + stride;
+        container.scrollTo({ left: targetScroll, behavior: 'smooth' });
+    };
+
+    const handleAgeMouseDown = (e) => {
+        setIsAgeDragging(true);
+        setAgeDragDistance(0);
+        setAgeStartX(e.pageX - ageContainerRef.current.offsetLeft);
+        setAgeScrollLeftPos(ageContainerRef.current.scrollLeft);
+    };
+
+    const handleAgeMouseLeave = () => {
+        setIsAgeDragging(false);
+    };
+
+    const handleAgeMouseUp = () => {
+        setIsAgeDragging(false);
+    };
+
+    const handleAgeMouseMove = (e) => {
+        if (!isAgeDragging) return;
+        e.preventDefault();
+        const x = e.pageX - ageContainerRef.current.offsetLeft;
+        const walk = (x - ageStartX) * 1.5;
+        setAgeDragDistance(Math.abs(walk));
+        ageContainerRef.current.scrollLeft = ageScrollLeftPos - walk;
+    };
+
+    // Mobile Touch Handlers
+    const handleAgeTouchStart = (e) => {
+        setIsAgeDragging(true);
+        setAgeDragDistance(0);
+        setAgeStartX(e.touches[0].pageX - ageContainerRef.current.offsetLeft);
+        setAgeScrollLeftPos(ageContainerRef.current.scrollLeft);
+    };
+
+    const handleAgeTouchMove = (e) => {
+        if (!isAgeDragging) return;
+        const x = e.touches[0].pageX - ageContainerRef.current.offsetLeft;
+        const walk = (x - ageStartX) * 1.3;
+        setAgeDragDistance(Math.abs(walk));
+        ageContainerRef.current.scrollLeft = ageScrollLeftPos - walk;
+    };
+
+    const handleAgeTouchEnd = () => {
+        setIsAgeDragging(false);
+    };
+
     const StarRating = ({ rating = 5, count }) => (
         <div className="flex items-center gap-1.5 mt-1">
             <div className="flex text-[#e8b960] text-[12px]">
@@ -394,7 +591,7 @@ const Dashboard = () => {
             </div>
 
             {/* Hero Section - Multi-Banner Carousel */}
-            <div className="w-full bg-[#FDFBF7] pt-4 md:pt-8 pb-2 overflow-hidden">
+            <div className="w-full bg-[#FFFDF9] pt-4 md:pt-8 pb-8 overflow-hidden border-b border-slate-200/90 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.03)]">
                 <div className="w-full mx-auto px-4 relative group/hero">
                     <Swiper
                         modules={[Navigation, Pagination, Autoplay]}
@@ -457,10 +654,13 @@ const Dashboard = () => {
 
 
             {/* Categories */}
-            <div className="w-full pt-16 pb-8 text-center bg-white">
+            <div className="w-full pt-14 pb-14 text-center bg-white border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
-                    <h2 className="text-[28px] md:text-[36px] font-black text-[#111] mb-2 tracking-tight uppercase">Toy Categories</h2>
-                    <p className="text-[#555] text-[15px] mb-10 font-bold uppercase tracking-wider">Everything your little one needs</p>
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-red-100 shadow-2xs">
+                        🎯 EXPLORE BY INTEREST
+                    </span>
+                    <h2 className="text-[28px] md:text-[38px] font-black text-[#111] mb-2 tracking-tight uppercase">Toy Categories</h2>
+                    <p className="text-[#666] text-[14px] md:text-[15px] mb-8 font-semibold uppercase tracking-wider">Everything your little one needs to learn, imagine & play</p>
                 </div>
 
                 <div
@@ -471,17 +671,19 @@ const Dashboard = () => {
                     {/* Left Arrow - Centered on Image */}
                     <button
                         onClick={() => handleManualScroll('left')}
-                        className="absolute left-4 top-[88px] -translate-y-1/2 z-20 text-white p-2 opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-125 hidden md:flex items-center justify-center cursor-pointer drop-shadow-md"
+                        className="absolute left-3 top-[92px] -translate-y-1/2 z-30 w-11 h-11 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-slate-200 text-slate-800 opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] hidden md:flex items-center justify-center cursor-pointer"
+                        title="Scroll Left"
                     >
-                        <ChevronLeft className="w-8 h-8" strokeWidth={2.5} />
+                        <ChevronLeft className="w-6 h-6" strokeWidth={2.5} />
                     </button>
 
                     {/* Right Arrow - Centered on Image */}
                     <button
                         onClick={() => handleManualScroll('right')}
-                        className="absolute right-4 top-[88px] -translate-y-1/2 z-20 text-white p-2 opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-125 hidden md:flex items-center justify-center cursor-pointer drop-shadow-md"
+                        className="absolute right-3 top-[92px] -translate-y-1/2 z-30 w-11 h-11 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-slate-200 text-slate-800 opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] hidden md:flex items-center justify-center cursor-pointer"
+                        title="Scroll Right"
                     >
-                        <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
+                        <ChevronRight className="w-6 h-6" strokeWidth={2.5} />
                     </button>
 
 
@@ -498,7 +700,7 @@ const Dashboard = () => {
                     </style>
                     <div
                         ref={categoryContainerRef}
-                        className={`flex overflow-x-auto hide-scrollbar pt-2 pb-6 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                        className={`flex overflow-x-auto hide-scrollbar pt-6 pb-6 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
                         style={{ gap: `${dynamicGap}px` }}
                         onMouseDown={handleMouseDown}
                         onMouseLeave={handleMouseLeaveDrag}
@@ -513,13 +715,29 @@ const Dashboard = () => {
                                     to={`/products?search=${encodeURIComponent(cat.name)}`}
                                     key={idx}
                                     onClick={(e) => { if (dragDistance > 5) e.preventDefault(); }}
-                                    className="group flex flex-col items-center justify-start flex-shrink-0"
-                                    style={{ width: '144px' }}
+                                    className="group flex flex-col items-center justify-start flex-shrink-0 transition-transform duration-500 ease-out hover:-translate-y-2 cursor-pointer select-none"
+                                    style={{ width: '150px' }}
                                 >
-                                    <div className="w-36 h-36 mb-4 shadow-sm flex items-center justify-center overflow-hidden rounded-full border-[2px] border-transparent transition-all duration-300 group-hover:border-[#e6a27a] bg-gray-50">
-                                        <img src={getImageUrl(cat.image)} alt={cat.name} draggable="false" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none" />
+                                    {/* Circular Image Container with Multi-layer Glow & Border */}
+                                    <div className="relative w-36 h-36 mb-4 flex items-center justify-center">
+                                        {/* Outer Soft Ring on Hover */}
+                                        <div className="absolute inset-0 rounded-full transition-all duration-500 ease-out group-hover:scale-105 group-hover:shadow-[0_12px_28px_-6px_rgba(229,26,34,0.22)] group-hover:ring-4 group-hover:ring-[#E51A22]/20"></div>
+
+                                        {/* Main Circular Mask */}
+                                        <div className="w-full h-full rounded-full overflow-hidden border-[3px] border-slate-100 group-hover:border-[#E51A22] bg-gray-50 shadow-sm transition-all duration-500 relative z-10 flex items-center justify-center">
+                                            <img 
+                                                src={getImageUrl(cat.image)} 
+                                                alt={cat.name} 
+                                                draggable="false" 
+                                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-112 pointer-events-none" 
+                                            />
+                                        </div>
                                     </div>
-                                    <span className="font-bold text-[#111] text-[15px] text-center uppercase tracking-wide group-hover:text-[#e6a27a] transition-colors">{cat.name}</span>
+
+                                    {/* Category Label */}
+                                    <span className="font-extrabold text-[#1A1A24] text-[14px] md:text-[15px] text-center uppercase tracking-wider group-hover:text-[#E51A22] transition-colors duration-300 px-1 leading-snug">
+                                        {cat.name}
+                                    </span>
                                 </Link>
                             );
                         })}
@@ -527,65 +745,70 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Featured Products */}
-            <div className="w-full bg-[#FDFBF7] pt-8 pb-10">
+            {/* Best Selling Picks - Ranked with Most Selling First */}
+            <div className="w-full bg-[#F8FAFC] pt-16 pb-16 border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
                     <div className="flex flex-col items-center justify-center text-center mb-10">
-                        <span className="text-[#E51A22] text-[13px] font-bold uppercase tracking-[0.2em] mb-2">EXPLORE</span>
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-amber-200/80 shadow-2xs">
+                            🏆 TOP-RANKED FAVORITES
+                        </span>
                         <h2 className="text-[32px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2">
-                            Explore Popular Toy Set
+                            Best Selling Picks
                         </h2>
-                        <p className="text-[#555] text-[15px] md:text-[18px]">Smart, Fun & Creative Toys for Every Little Adventure</p>
+                        <p className="text-[#666] text-[15px] md:text-[17px] font-medium">Top-rated toys loved by parents and kids alike</p>
                     </div>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 px-2 md:px-0">
-                        {[...allProducts]
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 sm:px-2 md:px-0">
+                        {((trendingProducts && trendingProducts.length > 0)
+                            ? [...trendingProducts]
+                            : [...allProducts].sort((a, b) => (b.totalSold || 0) - (a.totalSold || 0) || (b.reviewCount || 0) - (a.reviewCount || 0))
+                        )
                             .filter(product => product.status !== 'Out of Stock')
-                            .sort((a, b) => {
-                                if (a.bestSeller && !b.bestSeller) return -1;
-                                if (!a.bestSeller && b.bestSeller) return 1;
-                                return (b.reviewCount || 0) - (a.reviewCount || 0);
-                            })
-                            .slice(0, visibleCount)
+                            .slice(0, 8)
                             .map((product, idx) => (
-                                <div key={product._id} className="flex flex-col group cursor-pointer relative bg-white rounded-3xl border-2 border-transparent hover:border-red-50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden">
-                                    <div className="relative w-full aspect-square md:aspect-[4/3] overflow-hidden bg-[#F8F9FA]">
-                                        {/* Discount Badge */}
-                                        {product.originalPrice > product.price && (
-                                            <div className="absolute top-3 left-3 z-30 pointer-events-none">
-                                                <span className="bg-[#E51A22] text-white px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider shadow-sm flex items-center gap-0.5">
-                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                                <div key={product._id} className="flex flex-col group cursor-pointer relative bg-white rounded-2xl sm:rounded-3xl border border-slate-100 hover:border-red-50 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden">
+                                    <div className="relative w-full aspect-square overflow-hidden bg-[#F8F9FA]">
+                                        {/* Rank & Discount Badge */}
+                                        <div className="absolute top-2 left-2 z-30 pointer-events-none flex flex-col gap-1 items-start">
+                                            <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black tracking-wider shadow-xs flex items-center gap-1">
+                                                🏆 #{idx + 1}
+                                            </span>
+                                            {product.originalPrice > product.price && (
+                                                <span className="bg-[#E51A22] text-white px-1.5 py-0.5 rounded-full text-[8.5px] sm:text-[9.5px] font-bold tracking-wider shadow-xs flex items-center">
                                                     {`${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% Off`}
                                                 </span>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
 
-                                        {/* Soft dark overlay on hover to make icons pop */}
-                                        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"></div>
-                                        
-                                        <div className="absolute bottom-4 right-4 z-30 flex flex-col gap-3 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-400 translate-y-0 lg:translate-y-4 lg:group-hover:translate-y-0">
+                                        {/* Action Buttons in Image Footer - Wishlist & Add to Cart */}
+                                        <div className="absolute bottom-2.5 right-2.5 z-30 flex items-center gap-1.5 opacity-100 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300">
+                                            {/* Wishlist Button */}
                                             <button
                                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                                                className="w-11 h-11 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center hover:bg-red-50 hover:scale-110 transition-all border border-white/50"
+                                                className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
                                                 title="Wishlist"
                                             >
                                                 <HeartIcon
-                                                    className="w-5 h-5 transition-colors"
+                                                    className="w-4 h-4 transition-colors"
                                                     fill={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "transparent"}
-                                                    stroke={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#888"}
+                                                    stroke={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#64748b"}
                                                     strokeWidth={2.2}
                                                 />
                                             </button>
-                                            <button
-                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
-                                                className="w-11 h-11 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center hover:bg-[#E51A22] hover:text-white text-[#333] hover:scale-110 transition-all border border-white/50"
-                                                title="Add to Cart"
-                                            >
-                                                <ShoppingCart className="w-5 h-5" strokeWidth={2.2} />
-                                            </button>
+
+                                            {/* Add to Cart Button (Turns Red on hover) */}
+                                            {product.status !== 'Out of Stock' && (
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
+                                                    className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] backdrop-blur-sm shadow-md flex items-center justify-center hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
+                                                    title="Add to Cart"
+                                                >
+                                                    <ShoppingCart className="w-4 h-4 transition-colors" strokeWidth={2.2} />
+                                                </button>
+                                            )}
                                         </div>
 
-                                        <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center mix-blend-multiply group-hover:scale-105 transition-transform duration-700 ease-out p-4">
+                                        <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 ease-out">
                                             <ProductCardImageCarousel
                                                 images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])}
                                                 productName={product.name}
@@ -593,202 +816,344 @@ const Dashboard = () => {
                                         </Link>
                                     </div>
 
-                                    <div className="p-5 flex flex-col flex-grow text-left bg-white relative">
-                                        <div className="absolute top-0 left-5 right-5 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-                                        
+                                    <div className="p-3 sm:p-5 flex flex-col flex-grow text-left bg-white relative">
                                         {/* Ratings Display */}
-                                        <div className="flex items-center gap-2 mb-2.5">
+                                        <div className="flex items-center gap-1.5 mb-1.5">
                                             <div className="flex items-center gap-0.5 text-[#F5A623]">
                                                 {[...Array(5)].map((_, i) => (
-                                                    <svg key={i} className={`w-3.5 h-3.5 ${i < Math.round(product.averageRating || 5) ? 'fill-current' : 'text-gray-200 fill-current'}`} viewBox="0 0 20 20">
+                                                    <svg key={i} className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${i < Math.round(product.averageRating || 5) ? 'fill-current' : 'text-gray-200 fill-current'}`} viewBox="0 0 20 20">
                                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                                     </svg>
                                                 ))}
                                             </div>
-                                            <span className="text-[11px] text-gray-400 font-bold tracking-widest pt-0.5">({product.reviewCount || 0})</span>
+                                            <span className="text-[10px] sm:text-[11px] text-gray-400 font-bold tracking-wider">({product.reviewCount || 0})</span>
                                         </div>
 
-                                        <Link to={`/product/${product._id}`} className="font-semibold text-[#1A1A24] text-[16px] md:text-[17px] mb-1.5 hover:text-[#E51A22] transition-colors leading-snug line-clamp-1">
+                                        <Link to={`/product/${product._id}`} className="font-bold text-[#1A1A24] text-[13px] sm:text-[15px] md:text-[16px] mb-1 hover:text-[#E51A22] transition-colors leading-snug line-clamp-1">
                                             {product.name}
                                         </Link>
                                         
-                                        <div className="text-[13px] text-gray-500/90 mb-4 flex flex-col">
-                                            <div className="line-clamp-2 leading-relaxed">
-                                                {product.shortDescription || (product.description?.replace(/<[^>]+>/g, ' ')?.trim()) || "A wonderful toy designed for endless hours of fun and creativity for kids of all ages."}
-                                            </div>
-                                            <Link to={`/product/${product._id}`} className="inline-flex items-center gap-1.5 text-[#E51A22] font-black hover:gap-2.5 transition-all mt-2 self-start text-[11px] uppercase tracking-widest">
-                                                View Details 
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-                                            </Link>
+                                        <div className="text-[12px] text-gray-500/90 mb-3 leading-relaxed">
+                                            <p className={expandedProductDescIds[product._id] ? "" : "line-clamp-2 overflow-hidden"}>
+                                                {getCleanCardDescription(product)}
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    toggleProductDesc(product._id);
+                                                }}
+                                                className="mt-1 inline-flex items-center gap-1 text-[11.5px] font-bold text-[#E51A22] hover:text-[#b81219] transition-colors cursor-pointer"
+                                            >
+                                                <span>{expandedProductDescIds[product._id] ? 'View Less' : 'View More'}</span>
+                                                <svg
+                                                    className={`w-3 h-3 transition-transform duration-200 ${expandedProductDescIds[product._id] ? 'rotate-180' : ''}`}
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    strokeWidth={2.5}
+                                                >
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
                                         </div>
 
-                                        <div className="flex flex-col mt-auto pt-1">
-                                            <div className="flex items-center justify-between gap-2">
-                                                {product.status === 'Out of Stock' ? (
-                                                    <span className="font-semibold text-gray-500 text-[16px]">Out of Stock</span>
-                                                ) : (
-                                                    <div className="flex items-baseline gap-2">
-                                                        <span className="font-semibold text-[#1A1A24] text-[18px] md:text-[20px]">₹{`${(product.price || 0).toFixed(2)}`}</span>
-                                                        {product.originalPrice > (product.price || 0) && (
-                                                            <span className="text-[13px] text-gray-400 line-through font-medium">₹{`${(product.originalPrice || 0).toFixed(2)}`}</span>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
+                                        <div className="flex items-center justify-between gap-1 mt-auto pt-2 border-t border-slate-50">
+                                            {product.status === 'Out of Stock' ? (
+                                                <span className="font-bold text-gray-400 text-[12px]">Out of Stock</span>
+                                            ) : (
+                                                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
+                                                    <span className="font-extrabold text-[#1A1A24] text-[14.5px] sm:text-[17px] md:text-[19px]">
+                                                        ₹{`${(product.price || 0).toFixed(0)}`}
+                                                    </span>
+                                                    {product.originalPrice > (product.price || 0) && (
+                                                        <span className="text-[10.5px] sm:text-[12px] text-gray-400 line-through font-medium">
+                                                            ₹{`${(product.originalPrice || 0).toFixed(0)}`}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             ))}
                     </div>
 
-                    {/* Action Buttons */}
-                    {visibleCount < allProducts.length && (
-                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-12 px-4 md:px-0">
-                            <button onClick={() => setVisibleCount(prev => prev + 10)} className="group bg-white text-[#3d3130] border border-[#e5d9cc] shadow-sm hover:shadow-md hover:border-[#e6a27a] px-10 py-3.5 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
-                                Load More
-                                <ChevronRight className="w-5 h-5 text-[#e6a27a] group-hover:translate-x-1 transition-transform" />
-                            </button>
-                            <Link to="/products" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-10 py-3.5 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
-                                View All Products
-                                <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
-                            </Link>
-                        </div>
-                    )}
+                    <div className="flex justify-center items-center mt-10 px-4 md:px-0">
+                        <Link to="/products?sort=bestseller" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-10 py-3.5 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
+                            View All Best Sellers
+                            <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </div>
                 </div>
             </div>
 
-            {/* Shop By Age - Premium Circular 'Story' Style */}
-            <div className="w-full bg-[#FDFBF7] pt-16 pb-24 border-y border-gray-100/50">
-                <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
+            {/* Shop By Age - Continuous Running Line ("Aekdhari Line") */}
+            <div className="w-full bg-[#FFFBF5] pt-14 pb-16 md:pt-16 md:pb-20 border-b border-amber-200/70 relative overflow-hidden">
+                {/* Global SVG Clip Definitions (Defined once to eliminate duplicate ID bugs) */}
+                <svg width="0" height="0" className="absolute pointer-events-none">
+                    <defs>
+                        {[
+                            "M 50 5 A 16 16 0 0 1 72 12 A 16 16 0 0 1 90 32 A 16 16 0 0 1 95 56 A 16 16 0 0 1 83 78 A 16 16 0 0 1 61 93 A 16 16 0 0 1 39 93 A 16 16 0 0 1 17 78 A 16 16 0 0 1 5 56 A 16 16 0 0 1 10 32 A 16 16 0 0 1 28 12 A 16 16 0 0 1 50 5 Z",
+                            "M 50 98 A 43 43 0 0 0 90 38 A 18 18 0 0 0 65 15 A 43 43 0 0 0 35 15 A 18 18 0 0 0 10 38 A 43 43 0 0 0 50 98 Z",
+                            "M 50 5 A 45 45 0 1 1 49.99 5 Z",
+                            "M 50 5 C 85 5 95 15 95 50 C 95 85 85 95 50 95 C 15 95 5 85 5 50 C 5 15 15 5 50 5 Z",
+                            "M 5 50 A 45 45 0 0 1 95 50 L 95 85 Q 95 98 80 98 L 20 98 Q 5 98 5 85 Z"
+                        ].map((pathStr, sIdx) => (
+                            <clipPath key={`global-age-clip-${sIdx}`} id={`global-age-clip-${sIdx}`} clipPathUnits="objectBoundingBox">
+                                <path d={pathStr} transform="scale(0.01)" />
+                            </clipPath>
+                        ))}
+                    </defs>
+                </svg>
 
-                    <div className="flex flex-col items-center justify-center text-center mb-16">
-                        <span className="text-[#E51A22] text-[13px] font-bold uppercase tracking-[0.2em] mb-3">CURATED FOR GROWTH</span>
-                        <h2 className="text-[32px] md:text-[44px] font-black text-[#1A1A24] leading-tight mb-4">
+                {/* 2 Small Icons per card:
+                    Stationary by default on PC.
+                    ONLY when the card is hovered on PC, its 2 small icons bounce/wiggle playfully! */}
+                <style>{`
+                    @keyframes decoBounceLeft {
+                        0%, 100% {
+                            transform: translateY(0px) rotate(-10deg) scale(1);
+                        }
+                        50% {
+                            transform: translateY(-7px) rotate(-14deg) scale(1.12);
+                        }
+                    }
+                    @keyframes decoBounceRight {
+                        0%, 100% {
+                            transform: translateY(0px) rotate(10deg) scale(1);
+                        }
+                        50% {
+                            transform: translateY(-7px) rotate(14deg) scale(1.12);
+                        }
+                    }
+                    /* On PC: Icons sit completely still by default */
+                    .age-deco-left {
+                        transform: translateY(0px) rotate(-10deg) scale(1);
+                        transition: transform 0.3s ease;
+                    }
+                    .age-deco-right {
+                        transform: translateY(0px) rotate(10deg) scale(1);
+                        transition: transform 0.3s ease;
+                    }
+                    /* ONLY when this specific card is hovered by mouse */
+                    .group\\/ageCard:hover .age-deco-left {
+                        animation: decoBounceLeft 1.2s ease-in-out infinite;
+                    }
+                    .group\\/ageCard:hover .age-deco-right {
+                        animation: decoBounceRight 1.2s ease-in-out infinite 0.2s;
+                    }
+                `}</style>
+
+                <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
+                    {/* Header */}
+                    <div className="flex flex-col items-center justify-center text-center mb-8 md:mb-12">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-50 text-orange-700 text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-orange-200/80 shadow-2xs">
+                            🌱 DEVELOPMENT MILESTONES
+                        </span>
+                        <h2 className="text-[28px] sm:text-[34px] md:text-[44px] font-black text-[#1A1A24] leading-tight mb-2 md:mb-3">
                             Shop By Age
                         </h2>
-                        <div className="w-16 h-1 bg-[#1A1A24] rounded-full mx-auto"></div>
+                        <p className="text-[#666] text-[14px] md:text-[17px] font-medium max-w-xl">
+                            Curated developmental toys tailored precisely to your child's age group
+                        </p>
+                        <div className="w-16 h-1 bg-amber-400/80 rounded-full mx-auto mt-3 md:mt-4"></div>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-x-8 md:gap-x-10 lg:gap-x-16 gap-y-12 justify-items-center max-w-[1400px] mx-auto">
+                    {/* Quick Milestone Tap Pills */}
+                    <div className="flex items-center justify-start sm:justify-center overflow-x-auto hide-scrollbar gap-2 mb-6 md:mb-8 px-1 w-full">
                         {[
-                            { age: '0-12', label: 'Months', title: 'Infants', img: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=600&q=80', color: '#FF6B6B' },
-                            { age: '1-2', label: 'Years', title: 'Toddlers', img: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80', color: '#FFB84D' },
-                            { age: '3-4', label: 'Years', title: 'Preschool', img: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?auto=format&fit=crop&w=600&q=80', color: '#4ECDC4' },
-                            { age: '5-7', label: 'Years', title: 'Little Kids', img: 'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?auto=format&fit=crop&w=600&q=80', color: '#45B7D1' },
-                            { age: '8+', label: 'Years', title: 'Big Kids', img: 'https://images.unsplash.com/photo-1611604548018-d56bbd85d681?auto=format&fit=crop&w=600&q=80', color: '#9B59B6' },
-                        ].map((item, idx) => {
-                            const shapes = [
-                                {
-                                    // 1. Scalloped Cloud / Flower (Beautiful & Fluffy)
-                                    path: "M 50 5 A 16 16 0 0 1 72 12 A 16 16 0 0 1 90 32 A 16 16 0 0 1 95 56 A 16 16 0 0 1 83 78 A 16 16 0 0 1 61 93 A 16 16 0 0 1 39 93 A 16 16 0 0 1 17 78 A 16 16 0 0 1 5 56 A 16 16 0 0 1 10 32 A 16 16 0 0 1 28 12 A 16 16 0 0 1 50 5 Z",
-                                    border: '#DFA32B', bg: '#FFFDF9', textPrimary: '#224B9C', textSecondary: '#6B87B6', icon: '✨', decoLeft: '💧', decoRight: '🧡',
-                                    posLeft: 'top-2 -left-4 md:top-2 md:-left-6',
-                                    posRight: 'bottom-4 -right-4 md:bottom-6 md:-right-6'
-                                },
-                                {
-                                    // 2. Bear Face (Maximized scale, reaching edges)
-                                    path: "M 50 98 A 43 43 0 0 0 90 38 A 18 18 0 0 0 65 15 A 43 43 0 0 0 35 15 A 18 18 0 0 0 10 38 A 43 43 0 0 0 50 98 Z",
-                                    border: '#C1888B', bg: '#FFFDF9', textPrimary: '#224B9C', textSecondary: '#6B87B6', icon: '🛁', decoLeft: '🧸', decoRight: '🧩',
-                                    posLeft: 'bottom-12 -left-4 md:bottom-16 md:-left-8',
-                                    posRight: '-top-2 -right-2 md:-top-4 md:-right-4'
-                                },
-                                {
-                                    // 3. Perfect Circle (Classic, Maximum visibility)
-                                    path: "M 50 5 A 45 45 0 1 1 49.99 5 Z",
-                                    border: '#90B4EB', bg: '#FFFDF9', textPrimary: '#224B9C', textSecondary: '#6B87B6', icon: '☁️', decoLeft: '☂️', decoRight: '🛡️',
-                                    posLeft: '-top-4 -left-2 md:-top-6 md:-left-2',
-                                    posRight: 'top-1/2 -right-4 md:top-1/2 md:-right-8 -translate-y-1/2'
-                                },
-                                {
-                                    // 4. Rounded Square / iOS Squircle (Modern, Premium)
-                                    path: "M 50 5 C 85 5 95 15 95 50 C 95 85 85 95 50 95 C 15 95 5 85 5 50 C 5 15 15 5 50 5 Z",
-                                    border: '#8F5A40', bg: '#FFFDF9', textPrimary: '#224B9C', textSecondary: '#6B87B6', icon: '🌙', decoLeft: '🌙', decoRight: '✨',
-                                    posLeft: 'top-1/2 -left-4 md:top-1/2 md:-left-6 -translate-y-1/2',
-                                    posRight: 'bottom-0 -right-4 md:-bottom-2 md:-right-6'
-                                },
-                                {
-                                    // 5. Window Arch (Scaled up to match other shapes)
-                                    path: "M 5 50 A 45 45 0 0 1 95 50 L 95 85 Q 95 98 80 98 L 20 98 Q 5 98 5 85 Z",
-                                    border: '#86EFAC', bg: '#F0FDF4', textPrimary: '#224B9C', textSecondary: '#6B87B6', icon: '🌿', decoLeft: '☀️', decoRight: '🐞',
-                                    posLeft: '-top-4 left-6 md:-top-6 md:left-8',
-                                    posRight: '-top-2 right-0 md:-top-2 md:-right-2'
-                                }
-                            ];
-                            const style = shapes[idx % shapes.length];
-                            const clipId = `age-clip-perfect-${idx}`;
+                            { age: '0-12', label: 'Months', emoji: '🍼' },
+                            { age: '1-2', label: 'Years', emoji: '🧸' },
+                            { age: '3-4', label: 'Years', emoji: '🎨' },
+                            { age: '5-7', label: 'Years', emoji: '🚀' },
+                            { age: '8+', label: 'Years', emoji: '🧩' },
+                        ].map((item, idx) => (
+                            <Link
+                                key={`pill-${idx}`}
+                                to={`/products?age=${encodeURIComponent(item.age + ' ' + item.label)}`}
+                                className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-amber-200/80 shadow-2xs text-[12px] font-bold text-slate-700 hover:border-[#E51A22] hover:text-[#E51A22] hover:bg-red-50/50 transition-all active:scale-95 cursor-pointer"
+                            >
+                                <span>{item.emoji}</span>
+                                <span>{item.age} {item.label}</span>
+                            </Link>
+                        ))}
+                    </div>
 
-                            return (
-                                <Link
-                                    to={`/products?age=${encodeURIComponent(item.age + ' ' + item.label)}`}
-                                    key={idx}
-                                    className="group flex flex-col items-center justify-start transition-transform duration-300 hover:-translate-y-2 mt-4 relative"
-                                >
-                                    {/* Image Container with SVG Clip Path & Decorations */}
-                                    <div className="relative w-40 h-40 md:w-48 md:h-48 lg:w-52 lg:h-52 mb-6 flex items-center justify-center">
-
-                                        {/* Outer floating decorations - Continuous Bounce on hover */}
-                                        {style.decoLeft && (
-                                            <div className={`absolute ${style.posLeft || '-top-1 -left-4 md:top-1 md:-left-6'} opacity-100 transition-all z-30 group-hover:-translate-y-3 group-hover:scale-110`}>
-                                                <div 
-                                                    className="bg-white/90 backdrop-blur-md rounded-2xl p-2 md:p-2.5 flex items-center justify-center rotate-[-12deg] group-hover:animate-bounce transition-all duration-300 group-hover:rotate-0"
-                                                    style={{ border: `2px solid ${style.border}50`, boxShadow: `0 8px 24px ${style.border}30` }}
-                                                >
-                                                    <span className="text-xl md:text-2xl drop-shadow-sm">{style.decoLeft}</span>
-                                                </div>
-                                            </div>
-                                        )}
-                                        {style.decoRight && (
-                                            <div className={`absolute ${style.posRight || 'bottom-1 -right-4 md:bottom-2 md:-right-6'} opacity-100 transition-all z-30 group-hover:-translate-y-3 group-hover:scale-110`}>
-                                                <div 
-                                                    className="bg-white/90 backdrop-blur-md rounded-2xl p-2 md:p-2.5 flex items-center justify-center rotate-[12deg] group-hover:animate-bounce transition-all duration-300 group-hover:rotate-0" 
-                                                    style={{ border: `2px solid ${style.border}50`, boxShadow: `0 8px 24px ${style.border}30`, animationDelay: '0.2s' }}
-                                                >
-                                                    <span className="text-xl md:text-2xl drop-shadow-sm">{style.decoRight}</span>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Inner Wrapper for shape scaling */}
-                                        <div className="absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover:scale-110">
-                                            {/* The Thin Border SVG */}
-                                            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-md">
-                                                <path d={style.path} fill="none" stroke={style.border} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-
-                                            {/* The SVG Mask for Image */}
-                                            <svg width="0" height="0" className="absolute">
-                                                <defs>
-                                                    <clipPath id={clipId} clipPathUnits="objectBoundingBox">
-                                                        <path d={style.path} transform="scale(0.01)" />
-                                                    </clipPath>
-                                                </defs>
-                                            </svg>
-
-                                            {/* Pure image wrapped in clipPath - NO padding, NO inset */}
+                    {/* Desktop View: Clean Static 5-Column Grid (No moving line on PC) */}
+                    <div className="hidden md:grid md:grid-cols-5 gap-6 lg:gap-8 justify-items-center max-w-[1300px] mx-auto pt-2 pb-4">
+                        {ageMilestones.map((item, idx) => (
+                            <Link
+                                to={`/products?age=${encodeURIComponent(item.age + ' ' + item.label)}`}
+                                key={`age-desktop-${idx}`}
+                                className="group/ageCard flex flex-col items-center justify-start w-full transition-all duration-300 ease-out hover:-translate-y-2 cursor-pointer select-none"
+                            >
+                                {/* Organic Shape Container */}
+                                <div className="relative w-40 h-40 lg:w-44 lg:h-44 mb-4 flex items-center justify-center">
+                                    {/* 1st Small Icon (decoLeft) */}
+                                    {item.decoLeft && (
+                                        <div className={`absolute ${item.posLeft} pointer-events-none transition-transform duration-500 z-30`}>
                                             <div
-                                                className="absolute inset-0 w-full h-full bg-white z-10"
-                                                style={{ clipPath: `url(#${clipId})` }}
+                                                className="age-deco-left bg-white/95 backdrop-blur-md rounded-2xl p-2 lg:p-2.5 flex items-center justify-center shadow-md border"
+                                                style={{ borderColor: `${item.border}50` }}
                                             >
-                                                <img
-                                                    src={item.img}
-                                                    alt={item.title}
-                                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                                                />
+                                                <span className="text-xl lg:text-2xl select-none leading-none">{item.decoLeft}</span>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
 
-                                    {/* Text Content */}
-                                    <h3 className="font-bold text-[18px] md:text-[20px] mb-1 flex items-center gap-2 group-hover:text-[#E51A22] transition-colors" style={{ color: style.textPrimary }}>
-                                        <span className="text-[20px] opacity-80">{style.icon}</span>
-                                        {item.title}
-                                    </h3>
-                                    <p className="text-[14px] md:text-[15px] font-medium tracking-wide" style={{ color: style.textSecondary }}>
-                                        {item.age} {item.label}
-                                    </p>
-                                </Link>
-                            );
-                        })}
+                                    {/* 2nd Small Icon (decoRight) */}
+                                    {item.decoRight && (
+                                        <div className={`absolute ${item.posRight} pointer-events-none transition-transform duration-500 z-30`}>
+                                            <div
+                                                className="age-deco-right bg-white/95 backdrop-blur-md rounded-2xl p-2 lg:p-2.5 flex items-center justify-center shadow-md border"
+                                                style={{ borderColor: `${item.border}50` }}
+                                            >
+                                                <span className="text-xl lg:text-2xl select-none leading-none">{item.decoRight}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Inner Shape with border and clipPath */}
+                                    <div className="absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover/ageCard:scale-105">
+                                        {/* Border Outline SVG */}
+                                        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-md">
+                                            <path d={item.path} fill="none" stroke={item.border} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+
+                                        {/* Masked Image */}
+                                        <div
+                                            className="absolute inset-0 w-full h-full bg-white z-10"
+                                            style={{ clipPath: `url(#global-age-clip-${idx})` }}
+                                        >
+                                            <img
+                                                src={item.img}
+                                                alt={item.title}
+                                                draggable="false"
+                                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/ageCard:scale-110 pointer-events-none"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Text Details */}
+                                <h3 className="font-extrabold text-[18px] lg:text-[20px] mb-1 flex items-center gap-1.5 text-center group-hover/ageCard:text-[#E51A22] transition-colors" style={{ color: item.textPrimary }}>
+                                    <span className="text-[19px] lg:text-[21px] transition-transform duration-300 group-hover/ageCard:scale-125 inline-block">{item.icon}</span>
+                                    {item.title}
+                                </h3>
+                                <p className="text-[13px] lg:text-[14px] font-bold tracking-wide text-amber-800 bg-amber-100/70 px-3 py-0.5 rounded-full">
+                                    {item.age} {item.label}
+                                </p>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Mobile View: Continuous Running Line ("Aekdhari Line" - Only on Mobile) */}
+                    <div
+                        className="block md:hidden relative w-full py-2 group/ageSlider"
+                        onMouseEnter={() => setIsAgeHovered(true)}
+                        onMouseLeave={() => setIsAgeHovered(false)}
+                    >
+                        {/* Left Navigation Chevron */}
+                        <button
+                            onClick={() => handleAgeManualScroll('left')}
+                            className="absolute left-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-amber-200/80 text-slate-800 opacity-90 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white flex items-center justify-center cursor-pointer"
+                            title="Scroll Left"
+                        >
+                            <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
+                        </button>
+
+                        {/* Right Navigation Chevron */}
+                        <button
+                            onClick={() => handleAgeManualScroll('right')}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-amber-200/80 text-slate-800 opacity-90 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white flex items-center justify-center cursor-pointer"
+                            title="Scroll Right"
+                        >
+                            <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
+                        </button>
+
+                        <div
+                            ref={ageContainerRef}
+                            className={`flex overflow-x-auto hide-scrollbar pt-4 pb-4 px-3 gap-5 ${isAgeDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                            onMouseDown={handleAgeMouseDown}
+                            onMouseLeave={handleAgeMouseLeave}
+                            onMouseUp={handleAgeMouseUp}
+                            onMouseMove={handleAgeMouseMove}
+                            onTouchStart={handleAgeTouchStart}
+                            onTouchMove={handleAgeTouchMove}
+                            onTouchEnd={handleAgeTouchEnd}
+                        >
+                            {[...ageMilestones, ...ageMilestones, ...ageMilestones, ...ageMilestones].map((item, idx) => {
+                                const clipIndex = idx % 5;
+                                return (
+                                    <Link
+                                        to={`/products?age=${encodeURIComponent(item.age + ' ' + item.label)}`}
+                                        key={`age-mobile-${idx}`}
+                                        onClick={(e) => { if (ageDragDistance > 6) e.preventDefault(); }}
+                                        className="group flex flex-col items-center justify-start shrink-0 transition-transform duration-500 ease-out active:scale-95 cursor-pointer select-none"
+                                        style={{ width: '165px' }}
+                                    >
+                                        {/* Organic Shape Container */}
+                                        <div className="relative w-36 h-36 mb-3 flex items-center justify-center">
+                                            {/* 1st Small Icon (decoLeft) */}
+                                            {item.decoLeft && (
+                                                <div className={`absolute ${item.posLeft} pointer-events-none transition-transform duration-500 z-30`}>
+                                                    <div
+                                                        className="bg-white/95 backdrop-blur-md rounded-xl p-1.5 flex items-center justify-center rotate-[-10deg] shadow-md border"
+                                                        style={{ borderColor: `${item.border}50` }}
+                                                    >
+                                                        <span className="text-base select-none leading-none">{item.decoLeft}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* 2nd Small Icon (decoRight) */}
+                                            {item.decoRight && (
+                                                <div className={`absolute ${item.posRight} pointer-events-none transition-transform duration-500 z-30`}>
+                                                    <div
+                                                        className="bg-white/95 backdrop-blur-md rounded-xl p-1.5 flex items-center justify-center rotate-[10deg] shadow-md border"
+                                                        style={{ borderColor: `${item.border}50` }}
+                                                    >
+                                                        <span className="text-base select-none leading-none">{item.decoRight}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Inner Shape with border and clipPath */}
+                                            <div className="absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover:scale-105">
+                                                {/* Border Outline SVG */}
+                                                <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-md">
+                                                    <path d={item.path} fill="none" stroke={item.border} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+
+                                                {/* Masked Image */}
+                                                <div
+                                                    className="absolute inset-0 w-full h-full bg-white z-10"
+                                                    style={{ clipPath: `url(#global-age-clip-${clipIndex})` }}
+                                                >
+                                                    <img
+                                                        src={item.img}
+                                                        alt={item.title}
+                                                        draggable="false"
+                                                        className="w-full h-full object-cover pointer-events-none"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Text Details */}
+                                        <h3 className="font-extrabold text-[16px] mb-0.5 flex items-center gap-1.5 text-center text-[#224B9C]">
+                                            <span className="text-[17px]">{item.icon}</span>
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-[12px] font-bold tracking-wide text-amber-800 bg-amber-100/70 px-2.5 py-0.5 rounded-full">
+                                            {item.age} {item.label}
+                                        </p>
+                                    </Link>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -797,11 +1162,13 @@ const Dashboard = () => {
 
             {/* Promo Media (Videos & Images) - Limited Edition Style */}
             {promoMedia && promoMedia.length > 0 && (
-                <div className="w-full bg-[#FDFBF7] pt-8 pb-8">
+                <div className="w-full bg-[#F4F7FC] pt-16 pb-16 border-b border-indigo-200/70 relative">
                     <div className="w-full mx-auto px-4 md:px-8">
                         <div className="mb-8 text-center md:text-left">
-                            <span className="text-[#E51A22] text-[12px] font-bold uppercase tracking-widest mb-1 block">EXCLUSIVE COLLECTIONS</span>
-                            <h2 className="text-[28px] md:text-[36px] font-black text-[#1A1A24] mb-2 font-['Outfit']">Limited-edition playtime drops</h2>
+                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-blue-200/80 shadow-2xs">
+                                ✨ EXCLUSIVE DROPS
+                            </span>
+                            <h2 className="text-[28px] md:text-[36px] font-black text-[#1A1A24] mb-2 font-sans">Limited-edition playtime drops</h2>
                             <p className="text-[#555] text-[15px] max-w-2xl font-medium">Explore our limited-edition toy drops, crafted for unforgettable playtime moments and available only while exclusive stocks last.</p>
                         </div>
 
@@ -877,61 +1244,69 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Top 10 Trending Products */}
-            <div className="w-full bg-white pt-8 pb-8">
+            {/* Explore Popular Toy Set */}
+            <div className="w-full bg-white pt-16 pb-18 border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
                     <div className="flex flex-col items-center justify-center text-center mb-10">
-                        <span className="text-[#E51A22] text-[13px] font-bold uppercase tracking-[0.2em] mb-2">CURATED</span>
-                        <h2 className="text-[32px] md:text-[40px] font-black text-[#222E42] leading-tight mb-2">
-                            Best Selling Picks
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-rose-200/80 shadow-2xs">
+                            🧸 FEATURED PLAYSETS
+                        </span>
+                        <h2 className="text-[32px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2">
+                            Explore Popular Toy Set
                         </h2>
-                        <p className="text-[#555] text-[15px] md:text-[18px]">Top-rated toys loved by parents and kids alike</p>
+                        <p className="text-[#666] text-[15px] md:text-[17px] font-medium">Smart, Fun & Creative Toys for Every Little Adventure</p>
                     </div>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 px-2 md:px-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 sm:px-2 md:px-0">
                         {[...allProducts]
                             .filter(product => product.status !== 'Out of Stock')
-                            .sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0))
-                            .slice(0, 10)
+                            .sort((a, b) => {
+                                if (a.bestSeller && !b.bestSeller) return -1;
+                                if (!a.bestSeller && b.bestSeller) return 1;
+                                return (b.reviewCount || 0) - (a.reviewCount || 0);
+                            })
+                            .slice(0, visibleCount)
                             .map((product) => (
-                                <div key={product._id} className="flex flex-col group cursor-pointer relative bg-white rounded-3xl border-2 border-transparent hover:border-red-50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden">
-                                    <div className="relative w-full aspect-square md:aspect-[4/3] overflow-hidden bg-[#F8F9FA]">
+                                <div key={product._id} className="flex flex-col group cursor-pointer relative bg-white rounded-2xl sm:rounded-3xl border border-slate-100 hover:border-red-50 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden">
+                                    <div className="relative w-full aspect-square overflow-hidden bg-[#F8F9FA]">
                                         {/* Discount Badge */}
                                         {product.originalPrice > product.price && (
-                                            <div className="absolute top-3 left-3 z-30 pointer-events-none">
-                                                <span className="bg-[#E51A22] text-white px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider shadow-sm flex items-center gap-0.5">
-                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                                            <div className="absolute top-2 left-2 z-30 pointer-events-none">
+                                                <span className="bg-[#E51A22] text-white px-1.5 sm:px-2 py-0.5 rounded-full text-[8.5px] sm:text-[9.5px] font-bold tracking-wider shadow-xs flex items-center gap-0.5">
                                                     {`${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% Off`}
                                                 </span>
                                             </div>
                                         )}
 
-                                        {/* Soft dark overlay on hover to make icons pop */}
-                                        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"></div>
-                                        
-                                        <div className="absolute bottom-4 right-4 z-30 flex flex-col gap-3 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-400 translate-y-0 lg:translate-y-4 lg:group-hover:translate-y-0">
+                                        {/* Action Buttons in Image Footer - Wishlist & Add to Cart */}
+                                        <div className="absolute bottom-2.5 right-2.5 z-30 flex items-center gap-1.5 opacity-100 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300">
+                                            {/* Wishlist Button */}
                                             <button
                                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                                                className="w-11 h-11 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center hover:bg-red-50 hover:scale-110 transition-all border border-white/50"
+                                                className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
                                                 title="Wishlist"
                                             >
                                                 <HeartIcon
-                                                    className="w-5 h-5 transition-colors"
+                                                    className="w-4 h-4 transition-colors"
                                                     fill={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "transparent"}
-                                                    stroke={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#888"}
+                                                    stroke={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#64748b"}
                                                     strokeWidth={2.2}
                                                 />
                                             </button>
-                                            <button
-                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
-                                                className="w-11 h-11 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center hover:bg-[#E51A22] hover:text-white text-[#333] hover:scale-110 transition-all border border-white/50"
-                                                title="Add to Cart"
-                                            >
-                                                <ShoppingCart className="w-5 h-5" strokeWidth={2.2} />
-                                            </button>
+
+                                            {/* Add to Cart Button (Turns Red on hover) */}
+                                            {product.status !== 'Out of Stock' && (
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
+                                                    className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] backdrop-blur-sm shadow-md flex items-center justify-center hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
+                                                    title="Add to Cart"
+                                                >
+                                                    <ShoppingCart className="w-4 h-4 transition-colors" strokeWidth={2.2} />
+                                                </button>
+                                            )}
                                         </div>
 
-                                        <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center mix-blend-multiply group-hover:scale-105 transition-transform duration-700 ease-out p-4">
+                                        <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 ease-out">
                                             <ProductCardImageCarousel
                                                 images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])}
                                                 productName={product.name}
@@ -939,54 +1314,75 @@ const Dashboard = () => {
                                         </Link>
                                     </div>
 
-                                    <div className="p-5 flex flex-col flex-grow text-left bg-white relative">
-                                        <div className="absolute top-0 left-5 right-5 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-                                        
+                                    <div className="p-3 sm:p-5 flex flex-col flex-grow text-left bg-white relative">
                                         {/* Ratings Display */}
-                                        <div className="flex items-center gap-2 mb-2.5">
+                                        <div className="flex items-center gap-1.5 mb-1.5">
                                             <div className="flex items-center gap-0.5 text-[#F5A623]">
                                                 {[...Array(5)].map((_, i) => (
-                                                    <svg key={i} className={`w-3.5 h-3.5 ${i < Math.round(product.averageRating || 5) ? 'fill-current' : 'text-gray-200 fill-current'}`} viewBox="0 0 20 20">
+                                                    <svg key={i} className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${i < Math.round(product.averageRating || 5) ? 'fill-current' : 'text-gray-200 fill-current'}`} viewBox="0 0 20 20">
                                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                                     </svg>
                                                 ))}
                                             </div>
-                                            <span className="text-[11px] text-gray-400 font-bold tracking-widest pt-0.5">({product.reviewCount || 0})</span>
+                                            <span className="text-[10px] sm:text-[11px] text-gray-400 font-bold tracking-wider">({product.reviewCount || 0})</span>
                                         </div>
 
-                                        <Link to={`/product/${product._id}`} className="font-semibold text-[#1A1A24] text-[16px] md:text-[17px] mb-1.5 hover:text-[#E51A22] transition-colors leading-snug line-clamp-1">
+                                        <Link to={`/product/${product._id}`} className="font-bold text-[#1A1A24] text-[13px] sm:text-[15px] md:text-[16px] mb-1 hover:text-[#E51A22] transition-colors leading-snug line-clamp-1">
                                             {product.name}
                                         </Link>
                                         
-                                        <div className="text-[13px] text-gray-500/90 mb-4 flex flex-col">
-                                            <div className="line-clamp-2 leading-relaxed">
-                                                {product.shortDescription || (product.description?.replace(/<[^>]+>/g, ' ')?.trim()) || "A wonderful toy designed for endless hours of fun and creativity for kids of all ages."}
-                                            </div>
-                                            <Link to={`/product/${product._id}`} className="inline-flex items-center gap-1.5 text-[#E51A22] font-black hover:gap-2.5 transition-all mt-2 self-start text-[11px] uppercase tracking-widest">
-                                                View Details 
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-                                            </Link>
+                                        <div className="text-[12px] text-gray-500/90 mb-3 leading-relaxed">
+                                            <p className={expandedProductDescIds[product._id] ? "" : "line-clamp-2 overflow-hidden"}>
+                                                {getCleanCardDescription(product)}
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    toggleProductDesc(product._id);
+                                                }}
+                                                className="mt-1 inline-flex items-center gap-1 text-[11.5px] font-bold text-[#E51A22] hover:text-[#b81219] transition-colors cursor-pointer"
+                                            >
+                                                <span>{expandedProductDescIds[product._id] ? 'View Less' : 'View More'}</span>
+                                                <svg
+                                                    className={`w-3 h-3 transition-transform duration-200 ${expandedProductDescIds[product._id] ? 'rotate-180' : ''}`}
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    strokeWidth={2.5}
+                                                >
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
                                         </div>
 
-                                        <div className="flex flex-col mt-auto pt-1">
-                                            <div className="flex items-center justify-between gap-2">
-                                                <div className="flex items-baseline gap-2">
-                                                    <span className="font-semibold text-[#1A1A24] text-[18px] md:text-[20px]">₹{`${(product.price || 0).toFixed(2)}`}</span>
+                                        <div className="flex items-center justify-between gap-1 mt-auto pt-2 border-t border-slate-50">
+                                            {product.status === 'Out of Stock' ? (
+                                                <span className="font-bold text-gray-400 text-[12px]">Out of Stock</span>
+                                            ) : (
+                                                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
+                                                    <span className="font-extrabold text-[#1A1A24] text-[14.5px] sm:text-[17px] md:text-[19px]">
+                                                        ₹{`${(product.price || 0).toFixed(0)}`}
+                                                    </span>
                                                     {product.originalPrice > (product.price || 0) && (
-                                                        <span className="text-[13px] text-gray-400 line-through font-medium">₹{`${(product.originalPrice || 0).toFixed(2)}`}</span>
+                                                        <span className="text-[10.5px] sm:text-[12px] text-gray-400 line-through font-medium">
+                                                            ₹{`${(product.originalPrice || 0).toFixed(0)}`}
+                                                        </span>
                                                     )}
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             ))}
                     </div>
 
+                    {/* View All Products Button (Load More removed) */}
                     <div className="flex justify-center items-center mt-12 px-4 md:px-0">
-                        <Link to="/products" className="group bg-white text-[#3d3130] border border-[#e5d9cc] shadow-sm hover:shadow-md hover:border-[#e6a27a] px-10 py-3.5 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
-                            Load More
-                            <ChevronRight className="w-5 h-5 text-[#e6a27a] group-hover:translate-x-1 transition-transform" />
+                        <Link to="/products" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-10 py-3.5 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
+                            View All Products
+                            <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </div>
                 </div>
@@ -994,11 +1390,15 @@ const Dashboard = () => {
 
             {/* Brands Marquee - Premium Continuous Ticker */}
             {brands.length > 0 && (
-                <div className="w-full pt-12 pb-16 overflow-hidden bg-white font-['Outfit'] border-y border-slate-100/50">
-                    <div className="text-center mb-12 px-4 relative">
-                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent -z-10"></div>
-                        <span className="inline-block bg-white px-4 text-[#E51A22] text-[13px] font-black uppercase tracking-[0.25em] mb-2">TOP PARTNERS</span>
-                        <h2 className="text-[32px] md:text-[40px] font-black text-[#1A1A24] bg-white px-4 inline-block">Brands We Trust</h2>
+                <div className="w-full pt-16 pb-16 overflow-hidden bg-[#FFFDF9] font-sans border-b border-slate-200/90 relative">
+                    <div className="text-center mb-10 px-4 relative">
+                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-300 to-transparent -z-10"></div>
+                        <div className="inline-block bg-[#FFFDF9] px-6">
+                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-50 text-purple-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2 border border-purple-200/80 shadow-2xs">
+                                ⭐ OFFICIAL PARTNERS
+                            </span>
+                            <h2 className="text-[32px] md:text-[40px] font-black text-[#1A1A24] block mt-1">Brands We Trust</h2>
+                        </div>
                     </div>
 
                     <style>
@@ -1090,40 +1490,83 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Loved by Parents */}
-            <div className="max-w-[1400px] mx-auto pt-8 pb-16 px-4 md:px-6 text-center font-['Outfit']">
-                <div className="mb-2 text-[#E51A22]">✦</div>
-                <h2 className="text-[32px] font-black text-[#1A1A24] mb-2">Loved by Parents</h2>
-                <p className="text-[#555] font-medium text-[15px] mb-12">Real stories from our happy Little Joys family.</p>
+            {/* Loved by Parents - Original Design with Fully Working Arrow Buttons */}
+            <div className="w-full bg-[#F8FAFC] pt-16 pb-20 border-b border-slate-200/90 relative">
+                <div className="max-w-[1400px] mx-auto px-4 md:px-6 text-center font-sans relative">
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-emerald-200/80 shadow-2xs">
+                        💬 PARENT STORIES
+                    </span>
+                    <h2 className="text-[32px] md:text-[40px] font-black text-[#1A1A24] mb-2">Loved by Parents</h2>
+                    <p className="text-[#666] font-medium text-[15px] md:text-[17px] mb-8">Real stories from our happy Little Joys family</p>
 
-                <div className="relative overflow-hidden w-full py-6">
-                    <div
-                        className={`flex gap-6 ${isTestimonialTransitioning ? 'transition-transform duration-1000 ease-in-out' : ''}`}
-                        style={{ transform: `translateX(calc(-${testimonialIdx * (100 / (window.innerWidth < 768 ? 1 : 3))}% - ${testimonialIdx * (24 / (window.innerWidth < 768 ? 1 : 3))}px))` }}
-                        onTransitionEnd={handleTestimonialTransitionEnd}
+                {/* Arrow Buttons - Positioned top right or centered with elegant styling */}
+                <div className="flex justify-end items-center gap-3 mb-6 px-2">
+                    <button
+                        onClick={handlePrevTestimonial}
+                        className="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] transition-all duration-300 flex items-center justify-center shadow-xs hover:shadow-md cursor-pointer"
+                        title="Previous Review"
                     >
-                        {[...testimonials, ...testimonials].map((test, index) => (
-                            <div key={`${test._id || test.name}-${index}`} className="bg-white border border-slate-100 rounded-[2rem] p-8 text-left shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] min-w-[100%] md:min-w-[calc(33.333%-16px)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:border-red-50 cursor-default group">
-                                <p className="text-[#555] font-medium text-[14px] leading-relaxed mb-6 min-h-[80px]">
-                                    "{test.text}"
-                                </p>
-                                <div className="text-[#fbdf14]">
-                                    <StarRating rating={test.rating || 5} />
-                                </div>
-                                <div className="flex items-center gap-3 mt-6 pt-6 border-t border-slate-100 group-hover:border-red-50 transition-colors">
-                                    <img src={test.avatar} alt={test.name} className="w-10 h-10 rounded-full object-cover border-2 border-slate-100 group-hover:border-red-100 transition-colors" />
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-[#1A1A24] text-[14px]">{test.name}</span>
-                                        <span className="text-[11px] font-bold text-[#E51A22] tracking-wider uppercase">{test.location}</span>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button
+                        onClick={handleNextTestimonial}
+                        className="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] transition-all duration-300 flex items-center justify-center shadow-xs hover:shadow-md cursor-pointer"
+                        title="Next Review"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div className="relative w-full py-4">
+                    {testimonials.length > 0 && (
+                        <Swiper
+                            modules={[Navigation, Autoplay]}
+                            onSwiper={(swiper) => {
+                                testimonialSwiperRef.current = swiper;
+                            }}
+                            spaceBetween={24}
+                            slidesPerView={1}
+                            breakpoints={{
+                                640: { slidesPerView: 1.2 },
+                                768: { slidesPerView: 2 },
+                                1024: { slidesPerView: 3 },
+                            }}
+                            autoplay={{ delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true }}
+                            loop={testimonials.length >= 3}
+                            className="w-full !overflow-hidden pb-4"
+                        >
+                            {testimonials.map((test, index) => (
+                                <SwiperSlide key={`${test._id || test.name}-${index}`} className="!h-auto flex">
+                                    <div className="bg-white border border-slate-100 rounded-[2rem] p-8 text-left shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] w-full transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:border-red-50 cursor-default group flex flex-col justify-between">
+                                        <div>
+                                            <p className="text-[#555] font-medium text-[14px] leading-relaxed mb-6 min-h-[80px]">
+                                                "{test.text}"
+                                            </p>
+                                            <div className="text-[#fbdf14] flex gap-0.5">
+                                                <StarRating rating={test.rating || 5} />
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3 mt-6 pt-6 border-t border-slate-100 group-hover:border-red-50 transition-colors">
+                                            <img src={test.avatar} alt={test.name} className="w-10 h-10 rounded-full object-cover border-2 border-slate-100 group-hover:border-red-100 transition-colors" />
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-[#1A1A24] text-[14px]">{test.name}</span>
+                                                <span className="text-[11px] font-bold text-[#E51A22] tracking-wider uppercase">{test.location}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                    )}
                 </div>
             </div>
         </div>
-    );
+    </div>
+);
 };
 
 export default Dashboard;

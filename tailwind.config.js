@@ -7,8 +7,10 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"Outfit"', 'sans-serif'],
-                serif: ['"Lora"', 'serif'],
+                sans: ['"Nunito Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+                serif: ['"Nunito Sans"', 'serif'],
+                nunito: ['"Nunito Sans"', 'sans-serif'],
+                outfit: ['"Nunito Sans"', 'sans-serif'],
             },
             colors: {
                 gray: {

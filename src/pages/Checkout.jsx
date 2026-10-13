@@ -178,7 +178,7 @@ const Checkout = () => {
     }
 
     return (
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-10 md:py-16 font-['Outfit']">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-10 md:py-16 font-sans">
             <div className="flex items-center gap-2 mb-8 text-sm font-bold tracking-wide">
                 <Link to="/" className="text-slate-400 hover:text-[#E51A22] transition-colors">HOME</Link>
                 <span className="text-slate-300">/</span>

@@ -65,7 +65,7 @@ const Contact = () => {
     };
 
     return (
-        <div className="font-['Outfit'] bg-[#FDFBF7] min-h-screen">
+        <div className="font-sans bg-[#FDFBF7] min-h-screen">
             {/* Header Banner */}
             <div className="bg-gradient-to-b from-gray-50 to-[#FDFBF7] pt-20 pb-28 relative overflow-hidden border-b border-gray-100">
                 {/* Decorative Elements */}

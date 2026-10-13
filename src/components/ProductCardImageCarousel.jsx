@@ -4,12 +4,61 @@ const ProductCardImageCarousel = ({ images, productName }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [prevIndex, setPrevIndex] = useState(null);
     const [isHovered, setIsHovered] = useState(false);
+    const [isButtonHovered, setIsButtonHovered] = useState(false);
     const hoverTimer = useRef(null);
+    const containerRef = useRef(null);
+
+    // Track hover on the product card container
+    // This ensures hovering over Add to Cart / Wishlist does not trigger mouse leave or reset the image
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+
+        // Find the outer product card (.group) or aspect-square container
+        const card = el.closest('.group') || el.closest('.aspect-square') || el;
+
+        const handleMouseEnter = () => {
+            setIsHovered(true);
+        };
+
+        const handleMouseLeave = (e) => {
+            // If the mouse moved to another element inside the same card, ignore
+            if (e.relatedTarget && card.contains(e.relatedTarget)) {
+                return;
+            }
+            setIsHovered(false);
+            setIsButtonHovered(false);
+        };
+
+        const handleMouseMove = (e) => {
+            // Check if cursor is over an action button (e.g. Add to Cart or Wishlist)
+            const target = e.target;
+            const overBtn = !!target.closest('button');
+            setIsButtonHovered(overBtn);
+        };
+
+        card.addEventListener('mouseenter', handleMouseEnter);
+        card.addEventListener('mouseleave', handleMouseLeave);
+        card.addEventListener('mousemove', handleMouseMove);
+
+        return () => {
+            card.removeEventListener('mouseenter', handleMouseEnter);
+            card.removeEventListener('mouseleave', handleMouseLeave);
+            card.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []);
 
     useEffect(() => {
         if (!images || images.length <= 1 || !isHovered) return;
 
-        // Immediate change on hover
+        // When mouse is on the Add to Cart or Wishlist button, freeze the carousel:
+        // Keep whichever image is currently open, DO NOT change or rotate it!
+        if (isButtonHovered) {
+            if (hoverTimer.current) clearInterval(hoverTimer.current);
+            return;
+        }
+
+        // On first hover of the card, advance to next image if at index 0
         setCurrentIndex((prev) => {
             if (prev === 0) {
                 setPrevIndex(prev);
@@ -28,15 +77,41 @@ const ProductCardImageCarousel = ({ images, productName }) => {
         return () => {
             if (hoverTimer.current) clearInterval(hoverTimer.current);
         };
-    }, [images, isHovered]);
+    }, [images, isHovered, isButtonHovered]);
 
-    // Reset to first image when not hovering
+    // Reset to first image only when the mouse completely leaves the product card
     useEffect(() => {
         if (!isHovered && currentIndex !== 0) {
             setPrevIndex(currentIndex);
             setCurrentIndex(0);
         }
     }, [isHovered, currentIndex]);
+
+    const touchStartX = useRef(null);
+
+    const handleTouchStart = (e) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = (e) => {
+        if (!touchStartX.current || !images || images.length <= 1) return;
+        const touchEndX = e.changedTouches[0].clientX;
+        const diff = touchStartX.current - touchEndX;
+        if (diff > 25) {
+            // Swipe left -> next image
+            setCurrentIndex((prev) => {
+                setPrevIndex(prev);
+                return (prev + 1) % images.length;
+            });
+        } else if (diff < -25) {
+            // Swipe right -> prev image
+            setCurrentIndex((prev) => {
+                setPrevIndex(prev);
+                return (prev - 1 + images.length) % images.length;
+            });
+        }
+        touchStartX.current = null;
+    };
 
     if (!images || images.length === 0) {
         return (
@@ -51,16 +126,17 @@ const ProductCardImageCarousel = ({ images, productName }) => {
             <img
                 src={images[0]}
                 alt={productName}
-                className="max-w-full max-h-full object-contain drop-shadow-md"
+                className="w-full h-full object-cover object-center transition-transform duration-500"
             />
         );
     }
 
     return (
         <div 
-            className="relative w-full h-full overflow-hidden flex items-center justify-center"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            ref={containerRef}
+            className="relative w-full h-full overflow-hidden flex items-center justify-center select-none touch-pan-y"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
         >
             <style>
                 {`
@@ -102,10 +178,22 @@ const ProductCardImageCarousel = ({ images, productName }) => {
                         key={idx}
                         src={img}
                         alt={`${productName} - view ${idx + 1}`}
-                        className={`absolute inset-0 max-w-full max-h-full m-auto object-contain drop-shadow-md ${positionClass}`}
+                        className={`absolute inset-0 w-full h-full object-cover object-center ${positionClass}`}
                     />
                 );
             })}
+
+            {/* Subtle mobile dots indicator (No arrows on mobile) */}
+            {images.length > 1 && (
+                <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-20 flex gap-1 pointer-events-none md:hidden">
+                    {images.map((_, i) => (
+                        <span
+                            key={i}
+                            className={`rounded-full transition-all duration-300 ${i === currentIndex ? 'bg-[#E51A22] w-3 h-1.5' : 'bg-black/25 w-1.5 h-1.5'}`}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

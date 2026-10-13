@@ -4,7 +4,7 @@ import { Search, Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 
 const Blog = () => {
     return (
-        <div className="max-w-[1200px] mx-auto px-4 py-10 font-['Outfit'] bg-white">
+        <div className="max-w-[1200px] mx-auto px-4 py-10 font-sans bg-white">
             
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">

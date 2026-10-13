@@ -4,7 +4,7 @@ import { Truck, Clock, Globe, Box } from 'lucide-react';
 
 const Shipping = () => {
     return (
-        <div className="max-w-[1200px] mx-auto px-4 py-10 font-['Outfit'] bg-white min-h-[60vh]">
+        <div className="max-w-[1200px] mx-auto px-4 py-10 font-sans bg-white min-h-[60vh]">
             
 
             {/* Title */}

@@ -6,7 +6,7 @@ const Terms = () => {
     }, []);
 
     return (
-        <div className="bg-[#FDFBF7] min-h-screen py-16 px-4 md:px-8 font-['Outfit']">
+        <div className="bg-[#FDFBF7] min-h-screen py-16 px-4 md:px-8 font-sans">
             <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 lg:p-16 shadow-[0_4px_30px_rgba(0,0,0,0.03)] border border-slate-100">
                 <div className="mb-10 text-center">
                     <span className="text-[#E51A22] font-bold tracking-widest uppercase text-sm mb-3 block">Legal Information</span>

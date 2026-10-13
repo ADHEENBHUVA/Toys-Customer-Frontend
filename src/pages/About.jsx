@@ -4,7 +4,7 @@ import { ShieldCheck, Leaf, Heart, Users, Target, Sparkles } from 'lucide-react'
 
 const About = () => {
     return (
-        <div className="bg-[#FDFBF7] min-h-screen pt-12 pb-24 font-['Outfit']">
+        <div className="bg-[#FDFBF7] min-h-screen pt-12 pb-24 font-sans">
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                 
                 {/* Header Section */}
