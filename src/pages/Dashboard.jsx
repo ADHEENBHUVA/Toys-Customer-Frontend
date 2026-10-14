@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, Shield, Leaf, Heart as HeartIcon, Bell, Sparkles } from 'lucide-react';
+import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, Shield, Leaf, Heart as HeartIcon, Bell, Sparkles, Zap } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ProductCardImageCarousel from '../components/ProductCardImageCarousel';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -11,6 +11,14 @@ import 'swiper/css/pagination';
 
 const Dashboard = () => {
     const { addToCart, waitlistItems, toggleWaitlist, shippingSettings, websiteSettings } = useCart();
+    const navigate = useNavigate();
+
+    const handleBuyNow = (e, product) => {
+        e.preventDefault();
+        e.stopPropagation();
+        addToCart(product);
+        navigate('/checkout');
+    };
     const [trendingProducts, setTrendingProducts] = useState([]);
     const [visibleCount, setVisibleCount] = useState(12);
     const [hasLoadedMore, setHasLoadedMore] = useState(false);
@@ -768,11 +776,8 @@ const Dashboard = () => {
                             .map((product, idx) => (
                                 <div key={product._id} className="flex flex-col group cursor-pointer relative bg-white rounded-2xl sm:rounded-3xl border border-slate-100 hover:border-red-50 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden">
                                     <div className="relative w-full aspect-square overflow-hidden bg-[#F8F9FA]">
-                                        {/* Rank & Discount Badge */}
+                                        {/* Discount Badge */}
                                         <div className="absolute top-2 left-2 z-30 pointer-events-none flex flex-col gap-1 items-start">
-                                            <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black tracking-wider shadow-xs flex items-center gap-1">
-                                                🏆 #{idx + 1}
-                                            </span>
                                             {product.originalPrice > product.price && (
                                                 <span className="bg-[#E51A22] text-white px-1.5 py-0.5 rounded-full text-[8.5px] sm:text-[9.5px] font-bold tracking-wider shadow-xs flex items-center">
                                                     {`${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% Off`}
@@ -780,9 +785,8 @@ const Dashboard = () => {
                                             )}
                                         </div>
 
-                                        {/* Action Buttons in Image Footer - Wishlist & Add to Cart */}
-                                        <div className="absolute bottom-2.5 right-2.5 z-30 flex items-center gap-1.5 opacity-100 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300">
-                                            {/* Wishlist Button */}
+                                        {/* Waitlist Button - Top Right Header */}
+                                        <div className={`absolute top-2.5 right-2.5 z-30 transition-all duration-200 ${Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100'}`}>
                                             <button
                                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
                                                 className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
@@ -795,18 +799,9 @@ const Dashboard = () => {
                                                     strokeWidth={2.2}
                                                 />
                                             </button>
-
-                                            {/* Add to Cart Button (Turns Red on hover) */}
-                                            {product.status !== 'Out of Stock' && (
-                                                <button
-                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
-                                                    className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] backdrop-blur-sm shadow-md flex items-center justify-center hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
-                                                    title="Add to Cart"
-                                                >
-                                                    <ShoppingCart className="w-4 h-4 transition-colors" strokeWidth={2.2} />
-                                                </button>
-                                            )}
                                         </div>
+
+
 
                                         <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 ease-out">
                                             <ProductCardImageCarousel
@@ -873,6 +868,43 @@ const Dashboard = () => {
                                                         </span>
                                                     )}
                                                 </div>
+                                            )}
+                                        </div>
+
+                                        {/* Dual Action Buttons: Add to Cart & Buy Now */}
+                                        <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1.5 sm:gap-2">
+                                            {product.status === 'Out of Stock' ? (
+                                                <button
+                                                    disabled
+                                                    className="w-full py-2 px-3 rounded-xl bg-slate-100 text-slate-400 text-[11px] sm:text-[12px] font-bold cursor-not-allowed text-center"
+                                                >
+                                                    Out of Stock
+                                                </button>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            addToCart(product);
+                                                        }}
+                                                        className="flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl border border-slate-200 hover:border-[#E51A22] bg-white hover:bg-red-50/50 text-[#1A1A24] hover:text-[#E51A22] text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer shadow-2xs active:scale-95"
+                                                        title="Add to Cart"
+                                                    >
+                                                        <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
+                                                        <span className="truncate">Add to Cart</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => handleBuyNow(e, product)}
+                                                        className="flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl bg-[#E51A22] hover:bg-[#c9141b] text-white text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:shadow-red-500/25 active:scale-95"
+                                                        title="Buy Now"
+                                                    >
+                                                        <Zap className="w-3.5 h-3.5 shrink-0 fill-current" />
+                                                        <span className="truncate">Buy Now</span>
+                                                    </button>
+                                                </>
                                             )}
                                         </div>
                                     </div>
@@ -1278,9 +1310,8 @@ const Dashboard = () => {
                                             </div>
                                         )}
 
-                                        {/* Action Buttons in Image Footer - Wishlist & Add to Cart */}
-                                        <div className="absolute bottom-2.5 right-2.5 z-30 flex items-center gap-1.5 opacity-100 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300">
-                                            {/* Wishlist Button */}
+                                        {/* Waitlist Button - Top Right Header */}
+                                        <div className={`absolute top-2.5 right-2.5 z-30 transition-all duration-200 ${Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100'}`}>
                                             <button
                                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
                                                 className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
@@ -1293,18 +1324,9 @@ const Dashboard = () => {
                                                     strokeWidth={2.2}
                                                 />
                                             </button>
-
-                                            {/* Add to Cart Button (Turns Red on hover) */}
-                                            {product.status !== 'Out of Stock' && (
-                                                <button
-                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
-                                                    className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] backdrop-blur-sm shadow-md flex items-center justify-center hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
-                                                    title="Add to Cart"
-                                                >
-                                                    <ShoppingCart className="w-4 h-4 transition-colors" strokeWidth={2.2} />
-                                                </button>
-                                            )}
                                         </div>
+
+
 
                                         <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 ease-out">
                                             <ProductCardImageCarousel
@@ -1371,6 +1393,43 @@ const Dashboard = () => {
                                                         </span>
                                                     )}
                                                 </div>
+                                            )}
+                                        </div>
+
+                                        {/* Dual Action Buttons: Add to Cart & Buy Now */}
+                                        <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1.5 sm:gap-2">
+                                            {product.status === 'Out of Stock' ? (
+                                                <button
+                                                    disabled
+                                                    className="w-full py-2 px-3 rounded-xl bg-slate-100 text-slate-400 text-[11px] sm:text-[12px] font-bold cursor-not-allowed text-center"
+                                                >
+                                                    Out of Stock
+                                                </button>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            addToCart(product);
+                                                        }}
+                                                        className="flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl border border-slate-200 hover:border-[#E51A22] bg-white hover:bg-red-50/50 text-[#1A1A24] hover:text-[#E51A22] text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer shadow-2xs active:scale-95"
+                                                        title="Add to Cart"
+                                                    >
+                                                        <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
+                                                        <span className="truncate">Add to Cart</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => handleBuyNow(e, product)}
+                                                        className="flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl bg-[#E51A22] hover:bg-[#c9141b] text-white text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:shadow-red-500/25 active:scale-95"
+                                                        title="Buy Now"
+                                                    >
+                                                        <Zap className="w-3.5 h-3.5 shrink-0 fill-current" />
+                                                        <span className="truncate">Buy Now</span>
+                                                    </button>
+                                                </>
                                             )}
                                         </div>
                                     </div>

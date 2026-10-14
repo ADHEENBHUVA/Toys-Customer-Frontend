@@ -21,7 +21,7 @@ const Privacy = () => {
 
                     <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">1. We Do Not Sell Your Data (Zero Data Selling Policy)</h2>
                     <p className="mb-6 text-[#1A1A24] font-semibold bg-red-50 p-6 rounded-2xl border border-red-100">
-                        Ame amara customers no koi pan data (jem ke naam, number, email, ke address) koi ne pan sell (vechata) nathi, ane koi ne pan vaprva aaptu nathi. We absolutely do not sell, rent, or trade your personal information to third parties for their marketing or any other purposes. Your data is solely used to process your orders and improve your shopping experience with us.
+                        We strictly value your privacy and do not sell, rent, trade, or share any of your personal information (such as your name, phone number, email address, or shipping address) with third parties for marketing or any other purposes. Your data is solely and securely used to fulfill your orders and enhance your shopping experience with us.
                     </p>
 
                     <h2 className="text-2xl font-bold text-[#1A1A24] mt-10 mb-4">2. Information We Collect</h2>

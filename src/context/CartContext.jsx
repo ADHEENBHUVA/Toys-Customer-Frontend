@@ -95,18 +95,19 @@ export const CartProvider = ({ children }) => {
         return shippingSettings.baseShippingCharge;
     };
 
-    const addToCart = (product) => {
+    const addToCart = (product, qty = 1) => {
+        const quantityToAdd = typeof qty === 'number' && qty > 0 ? qty : 1;
         const existingItem = cartItems.find(item => item._id === product._id);
         if (existingItem) {
-            toast.success('Added another to your cart!');
+            toast.success(quantityToAdd > 1 ? `Added ${quantityToAdd} items to your cart!` : 'Added another to your cart!');
             setCartItems(prev => prev.map(item => 
                 item._id === product._id 
-                    ? { ...item, quantity: item.quantity + 1 }
+                    ? { ...item, quantity: item.quantity + quantityToAdd }
                     : item
             ));
         } else {
-            toast.success('Added to your magic cart!');
-            setCartItems(prev => [...prev, { ...product, quantity: 1 }]);
+            toast.success(quantityToAdd > 1 ? `Added ${quantityToAdd} items to your magic cart!` : 'Added to your magic cart!');
+            setCartItems(prev => [...prev, { ...product, quantity: quantityToAdd }]);
         }
     };
 
