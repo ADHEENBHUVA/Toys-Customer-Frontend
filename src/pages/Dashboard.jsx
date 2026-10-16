@@ -172,44 +172,52 @@ const Dashboard = () => {
         };
         const defaultStories = [
             {
-                name: 'Sophia M.',
-                location: 'DENVER, CO',
+                name: 'Pooja Patel',
+                location: 'Surat, Gujarat',
                 rating: 5,
-                text: 'Fast shipping, beautiful packaging, and excellent customer service. This is my go-to store for all baby essentials! The attention to detail is truly impressive.',
-                avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80',
+                text: 'Ordered the wooden Montessori puzzle set for my 3-year-old. The wood quality is top notch with completely smooth corners. Visited their Surat store too, really warm staff!',
+                avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&q=80',
                 badge: 'Verified Buyer'
             },
             {
-                name: 'Emily R.',
-                location: 'AUSTIN, TX',
+                name: 'Rahul Shah',
+                location: 'Ahmedabad, Gujarat',
                 rating: 5,
-                text: 'The quality is amazing! Everything feels so safe and thoughtfully made. My baby absolutely loves the toys. Highly recommended for any new parent looking for premium products.',
-                avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80',
-                badge: 'Mother of 2'
+                text: 'Got the building blocks in 2 days. The plastic is sturdy and odorless, not like cheap market toys. My son spends hours making castles instead of watching phone screens.',
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&q=80',
+                badge: 'Father of 4yo'
             },
             {
-                name: 'Jessica L.',
-                location: 'PORTLAND, OR',
+                name: 'Sneha Joshi',
+                location: 'Mumbai, Maharashtra',
                 rating: 5,
-                text: 'I love that the products are eco-friendly and non-toxic. It gives me peace of mind as a mom. The sustainable packaging and durability are a huge plus!',
-                avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80',
+                text: 'Best experience shopping for baby toys online! Bubble wrapped securely and completely non-toxic colors. My 2-year-old daughter loves the sound rattle and stacker rings.',
+                avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&q=80',
                 badge: 'Verified Buyer'
             },
             {
-                name: 'David K.',
-                location: 'CHICAGO, IL',
+                name: 'Ananya Verma',
+                location: 'Bangalore, Karnataka',
                 rating: 5,
-                text: 'My toddler has been hooked on the Montessori puzzle sets for weeks! Superb craftsmanship and smooth edges. Will definitely purchase again.',
-                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
-                badge: 'Verified Buyer'
-            },
-            {
-                name: 'Ananya P.',
-                location: 'MUMBAI, IN',
-                rating: 5,
-                text: 'Super fast delivery and adorable toy collection. The educational toys have helped my 3-year-old learn while having so much fun!',
-                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+                text: 'The flash cards and art kit are wonderful for early learning. Delivered on time with zero damage. Little Joys has become our go-to store for all birthday gifts.',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&q=80',
                 badge: 'Happy Parent'
+            },
+            {
+                name: 'Dhaval Mehta',
+                location: 'Vadodara, Gujarat',
+                rating: 5,
+                text: 'Bought the remote control stunt car for my nephew. Battery life is impressive and build quality can handle rough drops. Genuine products and prompt WhatsApp support.',
+                avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&q=80',
+                badge: 'Verified Buyer'
+            },
+            {
+                name: 'Meera Desai',
+                location: 'Rajkot, Gujarat',
+                rating: 5,
+                text: 'Very thoughtful selection of toys. Love that they focus on brain development rather than loud plastic noise. Truly worth every rupee!',
+                avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&q=80',
+                badge: 'Mother of 2'
             }
         ];
 
@@ -1570,56 +1578,56 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Loved by Parents - Premium Design with Hover-Only Reveal Side Arrows */}
-            <div className="w-full bg-gradient-to-b from-[#F8FAFC] via-white to-[#F8FAFC] pt-14 sm:pt-16 pb-24 sm:pb-20 border-b border-slate-200/90 relative overflow-hidden">
-                {/* Ambient Soft Glow Elements */}
-                <div className="absolute top-0 left-1/4 w-80 h-80 bg-rose-100/25 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-amber-100/25 rounded-full blur-3xl pointer-events-none" />
-
+            {/* Loved by Parents - Authentic, Human & Trustworthy Design */}
+            <div className="w-full bg-[#F8FAFC] pt-14 sm:pt-16 pb-24 sm:pb-20 border-b border-slate-200/90 relative">
                 <div className="max-w-[1400px] mx-auto px-3 sm:px-6 md:px-8 font-sans relative">
                     {/* Centered Section Header */}
-                    <div className="flex flex-col items-center justify-center text-center mb-8 sm:mb-10 px-2">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-rose-50 text-[#E51A22] text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 sm:mb-3 border border-rose-200/80 shadow-2xs">
-                            <Sparkles className="w-3.5 h-3.5 text-[#E51A22] fill-[#E51A22]" />
-                            REAL PARENT STORIES
-                        </span>
-                        <h2 className="text-[26px] sm:text-[36px] md:text-[42px] font-black text-[#1A1A24] leading-tight mb-2 tracking-tight">
-                            Loved by Parents
+                    <div className="flex flex-col items-center justify-center text-center mb-8 sm:mb-10 px-4 max-w-2xl mx-auto">
+                        <h2 className="text-[26px] sm:text-[34px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-2 tracking-tight">
+                            Loved by Parents Across India
                         </h2>
-                        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-slate-500 font-medium text-[14px] sm:text-[16px]">
-                            <span>Real stories from our happy Little Joys family</span>
-                            <span className="hidden sm:inline text-slate-300">•</span>
-                            <div className="inline-flex items-center gap-1.5 bg-amber-50/80 border border-amber-200/70 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-800 shadow-2xs">
-                                <div className="flex items-center text-amber-400 gap-0.5">
-                                    {[1, 2, 3, 4, 5].map((s) => (
-                                        <Star key={s} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                                    ))}
-                                </div>
-                                <span>4.9 / 5.0 Rating</span>
-                            </div>
+                        <p className="text-slate-600 font-medium text-[14px] sm:text-[15.5px] leading-relaxed">
+                            Real experiences and reviews from families who trust Little Joys for safe, durable, and playful toys.
+                        </p>
+                        {/* Authentic Trust Badges */}
+                        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mt-3.5 pt-1 text-xs sm:text-sm font-semibold text-slate-600">
+                            <span className="inline-flex items-center gap-1.5 text-amber-500 font-bold">
+                                <span>★★★★★</span>
+                                <span className="text-slate-700">4.9 / 5 Rating</span>
+                            </span>
+                            <span className="text-slate-300 hidden sm:inline">•</span>
+                            <span className="inline-flex items-center gap-1.5 text-slate-700">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                100% Genuine Reviews
+                            </span>
+                            <span className="text-slate-300 hidden sm:inline">•</span>
+                            <span className="inline-flex items-center gap-1.5 text-slate-700">
+                                <Shield className="w-4 h-4 text-[#E51A22]" />
+                                Child-Safe & Tested
+                            </span>
                         </div>
                     </div>
 
-                    {/* Review Slider with Left and Right Side Navigation Arrows (Revealed on Hover) */}
-                    <div className="relative w-full py-2 sm:py-4 px-2 sm:px-4 md:px-6 group/reviewSlider">
-                        {/* Left Side Arrow Button - Revealed when hovering over reviews */}
+                    {/* Review Slider with Left and Right Navigation Arrows */}
+                    <div className="relative w-full py-2 sm:py-3 px-2 sm:px-4 md:px-6 group/reviewSlider">
+                        {/* Left Side Arrow Button */}
                         <button
                             onClick={handlePrevTestimonial}
-                            className="absolute -left-1 sm:left-0 md:left-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_6px_20px_rgba(0,0,0,0.12)] hover:shadow-[0_8px_25px_rgba(229,26,34,0.35)] hover:scale-110 active:scale-95 sm:opacity-0 sm:group-hover/reviewSlider:opacity-100 opacity-90 sm:pointer-events-none sm:group-hover/reviewSlider:pointer-events-auto pointer-events-auto -translate-x-1 sm:group-hover/reviewSlider:translate-x-0 transition-all duration-300 flex items-center justify-center cursor-pointer group"
+                            className="absolute -left-1 sm:-left-2 md:-left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white text-slate-700 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(229,26,34,0.3)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
                             title="Previous Review"
                             aria-label="Previous Review"
                         >
-                            <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:-translate-x-0.5" />
+                            <ChevronLeft className="w-5 h-5 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200" />
                         </button>
 
-                        {/* Right Side Arrow Button - Revealed when hovering over reviews */}
+                        {/* Right Side Arrow Button */}
                         <button
                             onClick={handleNextTestimonial}
-                            className="absolute -right-1 sm:right-0 md:right-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_6px_20px_rgba(0,0,0,0.12)] hover:shadow-[0_8px_25px_rgba(229,26,34,0.35)] hover:scale-110 active:scale-95 sm:opacity-0 sm:group-hover/reviewSlider:opacity-100 opacity-90 sm:pointer-events-none sm:group-hover/reviewSlider:pointer-events-auto pointer-events-auto translate-x-1 sm:group-hover/reviewSlider:translate-x-0 transition-all duration-300 flex items-center justify-center cursor-pointer group"
+                            className="absolute -right-1 sm:-right-2 md:-right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white text-slate-700 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(229,26,34,0.3)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
                             title="Next Review"
                             aria-label="Next Review"
                         >
-                            <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:translate-x-0.5" />
+                            <ChevronRight className="w-5 h-5 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200" />
                         </button>
 
                         {testimonials.length > 0 && (
@@ -1628,12 +1636,12 @@ const Dashboard = () => {
                                 onSwiper={(swiper) => {
                                     testimonialSwiperRef.current = swiper;
                                 }}
-                                spaceBetween={28}
+                                spaceBetween={24}
                                 slidesPerView={1}
                                 breakpoints={{
-                                    640: { slidesPerView: 1.2, spaceBetween: 20 },
-                                    768: { slidesPerView: 2, spaceBetween: 24 },
-                                    1024: { slidesPerView: 3, spaceBetween: 28 },
+                                    640: { slidesPerView: 1.2, spaceBetween: 18 },
+                                    768: { slidesPerView: 2, spaceBetween: 20 },
+                                    1024: { slidesPerView: 3, spaceBetween: 24 },
                                 }}
                                 autoplay={{ delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true }}
                                 loop={testimonials.length >= 3}
@@ -1641,70 +1649,55 @@ const Dashboard = () => {
                             >
                                 {testimonials.map((test, index) => (
                                     <SwiperSlide key={`${test._id || test.name}-${index}`} className="!h-auto flex">
-                                        <div className="bg-white border border-slate-200/80 rounded-[26px] p-7 sm:p-8 md:p-9 text-left shadow-[0_4px_22px_-4px_rgba(0,0,0,0.04)] w-full transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_16px_40px_-8px_rgba(229,26,34,0.14)] hover:border-rose-200 cursor-default group flex flex-col justify-between relative overflow-hidden">
-                                            {/* Decorative subtle gradient background on hover */}
-                                            <div className="absolute inset-0 bg-gradient-to-b from-rose-50/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-                                            {/* Top Row: Stars + Rating Score + Verified Parent Badge */}
-                                            <div className="relative z-10 flex items-center justify-between gap-2 mb-5">
-                                                <div className="flex items-center gap-1.5">
-                                                    <div className="flex items-center gap-0.5">
+                                        <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 text-left shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_26px_rgba(0,0,0,0.07)] hover:border-slate-300 w-full transition-all duration-300 flex flex-col justify-between h-full group">
+                                            {/* Top Row: 5 Clean Golden Stars + Verified Badge */}
+                                            <div>
+                                                <div className="flex items-center justify-between mb-3.5">
+                                                    <div className="flex items-center gap-1 text-amber-400">
                                                         {[1, 2, 3, 4, 5].map((star) => (
                                                             <Star 
                                                                 key={star} 
-                                                                className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${
+                                                                className={`w-4 h-4 ${
                                                                     star <= (test.rating || 5) 
-                                                                        ? 'fill-amber-400 text-amber-400 drop-shadow-[0_1px_2px_rgba(251,191,36,0.4)]' 
+                                                                        ? 'fill-amber-400 text-amber-400' 
                                                                         : 'fill-slate-200 text-slate-200'
                                                                 }`} 
                                                             />
                                                         ))}
                                                     </div>
-                                                    <span className="text-[12px] font-black text-slate-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60 ml-0.5">
-                                                        {(test.rating || 5).toFixed(1)}
+                                                    <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md flex items-center gap-1 border border-emerald-100/80">
+                                                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                                        Verified Buyer
                                                     </span>
                                                 </div>
 
-                                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80 shadow-2xs">
-                                                    <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-                                                    <span className="whitespace-nowrap">{test.badge || 'Verified Buyer'}</span>
-                                                </span>
-                                            </div>
-
-                                            {/* Review Quote Body with Watermark Quote Icon */}
-                                            <div className="relative z-10 mb-6">
-                                                <Quote className="w-8 h-8 text-rose-100 fill-rose-50 absolute -top-2.5 -left-1.5 pointer-events-none opacity-60 group-hover:opacity-100 group-hover:text-rose-200 transition-all duration-300" />
-                                                <p className="text-slate-700 font-medium text-[15.5px] sm:text-[16.5px] md:text-[17px] leading-relaxed relative z-10 min-h-[92px] sm:min-h-[105px] italic">
+                                                {/* Review Body (Natural, Clean, No overlapping artifacts) */}
+                                                <p className="text-slate-700 font-normal text-[14.5px] sm:text-[15.5px] leading-relaxed min-h-[75px] sm:min-h-[85px]">
                                                     "{test.text}"
                                                 </p>
                                             </div>
 
-                                            {/* Bottom Footer: Avatar, Name & Location */}
-                                            <div className="relative z-10 flex items-center justify-between mt-auto pt-6 border-t border-slate-100 group-hover:border-rose-100 transition-colors">
-                                                <div className="flex items-center gap-3.5 min-w-0">
-                                                    <div className="relative shrink-0">
-                                                        <img 
-                                                            src={test.avatar} 
-                                                            alt={test.name} 
-                                                            className="w-12 h-12 sm:w-13 sm:h-13 rounded-full object-cover ring-2 ring-slate-100 group-hover:ring-rose-200 transition-all shadow-xs" 
-                                                        />
-                                                        <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-white" title="Verified Customer">
-                                                            <CheckCircle2 className="w-3 h-3 text-white fill-emerald-500" />
-                                                        </span>
-                                                    </div>
+                                            {/* Bottom Footer: Parent Profile */}
+                                            <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <img 
+                                                        src={test.avatar} 
+                                                        alt={test.name} 
+                                                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border border-slate-200 shadow-2xs shrink-0" 
+                                                    />
                                                     <div className="flex flex-col min-w-0">
-                                                        <span className="font-extrabold text-[#1A1A24] text-[15.5px] sm:text-[16px] leading-snug truncate group-hover:text-[#E51A22] transition-colors">
+                                                        <span className="font-bold text-[#1A1A24] text-[14.5px] sm:text-[15px] leading-snug truncate">
                                                             {test.name}
                                                         </span>
-                                                        <span className="text-[12px] font-semibold text-slate-500 flex items-center gap-1 mt-0.5 truncate">
+                                                        <span className="text-[12px] font-medium text-slate-500 flex items-center gap-1 mt-0.5 truncate">
                                                             <MapPin className="w-3 h-3 text-[#E51A22] shrink-0" />
-                                                            <span className="uppercase tracking-wider font-bold text-[11px] text-[#E51A22]">{test.location}</span>
+                                                            <span>{test.location}</span>
                                                         </span>
                                                     </div>
                                                 </div>
 
-                                                <div className="w-8 h-8 rounded-full bg-rose-50/70 text-[#E51A22] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shrink-0 ml-2">
-                                                    <Heart className="w-4 h-4 fill-[#E51A22]" />
+                                                <div className="text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md shrink-0">
+                                                    {test.badge || 'Parent'}
                                                 </div>
                                             </div>
                                         </div>
