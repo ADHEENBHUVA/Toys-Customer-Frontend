@@ -1614,12 +1614,12 @@ const Dashboard = () => {
                                 onSwiper={(swiper) => {
                                     testimonialSwiperRef.current = swiper;
                                 }}
-                                spaceBetween={24}
+                                spaceBetween={28}
                                 slidesPerView={1}
                                 breakpoints={{
-                                    640: { slidesPerView: 1.2 },
-                                    768: { slidesPerView: 2 },
-                                    1024: { slidesPerView: 3 },
+                                    640: { slidesPerView: 1.2, spaceBetween: 20 },
+                                    768: { slidesPerView: 2, spaceBetween: 24 },
+                                    1024: { slidesPerView: 3, spaceBetween: 28 },
                                 }}
                                 autoplay={{ delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true }}
                                 loop={testimonials.length >= 3}
@@ -1627,20 +1627,26 @@ const Dashboard = () => {
                             >
                                 {testimonials.map((test, index) => (
                                     <SwiperSlide key={`${test._id || test.name}-${index}`} className="!h-auto flex">
-                                        <div className="bg-white border border-slate-100 rounded-[2rem] p-6 sm:p-8 text-left shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] w-full transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:border-red-50 cursor-default group flex flex-col justify-between">
+                                        <div className="bg-white border border-slate-100 rounded-[2.2rem] p-7 sm:p-8 md:p-9 text-left shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)] w-full transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_12px_36px_rgba(229,26,34,0.12)] hover:border-red-50 cursor-default group flex flex-col justify-between">
                                             <div>
-                                                <p className="text-[#555] font-medium text-[14px] leading-relaxed mb-6 min-h-[80px]">
+                                                <p className="text-[#444] font-medium text-[15.5px] sm:text-[16.5px] md:text-[17px] leading-relaxed mb-6 min-h-[95px] sm:min-h-[105px]">
                                                     "{test.text}"
                                                 </p>
-                                                <div className="text-[#fbdf14] flex gap-0.5">
-                                                    <StarRating rating={test.rating || 5} />
+                                                <div className="text-[#fbdf14] flex gap-1 text-[16px] sm:text-[18px]">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <span key={star}>{star <= (test.rating || 5) ? '★' : '☆'}</span>
+                                                    ))}
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-3 mt-6 pt-6 border-t border-slate-100 group-hover:border-red-50 transition-colors">
-                                                <img src={test.avatar} alt={test.name} className="w-10 h-10 rounded-full object-cover border-2 border-slate-100 group-hover:border-red-100 transition-colors" />
+                                            <div className="flex items-center gap-3.5 mt-8 pt-6 border-t border-slate-100 group-hover:border-red-50 transition-colors">
+                                                <img 
+                                                    src={test.avatar} 
+                                                    alt={test.name} 
+                                                    className="w-12 h-12 sm:w-13 sm:h-13 rounded-full object-cover border-2 border-slate-100 group-hover:border-red-100 transition-colors shadow-2xs shrink-0" 
+                                                />
                                                 <div className="flex flex-col">
-                                                    <span className="font-bold text-[#1A1A24] text-[14px]">{test.name}</span>
-                                                    <span className="text-[11px] font-bold text-[#E51A22] tracking-wider uppercase">{test.location}</span>
+                                                    <span className="font-extrabold text-[#1A1A24] text-[15.5px] sm:text-[16px] leading-snug">{test.name}</span>
+                                                    <span className="text-[12px] font-bold text-[#E51A22] tracking-wider uppercase mt-0.5">{test.location}</span>
                                                 </div>
                                             </div>
                                         </div>
