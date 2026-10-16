@@ -16,8 +16,14 @@ const Dashboard = () => {
     const handleBuyNow = (e, product) => {
         e.preventDefault();
         e.stopPropagation();
-        addToCart(product);
-        navigate('/checkout');
+        if (product) {
+            const buyNowItem = {
+                ...product,
+                quantity: 1
+            };
+            sessionStorage.setItem('magic_toys_buynow', JSON.stringify(buyNowItem));
+            navigate('/checkout', { state: { buyNowItem } });
+        }
     };
     const [trendingProducts, setTrendingProducts] = useState([]);
     const [visibleCount, setVisibleCount] = useState(12);

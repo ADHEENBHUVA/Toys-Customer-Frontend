@@ -140,11 +140,18 @@ const Cart = () => {
                                             <span className="text-xs font-medium text-slate-400 mt-1 hidden md:block">ID: {item._id.substring(0, 8)}</span>
                                             
                                             <div className="mt-auto pt-3 flex items-center justify-between">
-                                                <div className="font-black text-[#1A1A24] text-[16px]">
-                                                    ₹{item.price.toFixed(2)}
+                                                <div className="flex flex-col">
+                                                    <span className="font-black text-[#1A1A24] text-[16px]">
+                                                        ₹{(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
+                                                    </span>
+                                                    {item.quantity > 1 && (
+                                                        <span className="text-[11px] text-slate-400 font-medium">
+                                                            ₹{Number(item.price || 0).toFixed(2)} each
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 {/* Mobile Quantity Selector */}
-                                                <div className="md:hidden flex items-center bg-slate-50 border border-slate-200 rounded-full overflow-hidden h-8 w-20">
+                                                <div className="md:hidden flex items-center bg-slate-50 border border-slate-200 rounded-full overflow-hidden h-8 w-22">
                                                     <button onClick={() => handleQuantityChange(item._id, item.quantity, -1)} className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:bg-slate-100 font-bold">-</button>
                                                     <span className="w-1/3 h-full flex items-center justify-center font-bold text-[#1A1A24] text-[12px]">{item.quantity}</span>
                                                     <button onClick={() => handleQuantityChange(item._id, item.quantity, 1)} className="w-1/3 h-full flex items-center justify-center text-slate-500 hover:bg-slate-100 font-bold">+</button>
@@ -170,14 +177,14 @@ const Cart = () => {
                                     {/* Unit Price (Desktop) */}
                                     <div className="hidden md:block col-span-2 text-right">
                                         <div className="font-bold text-slate-500 text-[15px]">
-                                            ₹{item.price.toFixed(2)}
+                                            ₹{Number(item.price || 0).toFixed(2)}
                                         </div>
                                     </div>
 
                                     {/* Total (Desktop) */}
                                     <div className="hidden md:block col-span-2 text-right">
                                         <div className="font-black text-[#1A1A24] text-[16px]">
-                                            ₹{(item.price * item.quantity).toFixed(2)}
+                                            ₹{(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
                                         </div>
                                     </div>
                                 </div>
@@ -279,6 +286,21 @@ const Cart = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Sticky Mobile Checkout Bar for real-time visibility */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3.5 px-5 z-40 shadow-[0_-4px_25px_rgba(0,0,0,0.1)] flex items-center justify-between gap-4">
+                <div className="flex flex-col">
+                    <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Total ({cartCount} {cartCount === 1 ? 'item' : 'items'})</span>
+                    <span className="text-xl sm:text-2xl font-black text-[#1A1A24] leading-tight">₹{total.toFixed(2)}</span>
+                </div>
+                <Link 
+                    to="/checkout" 
+                    className="bg-[#E51A22] hover:bg-[#c9141b] text-white font-bold text-sm py-3 px-6 rounded-xl flex items-center gap-2 shadow-md shadow-red-500/20 active:scale-95 transition-all"
+                >
+                    <span>Checkout</span>
+                    <ArrowRight className="w-4 h-4" />
+                </Link>
             </div>
         </div>
     );

@@ -1,14 +1,47 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 import { ShieldCheck, Lock, CreditCard, MapPin, User, Phone, Mail, ArrowLeft, Building2, Map } from 'lucide-react';
 
 const Checkout = () => {
-    const { cartItems, getCartTotal, clearCart, calculateShipping, appliedCoupon } = useCart();
+    const { cartItems, updateQuantity, clearCart, shippingSettings, appliedCoupon } = useCart();
     const navigate = useNavigate();
+    const location = useLocation();
     const [loading, setLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState('razorpay');
+
+    // Check if user came via Buy Now (either from location.state or sessionStorage)
+    const [buyNowItem, setBuyNowItem] = useState(() => {
+        if (location.state?.buyNowItem) return location.state.buyNowItem;
+        try {
+            const saved = sessionStorage.getItem('magic_toys_buynow');
+            return saved ? JSON.parse(saved) : null;
+        } catch {
+            return null;
+        }
+    });
+
+    const isBuyNow = Boolean(buyNowItem);
+    const checkoutItems = isBuyNow ? [buyNowItem] : cartItems;
+
+    const handleQuantityChange = (id, delta) => {
+        if (isBuyNow) {
+            const currentQty = buyNowItem.quantity || 1;
+            const newQty = currentQty + delta;
+            if (newQty < 1) return;
+            const updated = { ...buyNowItem, quantity: newQty };
+            setBuyNowItem(updated);
+            sessionStorage.setItem('magic_toys_buynow', JSON.stringify(updated));
+        } else {
+            const item = cartItems.find(i => i._id === id);
+            if (!item) return;
+            const currentQty = item.quantity || 1;
+            const newQty = currentQty + delta;
+            if (newQty < 1) return;
+            updateQuantity(id, newQty);
+        }
+    };
 
     const isLoggedIn = !!localStorage.getItem('token');
 
@@ -24,8 +57,26 @@ const Checkout = () => {
         orderNotes: ''
     });
 
-    const subTotal = getCartTotal();
-    const shippingCharge = calculateShipping();
+    const subTotal = checkoutItems.reduce((acc, item) => acc + (Number(item.price || 0) * Number(item.quantity || 1)), 0);
+    const checkoutItemCount = checkoutItems.reduce((acc, item) => acc + Number(item.quantity || 1), 0);
+
+    const calculateShippingCharge = () => {
+        if (!shippingSettings || !shippingSettings.isFreeShippingActive) {
+            return shippingSettings?.baseShippingCharge ?? 50;
+        }
+        const minAmount = shippingSettings.freeShippingMinAmount || 0;
+        const minItems = shippingSettings.freeShippingMinItems || 0;
+
+        if (minAmount === 0 && minItems === 0) {
+            return shippingSettings.baseShippingCharge ?? 50;
+        }
+        const amountMet = minAmount > 0 && subTotal >= minAmount;
+        const itemsMet = minItems > 0 && checkoutItemCount >= minItems;
+        if (amountMet || itemsMet) return 0;
+        return shippingSettings.baseShippingCharge ?? 50;
+    };
+
+    const shippingCharge = calculateShippingCharge();
     
     let discount = 0;
     if (appliedCoupon) {
@@ -68,8 +119,8 @@ const Checkout = () => {
             return;
         }
 
-        if (cartItems.length === 0) {
-            toast.error('Your cart is empty!');
+        if (checkoutItems.length === 0) {
+            toast.error('No items to checkout!');
             return;
         }
 
@@ -118,7 +169,7 @@ const Checkout = () => {
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_signature: response.razorpay_signature,
                                 orderData: {
-                                    items: cartItems.map(item => ({ productId: item._id, quantity: item.quantity, price: item.price })),
+                                    items: checkoutItems.map(item => ({ productId: item._id, quantity: item.quantity, price: item.price })),
                                     shippingAddress: { ...address, fullName: `${address.firstName} ${address.lastName}` },
                                     subTotal,
                                     shippingCharge,
@@ -132,7 +183,11 @@ const Checkout = () => {
                         const verifyData = await verifyRes.json();
                         if (verifyData.success) {
                             toast.success('Payment successful! Order placed.');
-                            clearCart();
+                            if (isBuyNow) {
+                                sessionStorage.removeItem('magic_toys_buynow');
+                            } else {
+                                clearCart();
+                            }
                             navigate('/order-success', { state: { orderId: verifyData.orderId } });
                         } else {
                             toast.error('Payment verification failed');
@@ -166,11 +221,11 @@ const Checkout = () => {
         }
     };
 
-    if (cartItems.length === 0) {
+    if (checkoutItems.length === 0) {
         return (
             <div className="max-w-[1400px] mx-auto px-4 py-20 min-h-[60vh] flex flex-col justify-center items-center">
-                <h3 className="text-2xl font-bold text-slate-800 mb-4">Your cart is empty</h3>
-                <Link to="/products" className="text-[#2eb3a6] font-bold flex items-center gap-2 hover:underline">
+                <h3 className="text-2xl font-bold text-slate-800 mb-4">No items to checkout</h3>
+                <Link to="/products" className="text-[#E51A22] font-bold flex items-center gap-2 hover:underline">
                     <ArrowLeft className="w-4 h-4" /> Return to shop
                 </Link>
             </div>
@@ -194,6 +249,27 @@ const Checkout = () => {
                     <span className="text-xs sm:text-sm font-bold">SSL Encrypted</span>
                 </div>
             </div>
+
+            {isBuyNow && (
+                <div className="mb-6 p-4 rounded-2xl bg-amber-50/90 border border-amber-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm shadow-xs">
+                    <div className="flex items-center gap-2 text-amber-900 font-semibold">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#E51A22] animate-pulse shrink-0"></span>
+                        <span>Direct Purchase: Checking out <strong>"{buyNowItem.name}"</strong> ({buyNowItem.quantity} {buyNowItem.quantity === 1 ? 'item' : 'items'}) only.</span>
+                    </div>
+                    {cartItems.length > 0 && (
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setBuyNowItem(null);
+                                sessionStorage.removeItem('magic_toys_buynow');
+                            }}
+                            className="text-xs font-bold text-[#E51A22] hover:underline cursor-pointer shrink-0"
+                        >
+                            Checkout full cart ({cartItems.length} items) instead →
+                        </button>
+                    )}
+                </div>
+            )}
 
             <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 xl:gap-14">
                 {/* Left Column - Forms */}
@@ -305,23 +381,59 @@ const Checkout = () => {
                     <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 lg:p-8 sticky top-32">
                         <h2 className="text-2xl font-black text-[#1A1A24] mb-6 tracking-tight">Order Summary</h2>
                         
-                        <div className="flex flex-col gap-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                            {cartItems.map(item => (
+                        <div className="flex flex-col gap-5 mb-8 max-h-[400px] overflow-y-auto pt-3 pr-3 pl-1 pb-1 custom-scrollbar">
+                            {checkoutItems.map(item => (
                                 <div key={item._id} className="flex gap-4 items-center">
-                                    <div className="w-20 h-20 rounded-2xl border border-slate-200 p-2 bg-white shrink-0 relative group">
-                                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-slate-800 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white z-10">
+                                    <div className="relative shrink-0 mr-1.5 mt-1">
+                                        <div className="w-20 h-20 rounded-2xl border border-slate-200/90 p-2 bg-white flex items-center justify-center overflow-hidden shadow-2xs group">
+                                            <img 
+                                                src={item.thumbnailImage || (item.images && item.images[0]) || '/placeholder.png'} 
+                                                alt={item.name} 
+                                                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        </div>
+                                        <div className="absolute -top-2.5 -right-2.5 min-w-[24px] h-[24px] px-1 bg-[#1A1A24] text-white rounded-full flex items-center justify-center text-xs font-black border-2 border-white shadow-md z-20 pointer-events-none">
                                             {item.quantity}
                                         </div>
-                                        <img 
-                                            src={item.thumbnailImage || (item.images && item.images[0]) || '/placeholder.png'} 
-                                            alt={item.name} 
-                                            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                                        />
                                     </div>
-                                    <div className="flex-1">
-                                        <h4 className="text-[15px] font-bold text-[#1A1A24] line-clamp-2 leading-tight mb-1">{item.name}</h4>
-                                        <div className="text-sm font-black text-[#1A1A24]">
-                                            ₹{(item.price * item.quantity).toFixed(2)}
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-[14px] sm:text-[15px] font-bold text-[#1A1A24] line-clamp-2 leading-tight mb-2">{item.name}</h4>
+                                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                                            {/* Quantity Selector */}
+                                            <div className="inline-flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden h-7 shadow-2xs">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleQuantityChange(item._id, -1)}
+                                                    disabled={item.quantity <= 1}
+                                                    className="w-7 h-full flex items-center justify-center text-slate-500 hover:text-black hover:bg-slate-100 font-bold text-xs disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                                                    title="Decrease quantity"
+                                                >
+                                                    -
+                                                </button>
+                                                <span className="w-8 text-center text-xs font-black text-[#1A1A24]">
+                                                    {item.quantity}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleQuantityChange(item._id, 1)}
+                                                    className="w-7 h-full flex items-center justify-center text-slate-500 hover:text-black hover:bg-slate-100 font-bold text-xs cursor-pointer transition-colors"
+                                                    title="Increase quantity"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+
+                                            {/* Product Total Price */}
+                                            <div className="text-right">
+                                                <span className="text-[15px] font-black text-[#1A1A24] block leading-tight">
+                                                    ₹{(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
+                                                </span>
+                                                {item.quantity > 1 && (
+                                                    <span className="text-[10px] text-slate-400 font-medium">
+                                                        (₹{Number(item.price || 0).toFixed(2)} × {item.quantity})
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

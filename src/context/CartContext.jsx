@@ -117,11 +117,12 @@ export const CartProvider = ({ children }) => {
     };
 
     const updateQuantity = (id, newQuantity) => {
-        if (newQuantity < 1) return;
+        const qty = parseInt(newQuantity, 10);
+        if (isNaN(qty) || qty < 1) return;
         setCartItems(prev => 
             prev.map(item => 
                 item._id === id 
-                    ? { ...item, quantity: newQuantity }
+                    ? { ...item, quantity: qty }
                     : item
             )
         );
@@ -133,11 +134,11 @@ export const CartProvider = ({ children }) => {
     };
 
     const getCartTotal = () => {
-        return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+        return cartItems.reduce((total, item) => total + (Number(item.price || 0) * Number(item.quantity || 1)), 0);
     };
 
     const getCartCount = () => {
-        return cartItems.reduce((count, item) => count + item.quantity, 0);
+        return cartItems.reduce((count, item) => count + Number(item.quantity || 1), 0);
     };
 
     const toggleWaitlist = (product) => {

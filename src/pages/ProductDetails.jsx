@@ -153,8 +153,13 @@ const ProductDetails = () => {
             e.stopPropagation();
         }
         if (p) {
-            addToCart(p, quantity);
-            navigate('/checkout');
+            const buyQty = (p._id === product?._id && typeof quantity === 'number' && quantity > 0) ? quantity : 1;
+            const buyNowItem = {
+                ...p,
+                quantity: buyQty
+            };
+            sessionStorage.setItem('magic_toys_buynow', JSON.stringify(buyNowItem));
+            navigate('/checkout', { state: { buyNowItem } });
         }
     };
 
