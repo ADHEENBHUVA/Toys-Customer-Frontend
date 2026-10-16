@@ -1566,63 +1566,62 @@ const Dashboard = () => {
             )}
 
             <div className="w-full bg-[#F8FAFC] pt-16 pb-20 border-b border-slate-200/90 relative">
-                <div className="max-w-[1400px] mx-auto px-4 md:px-6 font-sans relative">
-                    {/* Section Header with Responsive Aligned Arrow Buttons */}
-                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 px-1">
-                    <div className="text-center md:text-left">
+                <div className="max-w-[1400px] mx-auto px-3 sm:px-6 md:px-8 font-sans relative">
+                    {/* Centered Section Header */}
+                    <div className="flex flex-col items-center justify-center text-center mb-10 px-2">
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-emerald-200/80 shadow-2xs">
                             💬 PARENT STORIES
                         </span>
                         <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2">
                             Loved by Parents
                         </h2>
-                        <p className="text-slate-500 font-medium text-[14px] sm:text-[15px] md:text-[16px]">
+                        <p className="text-slate-500 font-medium text-[15px] md:text-[17px]">
                             Real stories from our happy Little Joys family
                         </p>
                     </div>
 
-                    {/* Arrow Navigation Buttons - Centered on Mobile, Right-aligned on Desktop */}
-                    <div className="flex justify-center md:justify-end items-center gap-3 shrink-0">
+                    {/* Review Slider with Left and Right Side Navigation Arrows */}
+                    <div className="relative w-full py-4 px-8 sm:px-12 md:px-14">
+                        {/* Left Side Arrow Button */}
                         <button
                             onClick={handlePrevTestimonial}
-                            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white border border-slate-200/90 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.25)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
+                            className="absolute left-0 sm:left-1 md:left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.3)] hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center cursor-pointer group"
                             title="Previous Review"
                             aria-label="Previous Review"
                         >
                             <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:-translate-x-0.5" />
                         </button>
+
+                        {/* Right Side Arrow Button */}
                         <button
                             onClick={handleNextTestimonial}
-                            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white border border-slate-200/90 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.25)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
+                            className="absolute right-0 sm:right-1 md:right-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.3)] hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center cursor-pointer group"
                             title="Next Review"
                             aria-label="Next Review"
                         >
                             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:translate-x-0.5" />
                         </button>
-                    </div>
-                </div>
 
-                <div className="relative w-full py-4">
-                    {testimonials.length > 0 && (
-                        <Swiper
-                            modules={[Navigation, Autoplay]}
-                            onSwiper={(swiper) => {
-                                testimonialSwiperRef.current = swiper;
-                            }}
-                            spaceBetween={24}
-                            slidesPerView={1}
-                            breakpoints={{
-                                640: { slidesPerView: 1.2 },
-                                768: { slidesPerView: 2 },
-                                1024: { slidesPerView: 3 },
-                            }}
-                            autoplay={{ delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true }}
-                            loop={testimonials.length >= 3}
-                            className="w-full !overflow-hidden pb-4"
-                        >
-                            {testimonials.map((test, index) => (
-                                <SwiperSlide key={`${test._id || test.name}-${index}`} className="!h-auto flex">
-                                    <div className="bg-white border border-slate-100 rounded-[2rem] p-8 text-left shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] w-full transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:border-red-50 cursor-default group flex flex-col justify-between">
+                        {testimonials.length > 0 && (
+                            <Swiper
+                                modules={[Navigation, Autoplay]}
+                                onSwiper={(swiper) => {
+                                    testimonialSwiperRef.current = swiper;
+                                }}
+                                spaceBetween={24}
+                                slidesPerView={1}
+                                breakpoints={{
+                                    640: { slidesPerView: 1.2 },
+                                    768: { slidesPerView: 2 },
+                                    1024: { slidesPerView: 3 },
+                                }}
+                                autoplay={{ delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true }}
+                                loop={testimonials.length >= 3}
+                                className="w-full !overflow-hidden pb-4"
+                            >
+                                {testimonials.map((test, index) => (
+                                    <SwiperSlide key={`${test._id || test.name}-${index}`} className="!h-auto flex">
+                                        <div className="bg-white border border-slate-100 rounded-[2rem] p-6 sm:p-8 text-left shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] w-full transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:border-red-50 cursor-default group flex flex-col justify-between">
                                         <div>
                                             <p className="text-[#555] font-medium text-[14px] leading-relaxed mb-6 min-h-[80px]">
                                                 "{test.text}"
