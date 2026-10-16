@@ -1500,19 +1500,24 @@ const Dashboard = () => {
                         */}
                         <div className="flex animate-marquee-scroll w-max hover:pause items-center">
                             {[...brands, ...brands, ...brands, ...brands].map((brand, idx) => {
-                                const brandShapes = [
-                                    { path: "M 20 6 L 80 6 C 92 6 95 12 95 24 L 95 76 C 95 88 92 94 80 94 L 20 94 C 8 94 5 88 5 76 L 5 24 C 5 12 8 6 20 6 Z", bg: '#FFF0F5', border: '#FFB6C1', emoji1: '🧸', emoji2: '🎈', pos1: '-top-3 -left-2', pos2: '-bottom-3 -right-2' }, // 1. Rounded Squircle
-                                    { path: "M 50 6 A 44 44 0 1 1 49.99 6 Z", bg: '#F0FFFF', border: '#87CEFA', emoji1: '🚀', emoji2: '⭐', pos1: '-top-3 -right-2', pos2: '-bottom-3 -left-2' }, // 2. Soft Circle
-                                    { path: "M 25 24 C 28 12 45 10 52 20 C 60 10 78 12 82 24 C 94 28 96 46 92 60 C 95 74 86 88 74 88 C 65 92 55 88 48 85 C 40 92 25 90 18 82 C 8 76 6 60 12 50 C 6 38 14 26 25 24 Z", bg: '#F5FFFA', border: '#98FB98', emoji1: '🚂', emoji2: '☁️', pos1: 'top-1/4 -left-4', pos2: 'bottom-1/4 -right-4' }, // 3. Fluffy Cloud
-                                    { path: "M 28 10 L 72 10 C 90 10 95 26 95 50 C 95 74 90 90 72 90 L 28 90 C 10 90 5 74 5 50 C 5 26 10 10 28 10 Z", bg: '#FFFACD', border: '#F0E68C', emoji1: '🧩', emoji2: '🎲', pos1: '-top-4 left-1/3', pos2: '-bottom-3 right-1/4' }, // 4. Wide Stadium Pill
-                                    { path: "M 50 6 C 60 6 88 20 92 28 C 96 36 96 64 92 72 C 88 80 60 94 50 94 C 40 94 12 80 8 72 C 4 64 4 36 8 28 C 12 20 40 6 50 6 Z", bg: '#F8F8FF', border: '#DDA0DD', emoji1: '🐣', emoji2: '🍼', pos1: 'top-8 -right-3', pos2: 'bottom-4 -left-3' }, // 5. Rounded Hexagon
-                                    { path: "M 50 8 C 80 6 94 24 92 50 C 90 76 78 92 50 92 C 22 92 8 76 8 50 C 8 24 24 10 50 8 Z", bg: '#F0FFF0', border: '#90EE90', emoji1: '🦖', emoji2: '🌿', pos1: '-bottom-3 right-1/3', pos2: '-top-3 left-1/4' }, // 6. Bubbly Blob 1
-                                    { path: "M 32 8 L 68 8 C 82 8 92 18 92 32 L 92 68 C 92 82 82 92 68 92 L 32 92 C 18 92 8 82 8 68 L 8 32 C 8 18 18 8 32 8 Z", bg: '#E6E6FA', border: '#BA55D3', emoji1: '🦄', emoji2: '✨', pos1: '-top-3 left-1/2', pos2: '-bottom-3 right-3' }, // 7. Soft Rounded Box
-                                    { path: "M 50 8 C 60 8 68 4 76 10 C 84 16 90 14 94 22 C 98 30 94 40 96 50 C 98 60 94 70 90 78 C 86 86 78 84 72 90 C 66 96 56 94 50 94 C 44 94 34 96 28 90 C 22 84 14 86 10 78 C 6 70 2 60 4 50 C 6 40 2 30 6 22 C 10 14 16 16 24 10 C 32 4 40 8 50 8 Z", bg: '#FFE4E1', border: '#F08080', emoji1: '🎀', emoji2: '🌸', pos1: 'top-1/4 -right-3', pos2: 'bottom-1/4 -left-3' }, // 8. Scalloped Daisy
-                                    { path: "M 20 12 C 40 8 60 8 80 12 C 92 28 94 62 82 80 C 68 92 50 94 50 94 C 50 94 32 92 18 80 C 6 62 8 28 20 12 Z", bg: '#E0FFFF', border: '#00CED1', emoji1: '🐬', emoji2: '🌊', pos1: '-bottom-3 -left-2', pos2: '-top-3 -right-2' }, // 9. Wide Crest
-                                    { path: "M 50 14 C 55 6 68 6 74 14 C 84 14 92 24 90 34 C 96 42 96 56 88 64 C 88 74 78 82 68 80 C 60 88 44 88 36 80 C 26 82 14 74 14 64 C 6 56 6 42 12 34 C 10 24 18 14 28 14 C 34 6 46 6 50 14 Z", bg: '#FFDAB9', border: '#FF8C00', emoji1: '🐝', emoji2: '🍯', pos1: '-top-2 left-10', pos2: '-bottom-2 right-10' } // 10. Bubbly Clover
-                                ];
-                                const style = brandShapes[idx % brandShapes.length];
+                                const brandShapesMap = {
+                                    squircle: { path: "M 20 6 L 80 6 C 92 6 95 12 95 24 L 95 76 C 95 88 92 94 80 94 L 20 94 C 8 94 5 88 5 76 L 5 24 C 5 12 8 6 20 6 Z", bg: '#FFF0F5', border: '#FFB6C1', emoji1: '🧸', emoji2: '🎈', pos1: '-top-3 -left-2', pos2: '-bottom-3 -right-2' },
+                                    circle: { path: "M 50 6 A 44 44 0 1 1 49.99 6 Z", bg: '#F0FFFF', border: '#87CEFA', emoji1: '🚀', emoji2: '⭐', pos1: '-top-3 -right-2', pos2: '-bottom-3 -left-2' },
+                                    cloud: { path: "M 25 24 C 28 12 45 10 52 20 C 60 10 78 12 82 24 C 94 28 96 46 92 60 C 95 74 86 88 74 88 C 65 92 55 88 48 85 C 40 92 25 90 18 82 C 8 76 6 60 12 50 C 6 38 14 26 25 24 Z", bg: '#F5FFFA', border: '#98FB98', emoji1: '🚂', emoji2: '☁️', pos1: 'top-1/4 -left-4', pos2: 'bottom-1/4 -right-4' },
+                                    pill: { path: "M 28 10 L 72 10 C 90 10 95 26 95 50 C 95 74 90 90 72 90 L 28 90 C 10 90 5 74 5 50 C 5 26 10 10 28 10 Z", bg: '#FFFACD', border: '#F0E68C', emoji1: '🧩', emoji2: '🎲', pos1: '-top-4 left-1/3', pos2: '-bottom-3 right-1/4' },
+                                    hexagon: { path: "M 50 6 C 60 6 88 20 92 28 C 96 36 96 64 92 72 C 88 80 60 94 50 94 C 40 94 12 80 8 72 C 4 64 4 36 8 28 C 12 20 40 6 50 6 Z", bg: '#F8F8FF', border: '#DDA0DD', emoji1: '🐣', emoji2: '🍼', pos1: 'top-8 -right-3', pos2: 'bottom-4 -left-3' },
+                                    blob: { path: "M 50 8 C 80 6 94 24 92 50 C 90 76 78 92 50 92 C 22 92 8 76 8 50 C 8 24 24 10 50 8 Z", bg: '#F0FFF0', border: '#90EE90', emoji1: '🦖', emoji2: '🌿', pos1: '-bottom-3 right-1/3', pos2: '-top-3 left-1/4' },
+                                    box: { path: "M 32 8 L 68 8 C 82 8 92 18 92 32 L 92 68 C 92 82 82 92 68 92 L 32 92 C 18 92 8 82 8 68 L 8 32 C 8 18 18 8 32 8 Z", bg: '#E6E6FA', border: '#BA55D3', emoji1: '🦄', emoji2: '✨', pos1: '-top-3 left-1/2', pos2: '-bottom-3 right-3' },
+                                    daisy: { path: "M 50 8 C 60 8 68 4 76 10 C 84 16 90 14 94 22 C 98 30 94 40 96 50 C 98 60 94 70 90 78 C 86 86 78 84 72 90 C 66 96 56 94 50 94 C 44 94 34 96 28 90 C 22 84 14 86 10 78 C 6 70 2 60 4 50 C 6 40 2 30 6 22 C 10 14 16 16 24 10 C 32 4 40 8 50 8 Z", bg: '#FFE4E1', border: '#F08080', emoji1: '🎀', emoji2: '🌸', pos1: 'top-1/4 -right-3', pos2: 'bottom-1/4 -left-3' },
+                                    crest: { path: "M 20 12 C 40 8 60 8 80 12 C 92 28 94 62 82 80 C 68 92 50 94 50 94 C 50 94 32 92 18 80 C 6 62 8 28 20 12 Z", bg: '#E0FFFF', border: '#00CED1', emoji1: '🐬', emoji2: '🌊', pos1: '-bottom-3 -left-2', pos2: '-top-3 -right-2' },
+                                    clover: { path: "M 50 14 C 55 6 68 6 74 14 C 84 14 92 24 90 34 C 96 42 96 56 88 64 C 88 74 78 82 68 80 C 60 88 44 88 36 80 C 26 82 14 74 14 64 C 6 56 6 42 12 34 C 10 24 18 14 28 14 C 34 6 46 6 50 14 Z", bg: '#FFDAB9', border: '#FF8C00', emoji1: '🐝', emoji2: '🍯', pos1: '-top-2 left-10', pos2: '-bottom-2 right-10' }
+                                };
+                                const shapeKeys = ['squircle', 'circle', 'cloud', 'pill', 'hexagon', 'blob', 'box', 'daisy', 'crest', 'clover'];
+                                const fallbackKey = shapeKeys[idx % shapeKeys.length];
+                                const activeShapeKey = (brand.shape && brandShapesMap[brand.shape]) ? brand.shape : fallbackKey;
+                                const style = brandShapesMap[activeShapeKey];
+                                const finalBg = brand.bgColor || style.bg;
+                                const finalBorder = brand.borderColor || style.border;
 
                                 return (
                                 <div key={`brand-${idx}-${brand._id}`} className="flex items-center justify-center px-4 md:px-6 py-6">
@@ -1537,8 +1542,8 @@ const Dashboard = () => {
                                         <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full z-0 drop-shadow-sm group-hover:drop-shadow-lg transition-all duration-300 group-hover:rotate-1">
                                             <path 
                                                 d={style.path} 
-                                                fill={style.bg} 
-                                                stroke={style.border} 
+                                                fill={finalBg} 
+                                                stroke={finalBorder} 
                                                 strokeWidth="2.5" 
                                                 strokeLinecap="round" 
                                                 strokeLinejoin="round" 
