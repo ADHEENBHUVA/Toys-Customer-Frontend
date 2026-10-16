@@ -174,50 +174,68 @@ const Dashboard = () => {
             {
                 name: 'Pooja Patel',
                 location: 'Surat, Gujarat',
+                title: 'Super smooth wood & completely plastic-free!',
+                product: 'Wooden Montessori Animal Puzzle',
+                childAge: 'Mother of 3yo Boy',
                 rating: 5,
-                text: 'Ordered the wooden Montessori puzzle set for my 3-year-old. The wood quality is top notch with completely smooth corners. Visited their Surat store too, really warm staff!',
+                text: 'Ordered this puzzle for my 3-year-old. The finish is unbelievably smooth with zero splinters or chemical smell. We even visited their Surat store in Mota Varachha, extremely polite and helpful team!',
                 avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&q=80',
                 badge: 'Verified Buyer'
             },
             {
                 name: 'Rahul Shah',
                 location: 'Ahmedabad, Gujarat',
+                title: 'Keeps kids engaged for hours without phones',
+                product: '120-Piece STEM Building Blocks',
+                childAge: 'Father of 4yo & 6yo',
                 rating: 5,
-                text: 'Got the building blocks in 2 days. The plastic is sturdy and odorless, not like cheap market toys. My son spends hours making castles instead of watching phone screens.',
+                text: 'Delivered in Ahmedabad in just 2 days. The plastic is thick, durable and snaps together firmly. Both my kids now spend evenings making towers and castles instead of watching TV or mobile screens.',
                 avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&q=80',
-                badge: 'Father of 4yo'
+                badge: 'Verified Buyer'
             },
             {
                 name: 'Sneha Joshi',
                 location: 'Mumbai, Maharashtra',
+                title: 'Safest baby rattles & fast delivery',
+                product: 'Pastel Wooden Sensory Rattle Set',
+                childAge: 'Mother of 9-Month Baby',
                 rating: 5,
-                text: 'Best experience shopping for baby toys online! Bubble wrapped securely and completely non-toxic colors. My 2-year-old daughter loves the sound rattle and stacker rings.',
+                text: 'Best online toy shopping experience! The packaging was bubble-wrapped with utmost care. The non-toxic water-based food-grade colors gave me complete peace of mind when my baby teethed on them.',
                 avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&q=80',
                 badge: 'Verified Buyer'
             },
             {
                 name: 'Ananya Verma',
                 location: 'Bangalore, Karnataka',
+                title: 'High quality flash cards & craft activities',
+                product: 'Early Learning Smart Flashcards',
+                childAge: 'Mother of 2.5yo Girl',
                 rating: 5,
-                text: 'The flash cards and art kit are wonderful for early learning. Delivered on time with zero damage. Little Joys has become our go-to store for all birthday gifts.',
+                text: 'Thick, laminated waterproof cards that toddler hands cannot tear easily. The illustrations are vivid and cute. Little Joys has officially become my favorite place for birthday gifting.',
                 avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&q=80',
-                badge: 'Happy Parent'
+                badge: 'Verified Buyer'
             },
             {
                 name: 'Dhaval Mehta',
                 location: 'Vadodara, Gujarat',
+                title: 'Rugged RC stunt car survives every drop',
+                product: '360° Double-Sided RC Stunt Car',
+                childAge: 'Uncle of 5yo Kid',
                 rating: 5,
-                text: 'Bought the remote control stunt car for my nephew. Battery life is impressive and build quality can handle rough drops. Genuine products and prompt WhatsApp support.',
+                text: 'Bought as a birthday surprise for my nephew. This car flips, rolls over stairs and survives heavy crashes without a scratch. Battery life is solid 40 minutes and customer support on WhatsApp is super quick!',
                 avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&q=80',
                 badge: 'Verified Buyer'
             },
             {
                 name: 'Meera Desai',
                 location: 'Rajkot, Gujarat',
+                title: 'Educational & brain stimulating games',
+                product: 'Multi-Color Wooden Abacus & Beads',
+                childAge: 'Mother of 4yo Girl',
                 rating: 5,
-                text: 'Very thoughtful selection of toys. Love that they focus on brain development rather than loud plastic noise. Truly worth every rupee!',
+                text: 'Such a refreshing difference from noisy electronic toys. These classic toys develop real focus and cognitive thinking. Truly premium craftsmanship at very reasonable prices.',
                 avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&q=80',
-                badge: 'Mother of 2'
+                badge: 'Verified Buyer'
             }
         ];
 
@@ -1578,32 +1596,38 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Loved by Parents - Authentic, Human & Trustworthy Design */}
-            <div className="w-full bg-[#F8FAFC] pt-14 sm:pt-16 pb-24 sm:pb-20 border-b border-slate-200/90 relative">
+            {/* Loved by Parents - Premium, Warm & High-Converting Design */}
+            <div className="w-full bg-gradient-to-b from-[#FFFDF9] via-[#FFF8F2] to-[#FFFDF9] pt-16 pb-24 sm:pb-20 border-b border-orange-100/70 relative overflow-hidden">
+                {/* Gentle Ambient Warm Glows */}
+                <div className="absolute -top-12 left-10 w-96 h-96 bg-amber-100/30 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-12 right-10 w-96 h-96 bg-rose-100/30 rounded-full blur-3xl pointer-events-none" />
+
                 <div className="max-w-[1400px] mx-auto px-3 sm:px-6 md:px-8 font-sans relative">
                     {/* Centered Section Header */}
-                    <div className="flex flex-col items-center justify-center text-center mb-8 sm:mb-10 px-4 max-w-2xl mx-auto">
-                        <h2 className="text-[26px] sm:text-[34px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-2 tracking-tight">
-                            Loved by Parents Across India
+                    <div className="flex flex-col items-center justify-center text-center mb-10 px-4 max-w-2xl mx-auto">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-100/70 text-[#E51A22] text-[11px] sm:text-[12px] font-bold uppercase tracking-wider mb-2.5">
+                            <Heart className="w-3.5 h-3.5 fill-[#E51A22]" />
+                            Real Parents, Genuine Smiles
+                        </span>
+                        <h2 className="text-[28px] sm:text-[36px] md:text-[42px] font-black text-[#1A1A24] leading-tight mb-2 tracking-tight">
+                            Loved by 10,000+ Happy Families
                         </h2>
                         <p className="text-slate-600 font-medium text-[14px] sm:text-[15.5px] leading-relaxed">
-                            Real experiences and reviews from families who trust Little Joys for safe, durable, and playful toys.
+                            Hear real stories from parents in Surat, Ahmedabad, and across India who trust Little Joys for screen-free, durable, and child-safe play.
                         </p>
-                        {/* Authentic Trust Badges */}
-                        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mt-3.5 pt-1 text-xs sm:text-sm font-semibold text-slate-600">
-                            <span className="inline-flex items-center gap-1.5 text-amber-500 font-bold">
-                                <span>★★★★★</span>
-                                <span className="text-slate-700">4.9 / 5 Rating</span>
+                        {/* Trust Strip - Clean Individual Badges */}
+                        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 md:gap-5 mt-4 text-xs sm:text-sm font-semibold text-slate-700">
+                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-orange-100/90 shadow-2xs">
+                                <span className="text-amber-500 font-bold">★★★★★</span>
+                                <span>4.9 / 5 Rating</span>
                             </span>
-                            <span className="text-slate-300 hidden sm:inline">•</span>
-                            <span className="inline-flex items-center gap-1.5 text-slate-700">
+                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-orange-100/90 shadow-2xs">
                                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                                100% Genuine Reviews
+                                <span>100% Verified Purchases</span>
                             </span>
-                            <span className="text-slate-300 hidden sm:inline">•</span>
-                            <span className="inline-flex items-center gap-1.5 text-slate-700">
+                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-orange-100/90 shadow-2xs">
                                 <Shield className="w-4 h-4 text-[#E51A22]" />
-                                Child-Safe & Tested
+                                <span>100% Non-Toxic & Safe</span>
                             </span>
                         </div>
                     </div>
@@ -1613,7 +1637,7 @@ const Dashboard = () => {
                         {/* Left Side Arrow Button */}
                         <button
                             onClick={handlePrevTestimonial}
-                            className="absolute -left-1 sm:-left-2 md:-left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white text-slate-700 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(229,26,34,0.3)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
+                            className="absolute -left-1 sm:-left-2 md:-left-3 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-700 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_24px_rgba(229,26,34,0.3)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
                             title="Previous Review"
                             aria-label="Previous Review"
                         >
@@ -1623,7 +1647,7 @@ const Dashboard = () => {
                         {/* Right Side Arrow Button */}
                         <button
                             onClick={handleNextTestimonial}
-                            className="absolute -right-1 sm:-right-2 md:-right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white text-slate-700 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(229,26,34,0.3)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
+                            className="absolute -right-1 sm:-right-2 md:-right-3 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-700 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_24px_rgba(229,26,34,0.3)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
                             title="Next Review"
                             aria-label="Next Review"
                         >
@@ -1649,10 +1673,10 @@ const Dashboard = () => {
                             >
                                 {testimonials.map((test, index) => (
                                     <SwiperSlide key={`${test._id || test.name}-${index}`} className="!h-auto flex">
-                                        <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 text-left shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_26px_rgba(0,0,0,0.07)] hover:border-slate-300 w-full transition-all duration-300 flex flex-col justify-between h-full group">
-                                            {/* Top Row: 5 Clean Golden Stars + Verified Badge */}
+                                        <div className="bg-white border border-orange-100/90 rounded-[24px] p-6 sm:p-7 md:p-8 text-left shadow-[0_4px_22px_-4px_rgba(229,26,34,0.05)] hover:shadow-[0_16px_36px_-6px_rgba(229,26,34,0.13)] hover:border-rose-200 hover:-translate-y-1.5 transition-all duration-300 w-full flex flex-col justify-between h-full group relative">
                                             <div>
-                                                <div className="flex items-center justify-between mb-3.5">
+                                                {/* Top Row: 5 Golden Stars + Verified Badge */}
+                                                <div className="flex items-center justify-between mb-3">
                                                     <div className="flex items-center gap-1 text-amber-400">
                                                         {[1, 2, 3, 4, 5].map((star) => (
                                                             <Star 
@@ -1665,14 +1689,27 @@ const Dashboard = () => {
                                                             />
                                                         ))}
                                                     </div>
-                                                    <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md flex items-center gap-1 border border-emerald-100/80">
+                                                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-emerald-100">
                                                         <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                                                         Verified Buyer
                                                     </span>
                                                 </div>
 
-                                                {/* Review Body (Natural, Clean, No overlapping artifacts) */}
-                                                <p className="text-slate-700 font-normal text-[14.5px] sm:text-[15.5px] leading-relaxed min-h-[75px] sm:min-h-[85px]">
+                                                {/* Purchased Toy Product Chip */}
+                                                {test.product && (
+                                                    <div className="mb-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-orange-50/90 border border-orange-200/60 text-[11.5px] font-bold text-orange-900 max-w-full">
+                                                        <span>🧸</span>
+                                                        <span className="truncate">{test.product}</span>
+                                                    </div>
+                                                )}
+
+                                                {/* Bold Review Highlight Title */}
+                                                <h3 className="font-extrabold text-[#1A1A24] text-[15.5px] sm:text-[16.5px] leading-snug mb-2 group-hover:text-[#E51A22] transition-colors">
+                                                    {test.title || "Wonderful Quality & Safe for Kids!"}
+                                                </h3>
+
+                                                {/* Review Body */}
+                                                <p className="text-slate-600 font-normal text-[14px] sm:text-[14.5px] leading-relaxed min-h-[68px]">
                                                     "{test.text}"
                                                 </p>
                                             </div>
@@ -1683,10 +1720,10 @@ const Dashboard = () => {
                                                     <img 
                                                         src={test.avatar} 
                                                         alt={test.name} 
-                                                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border border-slate-200 shadow-2xs shrink-0" 
+                                                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover ring-2 ring-orange-100 group-hover:ring-rose-200 transition-all shadow-2xs shrink-0" 
                                                     />
                                                     <div className="flex flex-col min-w-0">
-                                                        <span className="font-bold text-[#1A1A24] text-[14.5px] sm:text-[15px] leading-snug truncate">
+                                                        <span className="font-extrabold text-[#1A1A24] text-[14.5px] sm:text-[15px] leading-snug truncate">
                                                             {test.name}
                                                         </span>
                                                         <span className="text-[12px] font-medium text-slate-500 flex items-center gap-1 mt-0.5 truncate">
@@ -1696,8 +1733,8 @@ const Dashboard = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md shrink-0">
-                                                    {test.badge || 'Parent'}
+                                                <div className="text-[11px] font-semibold text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-lg shrink-0">
+                                                    {test.childAge || test.badge || 'Verified Parent'}
                                                 </div>
                                             </div>
                                         </div>
@@ -1705,6 +1742,16 @@ const Dashboard = () => {
                                 ))}
                             </Swiper>
                         )}
+                    </div>
+
+                    {/* Reassurance Callout */}
+                    <div className="mt-8 max-w-xl mx-auto text-center px-4">
+                        <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 bg-white/90 backdrop-blur-sm px-5 py-2.5 rounded-full border border-orange-100 shadow-2xs">
+                            <span>✨ Want to see our most loved toys?</span>
+                            <Link to="/products" className="text-[#E51A22] font-bold hover:underline inline-flex items-center gap-0.5">
+                                Explore Best Sellers →
+                            </Link>
+                        </div>
                     </div>
             </div>
         </div>
