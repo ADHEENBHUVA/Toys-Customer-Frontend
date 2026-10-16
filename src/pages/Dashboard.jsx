@@ -700,13 +700,13 @@ const Dashboard = () => {
 
 
             {/* Categories */}
-            <div className="w-full pt-14 pb-14 text-center bg-white border-b border-slate-200/90 relative">
+            <div className="w-full pt-8 sm:pt-10 pb-8 sm:pb-10 text-center bg-white border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
-                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-red-100 shadow-2xs">
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-red-100 shadow-2xs">
                         🎯 EXPLORE BY INTEREST
                     </span>
-                    <h2 className="text-[28px] md:text-[38px] font-black text-[#111] mb-2 tracking-tight uppercase">Toy Categories</h2>
-                    <p className="text-[#666] text-[14px] md:text-[15px] mb-8 font-semibold uppercase tracking-wider">Everything your little one needs to learn, imagine & play</p>
+                    <h2 className="text-[26px] md:text-[36px] font-black text-[#111] mb-1.5 tracking-tight uppercase">Toy Categories</h2>
+                    <p className="text-[#666] text-[13.5px] md:text-[14.5px] mb-5 sm:mb-6 font-semibold uppercase tracking-wider">Everything your little one needs to learn, imagine & play</p>
                 </div>
 
                 <div
@@ -792,16 +792,16 @@ const Dashboard = () => {
             </div>
 
             {/* Best Selling Picks - Ranked with Most Selling First */}
-            <div className="w-full bg-[#F8FAFC] pt-16 pb-16 border-b border-slate-200/90 relative">
+            <div className="w-full bg-[#F8FAFC] pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
-                    <div className="flex flex-col items-center justify-center text-center mb-10">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-amber-200/80 shadow-2xs">
+                    <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-8">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-amber-200/80 shadow-2xs">
                             🏆 TOP-RANKED FAVORITES
                         </span>
-                        <h2 className="text-[32px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2">
+                        <h2 className="text-[28px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-1.5">
                             Best Selling Picks
                         </h2>
-                        <p className="text-[#666] text-[15px] md:text-[17px] font-medium">Top-rated toys loved by parents and kids alike</p>
+                        <p className="text-[#666] text-[14.5px] md:text-[16px] font-medium">Top-rated toys loved by parents and kids alike</p>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 sm:px-2 md:px-0">
@@ -950,8 +950,8 @@ const Dashboard = () => {
                             ))}
                     </div>
 
-                    <div className="flex justify-center items-center mt-10 px-4 md:px-0">
-                        <Link to="/products?sort=bestseller" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-10 py-3.5 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
+                    <div className="flex justify-center items-center mt-6 sm:mt-8 px-4 md:px-0">
+                        <Link to="/products?sort=bestseller" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm">
                             View All Best Sellers
                             <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
                         </Link>
@@ -960,7 +960,7 @@ const Dashboard = () => {
             </div>
 
             {/* Shop By Age - Continuous Running Line ("Aekdhari Line") */}
-            <div className="w-full bg-[#FFFBF5] pt-14 pb-16 md:pt-16 md:pb-20 border-b border-amber-200/70 relative overflow-hidden">
+            <div className="w-full bg-[#FFFBF5] pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 border-b border-amber-200/70 relative overflow-hidden">
                 {/* Global SVG Clip Definitions (Defined once to eliminate duplicate ID bugs) */}
                 <svg width="0" height="0" className="absolute pointer-events-none">
                     <defs>
@@ -1018,21 +1018,21 @@ const Dashboard = () => {
 
                 <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
                     {/* Header */}
-                    <div className="flex flex-col items-center justify-center text-center mb-8 md:mb-12">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-50 text-orange-700 text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-orange-200/80 shadow-2xs">
+                    <div className="flex flex-col items-center justify-center text-center mb-5 md:mb-7">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-50 text-orange-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-orange-200/80 shadow-2xs">
                             🌱 DEVELOPMENT MILESTONES
                         </span>
-                        <h2 className="text-[28px] sm:text-[34px] md:text-[44px] font-black text-[#1A1A24] leading-tight mb-2 md:mb-3">
+                        <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-1.5 md:mb-2">
                             Shop By Age
                         </h2>
-                        <p className="text-[#666] text-[14px] md:text-[17px] font-medium max-w-xl">
+                        <p className="text-[#666] text-[14px] md:text-[16px] font-medium max-w-xl">
                             Curated developmental toys tailored precisely to your child's age group
                         </p>
-                        <div className="w-16 h-1 bg-amber-400/80 rounded-full mx-auto mt-3 md:mt-4"></div>
+                        <div className="w-16 h-1 bg-amber-400/80 rounded-full mx-auto mt-2.5 md:mt-3"></div>
                     </div>
 
                     {/* Quick Milestone Tap Pills */}
-                    <div className="flex items-center justify-start sm:justify-center overflow-x-auto hide-scrollbar gap-2 mb-6 md:mb-8 px-1 w-full">
+                    <div className="flex items-center justify-start sm:justify-center overflow-x-auto hide-scrollbar gap-2 mb-4 md:mb-6 px-1 w-full">
                         {[
                             { age: '0-12', label: 'Months', emoji: '🍼' },
                             { age: '1-2', label: 'Years', emoji: '🧸' },
@@ -1232,14 +1232,14 @@ const Dashboard = () => {
 
             {/* Promo Media (Videos & Images) - Limited Edition Style */}
             {promoMedia && promoMedia.length > 0 && (
-                <div className="w-full bg-[#F4F7FC] pt-16 pb-16 border-b border-indigo-200/70 relative">
+                <div className="w-full bg-[#F4F7FC] pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 border-b border-indigo-200/70 relative">
                     <div className="w-full mx-auto px-4 md:px-8">
-                        <div className="mb-8 text-center md:text-left">
-                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-blue-200/80 shadow-2xs">
+                        <div className="mb-5 sm:mb-6 text-center md:text-left">
+                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-blue-200/80 shadow-2xs">
                                 ✨ EXCLUSIVE DROPS
                             </span>
-                            <h2 className="text-[28px] md:text-[36px] font-black text-[#1A1A24] mb-2 font-sans">Limited-edition playtime drops</h2>
-                            <p className="text-[#555] text-[15px] max-w-2xl font-medium">Explore our limited-edition toy drops, crafted for unforgettable playtime moments and available only while exclusive stocks last.</p>
+                            <h2 className="text-[26px] md:text-[34px] font-black text-[#1A1A24] mb-1.5 font-sans">Limited-edition playtime drops</h2>
+                            <p className="text-[#555] text-[14px] md:text-[15px] max-w-2xl font-medium">Explore our limited-edition toy drops, crafted for unforgettable playtime moments and available only while exclusive stocks last.</p>
                         </div>
 
                         <div className="w-full relative group/promo">
@@ -1315,16 +1315,16 @@ const Dashboard = () => {
             )}
 
             {/* Explore Popular Toy Set */}
-            <div className="w-full bg-white pt-16 pb-18 border-b border-slate-200/90 relative">
+            <div className="w-full bg-white pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
-                    <div className="flex flex-col items-center justify-center text-center mb-10">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-rose-200/80 shadow-2xs">
+                    <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-8">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-rose-200/80 shadow-2xs">
                             🧸 FEATURED PLAYSETS
                         </span>
-                        <h2 className="text-[32px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2">
+                        <h2 className="text-[28px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-1.5">
                             Explore Popular Toy Set
                         </h2>
-                        <p className="text-[#666] text-[15px] md:text-[17px] font-medium">Smart, Fun & Creative Toys for Every Little Adventure</p>
+                        <p className="text-[#666] text-[14.5px] md:text-[16px] font-medium">Smart, Fun & Creative Toys for Every Little Adventure</p>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 sm:px-2 md:px-0">
@@ -1476,8 +1476,8 @@ const Dashboard = () => {
                     </div>
 
                     {/* View All Products Button (Load More removed) */}
-                    <div className="flex justify-center items-center mt-12 px-4 md:px-0">
-                        <Link to="/products" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-10 py-3.5 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center">
+                    <div className="flex justify-center items-center mt-6 sm:mt-8 px-4 md:px-0">
+                        <Link to="/products" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm">
                             View All Products
                             <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
                         </Link>
@@ -1487,14 +1487,14 @@ const Dashboard = () => {
 
             {/* Brands Marquee - Premium Continuous Ticker */}
             {brands.length > 0 && (
-                <div className="w-full pt-16 pb-16 overflow-hidden bg-[#FFFDF9] font-sans border-b border-slate-200/90 relative">
-                    <div className="text-center mb-10 px-4 relative">
+                <div className="w-full pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 overflow-hidden bg-[#FFFDF9] font-sans border-b border-slate-200/90 relative">
+                    <div className="text-center mb-6 sm:mb-7 px-4 relative">
                         <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-300 to-transparent -z-10"></div>
                         <div className="inline-block bg-[#FFFDF9] px-6">
                             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-50 text-purple-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2 border border-purple-200/80 shadow-2xs">
                                 ⭐ OFFICIAL PARTNERS
                             </span>
-                            <h2 className="text-[32px] md:text-[40px] font-black text-[#1A1A24] block mt-1">Brands We Trust</h2>
+                            <h2 className="text-[28px] md:text-[36px] font-black text-[#1A1A24] block mt-1">Brands We Trust</h2>
                         </div>
                     </div>
 
@@ -1597,22 +1597,22 @@ const Dashboard = () => {
             )}
 
             {/* Loved by Parents - Premium, Warm & High-Converting Design */}
-            <div className="w-full bg-gradient-to-b from-[#FFFDF9] via-[#FFF8F2] to-[#FFFDF9] pt-16 pb-24 sm:pb-20 border-b border-orange-100/70 relative overflow-hidden">
+            <div className="w-full bg-gradient-to-b from-[#FFFDF9] via-[#FFF8F2] to-[#FFFDF9] pt-8 sm:pt-10 md:pt-12 pb-10 sm:pb-14 border-b border-orange-100/70 relative overflow-hidden">
                 {/* Gentle Ambient Warm Glows */}
                 <div className="absolute -top-12 left-10 w-96 h-96 bg-amber-100/30 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute -bottom-12 right-10 w-96 h-96 bg-rose-100/30 rounded-full blur-3xl pointer-events-none" />
 
                 <div className="max-w-[1400px] mx-auto px-3 sm:px-6 md:px-8 font-sans relative">
                     {/* Centered Section Header */}
-                    <div className="flex flex-col items-center justify-center text-center mb-10 px-4 max-w-2xl mx-auto">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-100/70 text-[#E51A22] text-[11px] sm:text-[12px] font-bold uppercase tracking-wider mb-2.5">
+                    <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-8 px-4 max-w-2xl mx-auto">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-100/70 text-[#E51A22] text-[11px] sm:text-[12px] font-bold uppercase tracking-wider mb-2">
                             <Heart className="w-3.5 h-3.5 fill-[#E51A22]" />
                             Real Parents, Genuine Smiles
                         </span>
-                        <h2 className="text-[28px] sm:text-[36px] md:text-[42px] font-black text-[#1A1A24] leading-tight mb-2 tracking-tight">
+                        <h2 className="text-[26px] sm:text-[34px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-1.5 tracking-tight">
                             Loved by 10,000+ Happy Families
                         </h2>
-                        <p className="text-slate-600 font-medium text-[14px] sm:text-[15.5px] leading-relaxed">
+                        <p className="text-slate-600 font-medium text-[13.5px] sm:text-[15px] leading-relaxed">
                             Hear real stories from parents in Surat, Ahmedabad, and across India who trust Little Joys for screen-free, durable, and child-safe play.
                         </p>
                         {/* Trust Strip - Clean Individual Badges */}
@@ -1745,8 +1745,8 @@ const Dashboard = () => {
                     </div>
 
                     {/* Reassurance Callout */}
-                    <div className="mt-8 max-w-xl mx-auto text-center px-4">
-                        <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 bg-white/90 backdrop-blur-sm px-5 py-2.5 rounded-full border border-orange-100 shadow-2xs">
+                    <div className="mt-6 max-w-xl mx-auto text-center px-4">
+                        <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 bg-white/90 backdrop-blur-sm px-5 py-2 rounded-full border border-orange-100 shadow-2xs">
                             <span>✨ Want to see our most loved toys?</span>
                             <Link to="/products" className="text-[#E51A22] font-bold hover:underline inline-flex items-center gap-0.5">
                                 Explore Best Sellers →
