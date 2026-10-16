@@ -105,24 +105,26 @@ const Footer = () => {
                     </div>
 
                     <div className="w-full lg:w-auto flex justify-center lg:justify-end">
-                        <form onSubmit={handleSubscribe} className="flex w-full sm:w-[480px] lg:w-[520px] bg-white/95 backdrop-blur-md rounded-full p-2 shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-white focus-within:border-red-300 focus-within:shadow-[0_6px_28px_rgba(229,26,34,0.14)] transition-all">
-                            <div className="flex items-center pl-4 text-slate-400">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8" /></svg>
+                        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row w-full sm:w-[480px] lg:w-[520px] bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-full p-2 gap-2 sm:gap-0 shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-white focus-within:border-red-300 focus-within:shadow-[0_6px_28px_rgba(229,26,34,0.14)] transition-all">
+                            <div className="flex items-center flex-1">
+                                <div className="flex items-center pl-3 sm:pl-4 text-slate-400">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8" /></svg>
+                                </div>
+                                <input
+                                    type="email"
+                                    placeholder="Enter your email address"
+                                    className="flex-1 bg-transparent px-3 sm:px-4 py-2.5 sm:py-3 text-[15px] sm:text-[16px] text-[#1c274c] font-medium outline-none border-none focus:ring-0 placeholder:text-slate-400 w-full"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                                    title="Please enter a valid email address with @ and ."
+                                    required
+                                />
                             </div>
-                            <input
-                                type="email"
-                                placeholder="Enter your email address"
-                                className="flex-1 bg-transparent px-4 py-3 text-[16px] text-[#1c274c] font-medium outline-none border-none focus:ring-0 placeholder:text-slate-400 w-full"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
-                                title="Please enter a valid email address with @ and ."
-                                required
-                            />
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="bg-[#E51A22] hover:bg-red-600 text-white font-bold tracking-wide text-[15.5px] px-8 py-3.5 rounded-full transition-all whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(229,26,34,0.3)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.4)]"
+                                className="w-full sm:w-auto bg-[#E51A22] hover:bg-red-600 text-white font-bold tracking-wide text-[15px] sm:text-[15.5px] px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-full transition-all whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(229,26,34,0.3)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.4)]"
                             >
                                 {isLoading ? 'Subscribing...' : 'Subscribe'}
                             </button>

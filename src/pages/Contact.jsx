@@ -74,16 +74,16 @@ const Contact = () => {
 
                 <div className="max-w-[1200px] mx-auto px-4 md:px-6 relative z-10 text-center">
                     <span className="inline-block bg-white text-[#E51A22] border border-gray-100 font-bold tracking-[0.2em] uppercase text-xs px-4 py-2 rounded-full mb-6 shadow-sm">Reach Out To Us</span>
-                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-[#1A1A24] mb-6 leading-tight">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-[#1A1A24] mb-6 leading-tight">
                         Let's Get In <span className="text-[#E51A22]">Touch</span>
                     </h1>
-                    <p className="text-[#555] text-lg max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-[#555] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
                         Have a question about our toys, your order, or just want to say hello? We'd love to hear from you. Our team is always here to help.
                     </p>
                 </div>
             </div>
 
-            <div className="max-w-[1200px] mx-auto px-4 md:px-6 pb-20 -mt-12 relative z-20">
+            <div className="max-w-[1200px] mx-auto px-4 md:px-6 pb-28 md:pb-20 -mt-12 relative z-20">
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
                     
                     {/* Left Section: Info Cards (Vertical) */}
@@ -124,8 +124,8 @@ const Contact = () => {
 
                     {/* Right Section: Contact Form */}
                     <div className="lg:w-[65%] flex flex-col">
-                        <div className="h-full bg-white rounded-[2.5rem] border border-gray-100 shadow-xl overflow-hidden relative">
-                            <div className="p-8 md:p-12 relative z-10 flex flex-col justify-center h-full">
+                        <div className="h-full bg-white rounded-[2rem] sm:rounded-[2.5rem] border border-gray-100 shadow-xl overflow-hidden relative">
+                            <div className="p-5 sm:p-8 md:p-12 relative z-10 flex flex-col justify-center h-full">
                                 {isSubmitted ? (
                                     <div className="text-center py-12 px-4">
                                         <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-green-100">

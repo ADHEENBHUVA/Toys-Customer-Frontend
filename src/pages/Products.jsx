@@ -554,7 +554,7 @@ const Products = () => {
                                                     )}
 
                                                     {/* Waitlist Button - Top Right Header */}
-                                                    <div className={`absolute top-2.5 right-2.5 z-30 transition-all duration-200 ${Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100'}`}>
+                                                    <div className="absolute top-2.5 right-2.5 z-30 transition-all duration-200 opacity-100 scale-100">
                                                         <button
                                                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
                                                             className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"

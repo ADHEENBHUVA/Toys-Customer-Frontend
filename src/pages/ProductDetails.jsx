@@ -263,7 +263,7 @@ const ProductDetails = () => {
     const isWishlisted = Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id);
 
     return (
-        <div className="bg-white min-h-screen text-gray-900">
+        <div className="bg-white min-h-screen text-gray-900 pb-20 md:pb-0">
             {/* Clean, minimalist Breadcrumbs */}
             <Breadcrumb items={[
                 { label: 'Shop', link: '/products' },
@@ -850,7 +850,7 @@ const ProductDetails = () => {
                                         )}
 
                                         {/* Waitlist Button */}
-                                        <div className={`absolute top-2.5 right-2.5 z-20 transition-all duration-200 ${Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === rp._id) ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100'}`}>
+                                        <div className="absolute top-2.5 right-2.5 z-20 transition-all duration-200 opacity-100 scale-100">
                                             <button
                                                 type="button"
                                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(rp); }}
@@ -946,6 +946,41 @@ const ProductDetails = () => {
                     </section>
                 )}
             </main>
+
+            {/* Sticky Mobile Bottom CTA Bar */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 px-3 py-2.5 sm:px-4 sm:py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] flex items-center gap-2 sm:gap-3">
+                <div className="flex flex-col min-w-[65px] sm:min-w-[75px]">
+                    <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 tracking-wider">Price</span>
+                    <span className="text-sm sm:text-base font-black text-gray-900 leading-tight">₹{((product.sellingPrice || product.price || 0) * quantity).toLocaleString('en-IN')}</span>
+                </div>
+                {product.status === 'Out of Stock' ? (
+                    <button
+                        disabled
+                        className="flex-1 h-10 sm:h-11 rounded-xl bg-gray-200 text-gray-500 font-bold text-xs sm:text-sm cursor-not-allowed"
+                    >
+                        Out of Stock
+                    </button>
+                ) : (
+                    <div className="flex-1 grid grid-cols-2 gap-1.5 sm:gap-2">
+                        <button
+                            type="button"
+                            onClick={handleAddToCart}
+                            className="h-10 sm:h-11 rounded-xl border border-gray-900 text-gray-900 active:bg-gray-100 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                        >
+                            <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
+                            <span>Cart</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={(e) => handleBuyNow(e, product)}
+                            className="h-10 sm:h-11 rounded-xl bg-[#E51A22] active:bg-[#c9141b] text-white font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 transition-colors shadow-sm cursor-pointer"
+                        >
+                            <Zap className="w-3.5 h-3.5 shrink-0 fill-current" />
+                            <span>Buy Now</span>
+                        </button>
+                    </div>
+                )}
+            </div>
 
             {/* Lightbox Modal */}
             {isLightboxOpen && createPortal(

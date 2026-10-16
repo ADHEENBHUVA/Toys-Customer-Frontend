@@ -187,18 +187,18 @@ const Checkout = () => {
                 <span className="text-slate-800">CHECKOUT</span>
             </div>
 
-            <div className="mb-10 flex items-center justify-between">
-                <h1 className="text-4xl md:text-5xl font-black text-[#1A1A24] tracking-tight">Secure Checkout</h1>
-                <div className="hidden md:flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-full border border-green-200">
-                    <ShieldCheck className="w-5 h-5" />
-                    <span className="text-sm font-bold">SSL Encrypted</span>
+            <div className="mb-6 sm:mb-10 flex items-center justify-between">
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-[#1A1A24] tracking-tight">Secure Checkout</h1>
+                <div className="hidden sm:flex items-center gap-2 text-green-600 bg-green-50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-green-200">
+                    <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-xs sm:text-sm font-bold">SSL Encrypted</span>
                 </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-10 xl:gap-14">
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 xl:gap-14">
                 {/* Left Column - Forms */}
                 <div className="w-full lg:w-[60%]">
-                    <div className="bg-white border border-slate-100 rounded-3xl p-6 md:p-10 mb-8 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                    <div className="bg-white border border-slate-100 rounded-3xl p-4 sm:p-6 md:p-10 mb-8 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
                         <h2 className="text-2xl font-black text-[#1A1A24] mb-8 flex items-center gap-3">
                             <MapPin className="w-6 h-6 text-[#E51A22]" /> 
                             Shipping Details

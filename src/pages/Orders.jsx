@@ -149,7 +149,7 @@ const Orders = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-20 relative">
+        <div className="min-h-screen bg-slate-50 pb-28 md:pb-20 relative">
             
             {/* Elegant Header Section */}
             <div className="pt-16 pb-20 px-4 relative overflow-hidden bg-white border-b border-slate-200">

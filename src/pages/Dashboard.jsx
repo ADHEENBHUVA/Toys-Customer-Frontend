@@ -79,7 +79,12 @@ const Dashboard = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const activeBanners = banners.filter(b => b.platform === (isMobile ? 'Mobile' : 'PC'));
+    const platformBanners = banners.filter(b => b.platform === (isMobile ? 'Mobile' : 'PC'));
+    const activeBanners = platformBanners.length > 0 
+        ? platformBanners 
+        : (banners.filter(b => b.platform === 'All' || !b.platform).length > 0 
+            ? banners.filter(b => b.platform === 'All' || !b.platform) 
+            : banners);
 
     useEffect(() => {
         if (activeBanners.length <= 1) return;
@@ -283,11 +288,12 @@ const Dashboard = () => {
         'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=400&fit=crop'
     ];
 
+    const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000';
+
     const getImageUrl = (imagePath) => {
         if (!imagePath) return '';
         if (imagePath.startsWith('http') || imagePath.startsWith('data:')) return imagePath;
         if (imagePath.startsWith('/gallery')) return imagePath;
-        const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000';
         return `${baseUrl}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
     };
 
@@ -625,7 +631,7 @@ const Dashboard = () => {
                             <SwiperSlide key={idx} className="h-full">
                                 <Link to={banner.buttonLink || "/products"} className="block relative w-full aspect-[4/3] sm:aspect-[4/3] rounded-[24px] overflow-hidden shadow-sm group">
                                     <img
-                                        src={banner.image.startsWith('http') || banner.image.startsWith('data:') ? banner.image : `http://localhost:5000${banner.image}`}
+                                        src={banner.image.startsWith('http') || banner.image.startsWith('data:') ? banner.image : `${baseUrl}${banner.image.startsWith('/') ? '' : '/'}${banner.image}`}
                                         alt={banner.title || "Hero"}
                                         onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80' }}
                                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
@@ -786,7 +792,7 @@ const Dashboard = () => {
                                         </div>
 
                                         {/* Waitlist Button - Top Right Header */}
-                                        <div className={`absolute top-2.5 right-2.5 z-30 transition-all duration-200 ${Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100'}`}>
+                                        <div className="absolute top-2.5 right-2.5 z-30 transition-all duration-200 opacity-100 scale-100">
                                             <button
                                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
                                                 className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
@@ -1229,7 +1235,7 @@ const Dashboard = () => {
                                             <Link to={media.link || "/products"} className="relative w-full aspect-[4/5] rounded-t-[20px] overflow-hidden bg-[#F8F9FA] border-x border-t border-slate-200 block group-hover/card:border-red-100 transition-colors">
                                                 {media.type === 'video' ? (
                                                     <video
-                                                        src={media.mediaUrl?.startsWith('http') ? media.mediaUrl : `http://localhost:5000${media.mediaUrl || ''}`}
+                                                        src={media.mediaUrl?.startsWith('http') ? media.mediaUrl : `${baseUrl}${media.mediaUrl?.startsWith('/') ? '' : '/'}${media.mediaUrl || ''}`}
                                                         autoPlay
                                                         muted
                                                         loop
@@ -1238,7 +1244,7 @@ const Dashboard = () => {
                                                     />
                                                 ) : (
                                                     <img
-                                                        src={media.mediaUrl?.startsWith('http') ? media.mediaUrl : `http://localhost:5000${media.mediaUrl || ''}`}
+                                                        src={media.mediaUrl?.startsWith('http') ? media.mediaUrl : `${baseUrl}${media.mediaUrl?.startsWith('/') ? '' : '/'}${media.mediaUrl || ''}`}
                                                         alt={media.title}
                                                         className="absolute inset-0 w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-700 pointer-events-none"
                                                     />
@@ -1247,7 +1253,7 @@ const Dashboard = () => {
                                             <Link to={media.link || "/products"} className="bg-white p-3 rounded-b-[20px] border-x border-b border-slate-200 flex items-center gap-3 group-hover/card:border-red-100 group-hover/card:bg-red-50/30 transition-all h-[70px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] group-hover/card:shadow-[0_8px_30px_rgba(229,26,34,0.08)]">
                                                 {media.type === 'image' && (
                                                     <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-white border border-slate-100">
-                                                        <img src={media.mediaUrl?.startsWith('http') ? media.mediaUrl : `http://localhost:5000${media.mediaUrl || ''}`} alt="thumb" className="w-full h-full object-cover" />
+                                                        <img src={media.mediaUrl?.startsWith('http') ? media.mediaUrl : `${baseUrl}${media.mediaUrl?.startsWith('/') ? '' : '/'}${media.mediaUrl || ''}`} alt="thumb" className="w-full h-full object-cover" />
                                                     </div>
                                                 )}
                                                 {media.type === 'video' && (
@@ -1311,7 +1317,7 @@ const Dashboard = () => {
                                         )}
 
                                         {/* Waitlist Button - Top Right Header */}
-                                        <div className={`absolute top-2.5 right-2.5 z-30 transition-all duration-200 ${Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100'}`}>
+                                        <div className="absolute top-2.5 right-2.5 z-30 transition-all duration-200 opacity-100 scale-100">
                                             <button
                                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
                                                 className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
@@ -1538,7 +1544,7 @@ const Dashboard = () => {
                                         <div className="relative z-10 w-full h-full flex items-center justify-center p-6 md:p-7">
                                             <div className="w-full h-full flex items-center justify-center max-w-[85%] max-h-[70%]">
                                                 <img
-                                                    src={brand.logo ? (brand.logo.startsWith('data:') ? brand.logo : (brand.logo.startsWith('/uploads/') ? 'http://localhost:5000' + brand.logo : brand.logo)) : 'https://via.placeholder.com/150'}
+                                                    src={brand.logo ? (brand.logo.startsWith('data:') ? brand.logo : (brand.logo.startsWith('/uploads/') ? `${baseUrl}${brand.logo}` : brand.logo)) : 'https://via.placeholder.com/150'}
                                                     alt={brand.name}
                                                     className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
                                                 />

@@ -96,7 +96,7 @@ const LoginContent = () => {
     };
 
     return (
-        <div className="h-screen w-full flex font-sans overflow-hidden text-[#3d3130]">
+        <div className="min-h-[calc(100vh-140px)] w-full flex font-sans text-[#3d3130] py-6 sm:py-10">
             {/* Left Side - Image */}
             <div className="hidden lg:block lg:w-1/2 relative bg-[#f3eee7]">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"></div>
