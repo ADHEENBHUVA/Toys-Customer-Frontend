@@ -1565,35 +1565,41 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Loved by Parents - Original Design with Fully Working Arrow Buttons */}
             <div className="w-full bg-[#F8FAFC] pt-16 pb-20 border-b border-slate-200/90 relative">
-                <div className="max-w-[1400px] mx-auto px-4 md:px-6 text-center font-sans relative">
-                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[12px] font-black uppercase tracking-[0.2em] mb-3 border border-emerald-200/80 shadow-2xs">
-                        💬 PARENT STORIES
-                    </span>
-                    <h2 className="text-[32px] md:text-[40px] font-black text-[#1A1A24] mb-2">Loved by Parents</h2>
-                    <p className="text-[#666] font-medium text-[15px] md:text-[17px] mb-8">Real stories from our happy Little Joys family</p>
+                <div className="max-w-[1400px] mx-auto px-4 md:px-6 font-sans relative">
+                    {/* Section Header with Responsive Aligned Arrow Buttons */}
+                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 px-1">
+                    <div className="text-center md:text-left">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-emerald-200/80 shadow-2xs">
+                            💬 PARENT STORIES
+                        </span>
+                        <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2">
+                            Loved by Parents
+                        </h2>
+                        <p className="text-slate-500 font-medium text-[14px] sm:text-[15px] md:text-[16px]">
+                            Real stories from our happy Little Joys family
+                        </p>
+                    </div>
 
-                {/* Arrow Buttons - Positioned top right or centered with elegant styling */}
-                <div className="flex justify-end items-center gap-3 mb-6 px-2">
-                    <button
-                        onClick={handlePrevTestimonial}
-                        className="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] transition-all duration-300 flex items-center justify-center shadow-xs hover:shadow-md cursor-pointer"
-                        title="Previous Review"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                    <button
-                        onClick={handleNextTestimonial}
-                        className="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] transition-all duration-300 flex items-center justify-center shadow-xs hover:shadow-md cursor-pointer"
-                        title="Next Review"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
+                    {/* Arrow Navigation Buttons - Centered on Mobile, Right-aligned on Desktop */}
+                    <div className="flex justify-center md:justify-end items-center gap-3 shrink-0">
+                        <button
+                            onClick={handlePrevTestimonial}
+                            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white border border-slate-200/90 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.25)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
+                            title="Previous Review"
+                            aria-label="Previous Review"
+                        >
+                            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:-translate-x-0.5" />
+                        </button>
+                        <button
+                            onClick={handleNextTestimonial}
+                            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white border border-slate-200/90 text-slate-700 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.25)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
+                            title="Next Review"
+                            aria-label="Next Review"
+                        >
+                            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:translate-x-0.5" />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="relative w-full py-4">
