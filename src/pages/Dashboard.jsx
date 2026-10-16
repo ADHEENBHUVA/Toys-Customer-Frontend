@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, CheckCircle2, Shield, Leaf, Heart as HeartIcon, Bell, Sparkles, Zap } from 'lucide-react';
+import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, CheckCircle2, Shield, Leaf, Heart as HeartIcon, Bell, Sparkles, Zap, Star, Quote, MapPin } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ProductCardImageCarousel from '../components/ProductCardImageCarousel';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -1570,42 +1570,56 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Loved by Parents - Original Design with Hover-Only Reveal Side Arrows */}
-            <div className="w-full bg-[#F8FAFC] pt-16 pb-20 border-b border-slate-200/90 relative">
+            {/* Loved by Parents - Premium Design with Hover-Only Reveal Side Arrows */}
+            <div className="w-full bg-gradient-to-b from-[#F8FAFC] via-white to-[#F8FAFC] pt-14 sm:pt-16 pb-24 sm:pb-20 border-b border-slate-200/90 relative overflow-hidden">
+                {/* Ambient Soft Glow Elements */}
+                <div className="absolute top-0 left-1/4 w-80 h-80 bg-rose-100/25 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-amber-100/25 rounded-full blur-3xl pointer-events-none" />
+
                 <div className="max-w-[1400px] mx-auto px-3 sm:px-6 md:px-8 font-sans relative">
                     {/* Centered Section Header */}
-                    <div className="flex flex-col items-center justify-center text-center mb-10 px-2">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-emerald-200/80 shadow-2xs">
-                            💬 PARENT STORIES
+                    <div className="flex flex-col items-center justify-center text-center mb-8 sm:mb-10 px-2">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-rose-50 text-[#E51A22] text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 sm:mb-3 border border-rose-200/80 shadow-2xs">
+                            <Sparkles className="w-3.5 h-3.5 text-[#E51A22] fill-[#E51A22]" />
+                            REAL PARENT STORIES
                         </span>
-                        <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2">
+                        <h2 className="text-[26px] sm:text-[36px] md:text-[42px] font-black text-[#1A1A24] leading-tight mb-2 tracking-tight">
                             Loved by Parents
                         </h2>
-                        <p className="text-slate-500 font-medium text-[15px] md:text-[17px]">
-                            Real stories from our happy Little Joys family
-                        </p>
+                        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-slate-500 font-medium text-[14px] sm:text-[16px]">
+                            <span>Real stories from our happy Little Joys family</span>
+                            <span className="hidden sm:inline text-slate-300">•</span>
+                            <div className="inline-flex items-center gap-1.5 bg-amber-50/80 border border-amber-200/70 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-800 shadow-2xs">
+                                <div className="flex items-center text-amber-400 gap-0.5">
+                                    {[1, 2, 3, 4, 5].map((s) => (
+                                        <Star key={s} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                    ))}
+                                </div>
+                                <span>4.9 / 5.0 Rating</span>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Review Slider with Left and Right Side Navigation Arrows (Revealed on Hover) */}
-                    <div className="relative w-full py-4 px-8 sm:px-12 md:px-14 group/reviewSlider">
+                    <div className="relative w-full py-2 sm:py-4 px-2 sm:px-4 md:px-6 group/reviewSlider">
                         {/* Left Side Arrow Button - Revealed when hovering over reviews */}
                         <button
                             onClick={handlePrevTestimonial}
-                            className="absolute left-0 sm:left-1 md:left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.3)] hover:scale-110 active:scale-95 sm:opacity-0 sm:group-hover/reviewSlider:opacity-100 opacity-90 sm:pointer-events-none sm:group-hover/reviewSlider:pointer-events-auto pointer-events-auto -translate-x-2 sm:group-hover/reviewSlider:translate-x-0 transition-all duration-300 flex items-center justify-center cursor-pointer group"
+                            className="absolute -left-1 sm:left-0 md:left-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_6px_20px_rgba(0,0,0,0.12)] hover:shadow-[0_8px_25px_rgba(229,26,34,0.35)] hover:scale-110 active:scale-95 sm:opacity-0 sm:group-hover/reviewSlider:opacity-100 opacity-90 sm:pointer-events-none sm:group-hover/reviewSlider:pointer-events-auto pointer-events-auto -translate-x-1 sm:group-hover/reviewSlider:translate-x-0 transition-all duration-300 flex items-center justify-center cursor-pointer group"
                             title="Previous Review"
                             aria-label="Previous Review"
                         >
-                            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:-translate-x-0.5" />
+                            <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:-translate-x-0.5" />
                         </button>
 
                         {/* Right Side Arrow Button - Revealed when hovering over reviews */}
                         <button
                             onClick={handleNextTestimonial}
-                            className="absolute right-0 sm:right-1 md:right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.3)] hover:scale-110 active:scale-95 sm:opacity-0 sm:group-hover/reviewSlider:opacity-100 opacity-90 sm:pointer-events-none sm:group-hover/reviewSlider:pointer-events-auto pointer-events-auto translate-x-2 sm:group-hover/reviewSlider:translate-x-0 transition-all duration-300 flex items-center justify-center cursor-pointer group"
+                            className="absolute -right-1 sm:right-0 md:right-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_6px_20px_rgba(0,0,0,0.12)] hover:shadow-[0_8px_25px_rgba(229,26,34,0.35)] hover:scale-110 active:scale-95 sm:opacity-0 sm:group-hover/reviewSlider:opacity-100 opacity-90 sm:pointer-events-none sm:group-hover/reviewSlider:pointer-events-auto pointer-events-auto translate-x-1 sm:group-hover/reviewSlider:translate-x-0 transition-all duration-300 flex items-center justify-center cursor-pointer group"
                             title="Next Review"
                             aria-label="Next Review"
                         >
-                            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:translate-x-0.5" />
+                            <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:translate-x-0.5" />
                         </button>
 
                         {testimonials.length > 0 && (
@@ -1623,30 +1637,74 @@ const Dashboard = () => {
                                 }}
                                 autoplay={{ delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true }}
                                 loop={testimonials.length >= 3}
-                                className="w-full !overflow-hidden pb-4"
+                                className="w-full !overflow-hidden pb-4 px-1"
                             >
                                 {testimonials.map((test, index) => (
                                     <SwiperSlide key={`${test._id || test.name}-${index}`} className="!h-auto flex">
-                                        <div className="bg-white border border-slate-100 rounded-[2.2rem] p-7 sm:p-8 md:p-9 text-left shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)] w-full transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_12px_36px_rgba(229,26,34,0.12)] hover:border-red-50 cursor-default group flex flex-col justify-between">
-                                            <div>
-                                                <p className="text-[#444] font-medium text-[15.5px] sm:text-[16.5px] md:text-[17px] leading-relaxed mb-6 min-h-[95px] sm:min-h-[105px]">
+                                        <div className="bg-white border border-slate-200/80 rounded-[26px] p-7 sm:p-8 md:p-9 text-left shadow-[0_4px_22px_-4px_rgba(0,0,0,0.04)] w-full transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_16px_40px_-8px_rgba(229,26,34,0.14)] hover:border-rose-200 cursor-default group flex flex-col justify-between relative overflow-hidden">
+                                            {/* Decorative subtle gradient background on hover */}
+                                            <div className="absolute inset-0 bg-gradient-to-b from-rose-50/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                                            {/* Top Row: Stars + Rating Score + Verified Parent Badge */}
+                                            <div className="relative z-10 flex items-center justify-between gap-2 mb-5">
+                                                <div className="flex items-center gap-1.5">
+                                                    <div className="flex items-center gap-0.5">
+                                                        {[1, 2, 3, 4, 5].map((star) => (
+                                                            <Star 
+                                                                key={star} 
+                                                                className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${
+                                                                    star <= (test.rating || 5) 
+                                                                        ? 'fill-amber-400 text-amber-400 drop-shadow-[0_1px_2px_rgba(251,191,36,0.4)]' 
+                                                                        : 'fill-slate-200 text-slate-200'
+                                                                }`} 
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                    <span className="text-[12px] font-black text-slate-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60 ml-0.5">
+                                                        {(test.rating || 5).toFixed(1)}
+                                                    </span>
+                                                </div>
+
+                                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80 shadow-2xs">
+                                                    <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                                                    <span className="whitespace-nowrap">{test.badge || 'Verified Buyer'}</span>
+                                                </span>
+                                            </div>
+
+                                            {/* Review Quote Body with Watermark Quote Icon */}
+                                            <div className="relative z-10 mb-6">
+                                                <Quote className="w-8 h-8 text-rose-100 fill-rose-50 absolute -top-2.5 -left-1.5 pointer-events-none opacity-60 group-hover:opacity-100 group-hover:text-rose-200 transition-all duration-300" />
+                                                <p className="text-slate-700 font-medium text-[15.5px] sm:text-[16.5px] md:text-[17px] leading-relaxed relative z-10 min-h-[92px] sm:min-h-[105px] italic">
                                                     "{test.text}"
                                                 </p>
-                                                <div className="text-[#fbdf14] flex gap-1 text-[16px] sm:text-[18px]">
-                                                    {[1, 2, 3, 4, 5].map((star) => (
-                                                        <span key={star}>{star <= (test.rating || 5) ? '★' : '☆'}</span>
-                                                    ))}
-                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-3.5 mt-8 pt-6 border-t border-slate-100 group-hover:border-red-50 transition-colors">
-                                                <img 
-                                                    src={test.avatar} 
-                                                    alt={test.name} 
-                                                    className="w-12 h-12 sm:w-13 sm:h-13 rounded-full object-cover border-2 border-slate-100 group-hover:border-red-100 transition-colors shadow-2xs shrink-0" 
-                                                />
-                                                <div className="flex flex-col">
-                                                    <span className="font-extrabold text-[#1A1A24] text-[15.5px] sm:text-[16px] leading-snug">{test.name}</span>
-                                                    <span className="text-[12px] font-bold text-[#E51A22] tracking-wider uppercase mt-0.5">{test.location}</span>
+
+                                            {/* Bottom Footer: Avatar, Name & Location */}
+                                            <div className="relative z-10 flex items-center justify-between mt-auto pt-6 border-t border-slate-100 group-hover:border-rose-100 transition-colors">
+                                                <div className="flex items-center gap-3.5 min-w-0">
+                                                    <div className="relative shrink-0">
+                                                        <img 
+                                                            src={test.avatar} 
+                                                            alt={test.name} 
+                                                            className="w-12 h-12 sm:w-13 sm:h-13 rounded-full object-cover ring-2 ring-slate-100 group-hover:ring-rose-200 transition-all shadow-xs" 
+                                                        />
+                                                        <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-white" title="Verified Customer">
+                                                            <CheckCircle2 className="w-3 h-3 text-white fill-emerald-500" />
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <span className="font-extrabold text-[#1A1A24] text-[15.5px] sm:text-[16px] leading-snug truncate group-hover:text-[#E51A22] transition-colors">
+                                                            {test.name}
+                                                        </span>
+                                                        <span className="text-[12px] font-semibold text-slate-500 flex items-center gap-1 mt-0.5 truncate">
+                                                            <MapPin className="w-3 h-3 text-[#E51A22] shrink-0" />
+                                                            <span className="uppercase tracking-wider font-bold text-[11px] text-[#E51A22]">{test.location}</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="w-8 h-8 rounded-full bg-rose-50/70 text-[#E51A22] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shrink-0 ml-2">
+                                                    <Heart className="w-4 h-4 fill-[#E51A22]" />
                                                 </div>
                                             </div>
                                         </div>
