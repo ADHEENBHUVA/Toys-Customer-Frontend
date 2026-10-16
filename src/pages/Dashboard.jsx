@@ -1565,50 +1565,42 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Loved by Parents - Premium Design with Hover-Only Reveal Side Arrows */}
-            <div className="w-full bg-gradient-to-b from-[#FDFBF7] via-white to-[#F8FAFC] pt-16 pb-20 border-b border-slate-200/90 relative overflow-hidden">
+            {/* Loved by Parents - Original Design with Hover-Only Reveal Side Arrows */}
+            <div className="w-full bg-[#F8FAFC] pt-16 pb-20 border-b border-slate-200/90 relative">
                 <div className="max-w-[1400px] mx-auto px-3 sm:px-6 md:px-8 font-sans relative">
                     {/* Centered Section Header */}
                     <div className="flex flex-col items-center justify-center text-center mb-10 px-2">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-rose-200/80 shadow-2xs">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-emerald-200/80 shadow-2xs">
                             💬 PARENT STORIES
                         </span>
                         <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2">
-                            Loved by 10,000+ Parents
+                            Loved by Parents
                         </h2>
-                        <p className="text-slate-500 font-medium text-[15px] md:text-[17px] max-w-xl mx-auto">
-                            Real stories from families across India who trust Little Joys for safe, joyful learning toys.
+                        <p className="text-slate-500 font-medium text-[15px] md:text-[17px]">
+                            Real stories from our happy Little Joys family
                         </p>
-                        
-                        {/* Rating Trust Pill */}
-                        <div className="flex items-center gap-2.5 mt-3.5 bg-white border border-slate-200/80 shadow-2xs px-4 py-1.5 rounded-full text-[12px] font-bold text-slate-700">
-                            <div className="flex text-amber-400 text-[13px] tracking-tight">★★★★★</div>
-                            <span className="font-extrabold text-slate-900">4.9 / 5.0</span>
-                            <span className="text-slate-300">•</span>
-                            <span className="text-slate-500 font-semibold">12,500+ Happy Families</span>
-                        </div>
                     </div>
 
                     {/* Review Slider with Left and Right Side Navigation Arrows (Revealed on Hover) */}
-                    <div className="relative w-full py-4 px-6 sm:px-12 md:px-14 group/reviewSlider">
+                    <div className="relative w-full py-4 px-8 sm:px-12 md:px-14 group/reviewSlider">
                         {/* Left Side Arrow Button - Revealed when hovering over reviews */}
                         <button
                             onClick={handlePrevTestimonial}
-                            className="absolute left-0 sm:left-1 md:left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_6px_25px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_25px_rgba(229,26,34,0.35)] hover:scale-110 active:scale-95 sm:opacity-0 sm:group-hover/reviewSlider:opacity-100 opacity-90 sm:pointer-events-none sm:group-hover/reviewSlider:pointer-events-auto pointer-events-auto -translate-x-3 sm:group-hover/reviewSlider:translate-x-0 transition-all duration-300 ease-out flex items-center justify-center cursor-pointer group/btn"
+                            className="absolute left-0 sm:left-1 md:left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.3)] hover:scale-110 active:scale-95 sm:opacity-0 sm:group-hover/reviewSlider:opacity-100 opacity-90 sm:pointer-events-none sm:group-hover/reviewSlider:pointer-events-auto pointer-events-auto -translate-x-2 sm:group-hover/reviewSlider:translate-x-0 transition-all duration-300 flex items-center justify-center cursor-pointer group"
                             title="Previous Review"
                             aria-label="Previous Review"
                         >
-                            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5] transition-transform duration-200 group-hover/btn:-translate-x-0.5" />
+                            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:-translate-x-0.5" />
                         </button>
 
                         {/* Right Side Arrow Button - Revealed when hovering over reviews */}
                         <button
                             onClick={handleNextTestimonial}
-                            className="absolute right-0 sm:right-1 md:right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_6px_25px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_25px_rgba(229,26,34,0.35)] hover:scale-110 active:scale-95 sm:opacity-0 sm:group-hover/reviewSlider:opacity-100 opacity-90 sm:pointer-events-none sm:group-hover/reviewSlider:pointer-events-auto pointer-events-auto translate-x-3 sm:group-hover/reviewSlider:translate-x-0 transition-all duration-300 ease-out flex items-center justify-center cursor-pointer group/btn"
+                            className="absolute right-0 sm:right-1 md:right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.3)] hover:scale-110 active:scale-95 sm:opacity-0 sm:group-hover/reviewSlider:opacity-100 opacity-90 sm:pointer-events-none sm:group-hover/reviewSlider:pointer-events-auto pointer-events-auto translate-x-2 sm:group-hover/reviewSlider:translate-x-0 transition-all duration-300 flex items-center justify-center cursor-pointer group"
                             title="Next Review"
                             aria-label="Next Review"
                         >
-                            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5] transition-transform duration-200 group-hover/btn:translate-x-0.5" />
+                            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200 group-hover:translate-x-0.5" />
                         </button>
 
                         {testimonials.length > 0 && (
@@ -1630,54 +1622,21 @@ const Dashboard = () => {
                             >
                                 {testimonials.map((test, index) => (
                                     <SwiperSlide key={`${test._id || test.name}-${index}`} className="!h-auto flex">
-                                        <div className="bg-white rounded-3xl p-6 sm:p-7 text-left border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_36px_rgba(229,26,34,0.1)] hover:border-red-200 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between w-full h-full relative overflow-hidden group/card cursor-default">
+                                        <div className="bg-white border border-slate-100 rounded-[2rem] p-6 sm:p-8 text-left shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] w-full transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:border-red-50 cursor-default group flex flex-col justify-between">
                                             <div>
-                                                {/* Card Header: Rating Stars and Decorative Quote */}
-                                                <div className="flex items-center justify-between mb-4">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <div className="flex text-amber-400 text-[15px] tracking-tight">
-                                                            {'★'.repeat(test.rating || 5)}
-                                                        </div>
-                                                        <span className="text-[11px] font-extrabold text-amber-800 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-full ml-1">
-                                                            {test.rating ? test.rating.toFixed(1) : '5.0'}
-                                                        </span>
-                                                    </div>
-                                                    <div className="w-8 h-8 rounded-full bg-rose-50 text-[#E51A22] flex items-center justify-center font-serif text-2xl font-black opacity-80 group-hover/card:scale-110 group-hover/card:bg-[#E51A22] group-hover/card:text-white transition-all duration-300">
-                                                        “
-                                                    </div>
-                                                </div>
-
-                                                {/* Review Body */}
-                                                <p className="text-slate-700 font-medium text-[14px] sm:text-[14.5px] leading-relaxed mb-6 min-h-[75px]">
+                                                <p className="text-[#555] font-medium text-[14px] leading-relaxed mb-6 min-h-[80px]">
                                                     "{test.text}"
                                                 </p>
-                                            </div>
-
-                                            {/* Card Footer: Parent Profile + Verified Buyer Badge */}
-                                            <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-100 group-hover/card:border-rose-100 transition-colors">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="relative">
-                                                        <img
-                                                            src={test.avatar}
-                                                            alt={test.name}
-                                                            className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-xs ring-2 ring-slate-100 group-hover/card:ring-rose-200 transition-all"
-                                                        />
-                                                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></span>
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="font-extrabold text-slate-900 text-[14px] leading-tight">
-                                                            {test.name}
-                                                        </span>
-                                                        <span className="text-[11px] font-bold text-slate-400 tracking-wide mt-0.5">
-                                                            📍 {test.location || 'India'}
-                                                        </span>
-                                                    </div>
+                                                <div className="text-[#fbdf14] flex gap-0.5">
+                                                    <StarRating rating={test.rating || 5} />
                                                 </div>
-
-                                                <span className="inline-flex items-center gap-1 text-[10.5px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full shrink-0">
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                                                    Verified Parent
-                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-3 mt-6 pt-6 border-t border-slate-100 group-hover:border-red-50 transition-colors">
+                                                <img src={test.avatar} alt={test.name} className="w-10 h-10 rounded-full object-cover border-2 border-slate-100 group-hover:border-red-100 transition-colors" />
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-[#1A1A24] text-[14px]">{test.name}</span>
+                                                    <span className="text-[11px] font-bold text-[#E51A22] tracking-wider uppercase">{test.location}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </SwiperSlide>
