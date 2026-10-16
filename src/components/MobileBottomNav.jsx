@@ -7,8 +7,8 @@ const MobileBottomNav = () => {
     const location = useLocation();
     const { getCartCount, getWaitlistCount } = useCart();
 
-    // On Product Details page, let the dedicated Add to Cart sticky bar take focus
-    if (location.pathname.startsWith('/product/')) {
+    // On Product Details, Cart, and Checkout pages, let dedicated action bars or full-page checkout take focus
+    if (location.pathname.startsWith('/product/') || location.pathname === '/cart' || location.pathname === '/checkout') {
         return null;
     }
 

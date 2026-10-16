@@ -41,8 +41,11 @@ const ScrollToTop = () => {
 import MobileBottomNav from './components/MobileBottomNav';
 
 const Layout = () => {
+    const { pathname } = useLocation();
+    const hideBottomNav = pathname.startsWith('/product/') || pathname === '/cart' || pathname === '/checkout';
+
     return (
-        <div className="min-h-screen bg-transparent font-sans text-slate-800 flex flex-col relative pb-16 md:pb-0">
+        <div className={`min-h-screen bg-transparent font-sans text-slate-800 flex flex-col relative ${hideBottomNav ? 'pb-0' : 'pb-16 md:pb-0'}`}>
             <ScrollToTop />
             <Navbar />
             <main className="flex-1 relative z-10">
