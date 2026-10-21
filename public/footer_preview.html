@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Little Joys - Footer Design Options</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; }
+        .train-track {
+            background-image: repeating-linear-gradient(90deg, #94a3b8 0, #94a3b8 10px, transparent 10px, transparent 20px);
+        }
+        @keyframes trainMove {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(calc(100vw + 100px)); }
+        }
+        .animate-train {
+            animation: trainMove 18s linear infinite;
+        }
+        @keyframes balloonFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(3deg); }
+        }
+        .animate-balloon {
+            animation: balloonFloat 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="p-6 md:p-10 text-slate-800">
+    <div class="max-w-7xl mx-auto mb-8 text-center">
+        <span class="bg-red-100 text-red-600 font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Footer Solutions</span>
+        <h1 class="text-3xl md:text-4xl font-black text-[#1c274c] mt-2">તમારા માટે ૩ શ્રેષ્ઠ Footer Options</h1>
+        <p class="text-slate-600 mt-2 text-base">નીચેનામાંથી તમને કયું Footer સૌથી વધુ ગમે છે તે જણાવો. કોઈ પણ બેકગ્રાઉન્ડ ઝાંખું (Faded) નથી, એકદમ શાર્પ & ક્લિયર છે!</p>
+    </div>
+
+    <!-- OPTION 1: 3D Pixar Toyland Panorama (Ultra HD, Centered Content) -->
+    <div class="mb-14 bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="bg-white text-orange-600 font-black rounded-full w-7 h-7 flex items-center justify-center text-sm shadow">1</span>
+                <span class="font-bold text-lg">Option 1: 3D Pixar Toyland Panorama (Vibrant & Ultra HD)</span>
+            </div>
+            <span class="text-xs bg-white/20 px-3 py-1 rounded-full font-semibold">Recommended</span>
+        </div>
+        
+        <footer class="w-full relative bg-[#FFFDF9] overflow-hidden flex flex-col min-h-[520px]">
+            <div class="absolute inset-0 w-full h-full pointer-events-none z-0">
+                <img src="/images/toys_footer_panoramic.jpg" class="w-full h-full object-cover object-bottom" style="opacity: 0.95;">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-b from-white/90 via-white/50 to-white/75 pointer-events-none z-0"></div>
+
+            <div class="relative z-10 w-full max-w-6xl mx-auto px-6 pt-12 pb-10 flex flex-col gap-8">
+                <!-- Newsletter -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-md border border-white/80 flex flex-col lg:flex-row items-center justify-between gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-red-50 text-[#E51A22] rounded-2xl flex items-center justify-center text-2xl font-bold shadow-xs">🎁</div>
+                        <div>
+                            <h3 class="text-2xl font-black text-[#1c274c]">Join Our Little Joys Family</h3>
+                            <p class="text-sm font-semibold text-slate-600">Subscribe for exclusive discounts & toy drops.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 w-full lg:w-auto">
+                        <input type="email" placeholder="Enter your email" class="px-5 py-3 rounded-full border border-slate-300 text-sm font-semibold w-full sm:w-80 shadow-xs focus:outline-none">
+                        <button class="bg-[#E51A22] text-white px-7 py-3 rounded-full font-bold text-sm shadow-md hover:bg-red-600 whitespace-nowrap">Subscribe</button>
+                    </div>
+                </div>
+
+                <!-- Links Grid in Glass Pill -->
+                <div class="bg-white/85 backdrop-blur-md rounded-3xl p-8 shadow-md border border-white/80 grid grid-cols-2 md:grid-cols-5 gap-8">
+                    <div class="col-span-2 md:col-span-1">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-9 h-9 rounded-full bg-[#E51A22] text-white flex items-center justify-center font-black">LJ</div>
+                            <span class="text-xl font-black text-[#1c274c]">Little Joys</span>
+                        </div>
+                        <p class="text-xs text-slate-600 font-medium leading-relaxed mb-4">Thoughtfully chosen baby and kids products for every little adventure.</p>
+                        <div class="flex gap-2 text-[#1c274c]">
+                            <span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold">f</span>
+                            <span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold">ig</span>
+                            <span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold">yt</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#1c274c] text-sm uppercase tracking-wider mb-4">Shop</h4>
+                        <ul class="space-y-2.5 text-xs text-slate-700 font-bold">
+                            <li>All Products</li>
+                            <li>New Arrivals</li>
+                            <li>Best Sellers</li>
+                            <li>Sale</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#1c274c] text-sm uppercase tracking-wider mb-4">Categories</h4>
+                        <ul class="space-y-2.5 text-xs text-slate-700 font-bold">
+                            <li>Soft Toys</li>
+                            <li>Dolls & Accessories</li>
+                            <li>Art & Craft</li>
+                            <li>Musical Instruments</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#1c274c] text-sm uppercase tracking-wider mb-4">Customer Care</h4>
+                        <ul class="space-y-2.5 text-xs text-slate-700 font-bold">
+                            <li>Shipping & Delivery</li>
+                            <li>Returns & Exchanges</li>
+                            <li>FAQ</li>
+                            <li>Contact Us</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#1c274c] text-sm uppercase tracking-wider mb-4">Contact Us</h4>
+                        <ul class="space-y-2.5 text-xs text-slate-700 font-bold">
+                            <li>📞 +91 8347640423</li>
+                            <li>✉️ adheenbhuva0007@gmail.com</li>
+                            <li>📍 Tulsi Arcade, Surat</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="relative z-10 bg-white/90 py-3 border-t border-slate-200 text-center text-xs text-slate-600 font-semibold">
+                © 2026 Little Joys. All rights reserved. | Developed by <span class="text-blue-600 font-bold">Appifly Infotech</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- OPTION 2: 3D Cute Kids Playroom Scene (Framed Boy & Girl, Clean Open Center) -->
+    <div class="mb-14 bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+        <div class="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="bg-white text-blue-600 font-black rounded-full w-7 h-7 flex items-center justify-center text-sm shadow">2</span>
+                <span class="font-bold text-lg">Option 2: 3D Cute Kids Scene (Boy & Girl on Sides, Clean Center)</span>
+            </div>
+            <span class="text-xs bg-white/20 px-3 py-1 rounded-full font-semibold">Playful & Cute</span>
+        </div>
+        
+        <footer class="w-full relative bg-[#edf7fc] overflow-hidden flex flex-col min-h-[520px]">
+            <div class="absolute inset-0 w-full h-full pointer-events-none z-0">
+                <img src="/images/footer_bg_new.png" class="w-full h-full object-cover object-center" style="opacity: 1;">
+            </div>
+
+            <div class="relative z-10 w-full max-w-4xl mx-auto px-6 pt-12 pb-10 flex flex-col gap-8">
+                <!-- Newsletter -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-md border border-sky-100 flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-red-100 text-[#E51A22] rounded-xl flex items-center justify-center text-xl font-bold">💌</div>
+                        <div>
+                            <h3 class="text-xl font-black text-[#1c274c]">Join Our Little Joys Family</h3>
+                            <p class="text-xs font-semibold text-slate-600">Discounts & parenting tips in your inbox.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <input type="email" placeholder="Your email address" class="px-4 py-2.5 rounded-full border border-slate-300 text-xs font-semibold w-full sm:w-64">
+                        <button class="bg-[#E51A22] text-white px-5 py-2.5 rounded-full font-bold text-xs shadow-md whitespace-nowrap">Subscribe</button>
+                    </div>
+                </div>
+
+                <!-- 4 Clean Columns in open sky -->
+                <div class="bg-white/80 backdrop-blur-md rounded-3xl p-7 shadow-md border border-sky-100 grid grid-cols-2 md:grid-cols-4 gap-6 text-center md:text-left">
+                    <div>
+                        <h4 class="font-extrabold text-[#1c274c] text-sm uppercase tracking-wider mb-3">Shop</h4>
+                        <ul class="space-y-2 text-xs text-slate-700 font-bold">
+                            <li>All Products</li>
+                            <li>New Arrivals</li>
+                            <li>Best Sellers</li>
+                            <li>Sale</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#1c274c] text-sm uppercase tracking-wider mb-3">Categories</h4>
+                        <ul class="space-y-2 text-xs text-slate-700 font-bold">
+                            <li>Soft Toys</li>
+                            <li>Dolls & Accessories</li>
+                            <li>Art & Craft</li>
+                            <li>Musical Toys</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#1c274c] text-sm uppercase tracking-wider mb-3">Customer Care</h4>
+                        <ul class="space-y-2 text-xs text-slate-700 font-bold">
+                            <li>Shipping & Delivery</li>
+                            <li>Returns & Exchanges</li>
+                            <li>FAQ</li>
+                            <li>Contact Us</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-[#1c274c] text-sm uppercase tracking-wider mb-3">Contact</h4>
+                        <ul class="space-y-2 text-xs text-slate-700 font-bold">
+                            <li>📞 +91 8347640423</li>
+                            <li>✉️ adheenbhuva0007@gmail.com</li>
+                            <li>📍 Tulsi Arcade, Surat</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative z-10 bg-white/90 py-3 border-t border-sky-100 text-center text-xs text-slate-600 font-semibold mt-auto">
+                © 2026 Little Joys. All rights reserved. | Developed by <span class="text-blue-600 font-bold">Appifly Infotech</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- OPTION 3: Animated Toy Train & Hot Air Balloon (Interactive CSS Micro-Animations) -->
+    <div class="mb-14 bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="bg-white text-emerald-600 font-black rounded-full w-7 h-7 flex items-center justify-center text-sm shadow">3</span>
+                <span class="font-bold text-lg">Option 3: Animated Toy Train & Hot Air Balloons (Pure CSS Motion)</span>
+            </div>
+            <span class="text-xs bg-white/20 px-3 py-1 rounded-full font-semibold">100% Crisp & Animated</span>
+        </div>
+        
+        <footer class="w-full relative bg-gradient-to-b from-[#FFFDF9] via-[#fefaf4] to-[#fdeed9] overflow-hidden flex flex-col">
+            <!-- Animated Floating Hot Air Balloon -->
+            <div class="absolute top-6 right-16 pointer-events-none animate-balloon z-0 opacity-80 hidden md:block">
+                <div class="text-5xl">🎈</div>
+            </div>
+            <div class="absolute top-14 left-10 pointer-events-none animate-balloon z-0 opacity-70 hidden md:block" style="animation-delay: -2s;">
+                <div class="text-4xl">🧸</div>
+            </div>
+
+            <div class="relative z-10 w-full max-w-7xl mx-auto px-6 pt-12 pb-8 flex flex-col gap-10">
+                <!-- Newsletter -->
+                <div class="flex flex-col lg:flex-row items-center justify-between gap-6 pb-8 border-b border-amber-200/60">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center text-2xl font-bold shadow-xs">🚂</div>
+                        <div>
+                            <h3 class="text-2xl font-black text-[#1c274c]">Join Our Little Joys Family</h3>
+                            <p class="text-sm font-semibold text-slate-600">Subscribe for exclusive discounts & parenting tips.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 w-full lg:w-auto">
+                        <input type="email" placeholder="Enter your email" class="px-5 py-3 rounded-full border border-amber-200 text-sm font-semibold w-full sm:w-80 bg-white shadow-xs focus:outline-none">
+                        <button class="bg-[#E51A22] text-white px-7 py-3 rounded-full font-bold text-sm shadow-md hover:bg-red-600 whitespace-nowrap">Subscribe</button>
+                    </div>
+                </div>
+
+                <!-- 5 Columns -->
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-8">
+                    <div class="col-span-2 md:col-span-4 lg:col-span-3">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-10 h-10 rounded-full border-2 border-[#E51A22] text-[#E51A22] bg-white flex items-center justify-center font-black">LJ</div>
+                            <span class="text-2xl font-black text-[#1c274c]">Little Joys</span>
+                        </div>
+                        <p class="text-sm text-slate-600 font-medium leading-relaxed mb-4">Thoughtfully chosen baby and kids products for every little adventure.</p>
+                        <div class="flex gap-2">
+                            <span class="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-sm font-bold shadow-xs">f</span>
+                            <span class="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-sm font-bold shadow-xs">ig</span>
+                            <span class="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-sm font-bold shadow-xs">yt</span>
+                        </div>
+                    </div>
+                    <div class="col-span-1 md:col-span-2 lg:col-span-2">
+                        <h4 class="font-extrabold text-[#1c274c] text-base mb-4">Shop</h4>
+                        <ul class="space-y-2.5 text-sm text-slate-700 font-bold">
+                            <li class="hover:text-red-500 cursor-pointer">All Products</li>
+                            <li class="hover:text-red-500 cursor-pointer">New Arrivals</li>
+                            <li class="hover:text-red-500 cursor-pointer">Best Sellers</li>
+                            <li class="hover:text-red-500 cursor-pointer">Sale</li>
+                        </ul>
+                    </div>
+                    <div class="col-span-1 md:col-span-2 lg:col-span-2">
+                        <h4 class="font-extrabold text-[#1c274c] text-base mb-4">Categories</h4>
+                        <ul class="space-y-2.5 text-sm text-slate-700 font-bold">
+                            <li class="hover:text-red-500 cursor-pointer">Soft Toys</li>
+                            <li class="hover:text-red-500 cursor-pointer">Dolls & Accessories</li>
+                            <li class="hover:text-red-500 cursor-pointer">Art & Craft</li>
+                            <li class="hover:text-red-500 cursor-pointer">Musical Instruments</li>
+                        </ul>
+                    </div>
+                    <div class="col-span-1 md:col-span-2 lg:col-span-2">
+                        <h4 class="font-extrabold text-[#1c274c] text-base mb-4">Customer Care</h4>
+                        <ul class="space-y-2.5 text-sm text-slate-700 font-bold">
+                            <li class="hover:text-red-500 cursor-pointer">Shipping & Delivery</li>
+                            <li class="hover:text-red-500 cursor-pointer">Returns & Exchanges</li>
+                            <li class="hover:text-red-500 cursor-pointer">FAQ</li>
+                            <li class="hover:text-red-500 cursor-pointer">Contact Us</li>
+                        </ul>
+                    </div>
+                    <div class="col-span-2 md:col-span-2 lg:col-span-3">
+                        <h4 class="font-extrabold text-[#1c274c] text-base mb-4">Contact Us</h4>
+                        <ul class="space-y-3 text-sm text-slate-700 font-bold">
+                            <li>📞 +91 8347640423</li>
+                            <li>✉️ adheenbhuva0007@gmail.com</li>
+                            <li>📍 Tulsi Arcade, Mota Varachha, Surat</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Moving Toy Train along bottom track -->
+            <div class="relative w-full h-8 train-track overflow-hidden border-t border-slate-300">
+                <div class="absolute -top-3 animate-train text-2xl whitespace-nowrap">
+                    🚂 🚃 🚃 🚃 🧸 🎈
+                </div>
+            </div>
+
+            <!-- Bottom Copyright -->
+            <div class="relative z-10 bg-white/90 py-4 border-t border-amber-200/60 text-center text-xs text-slate-600 font-semibold">
+                © 2026 Little Joys. All rights reserved. | Developed by <span class="text-blue-600 font-bold">Appifly Infotech</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
