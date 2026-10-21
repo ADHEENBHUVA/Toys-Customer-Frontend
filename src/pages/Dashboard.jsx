@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, CheckCircle2, Shield, Leaf, Heart as HeartIcon, Bell, Sparkles, Zap, Star, Quote, MapPin } from 'lucide-react';
+import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, CheckCircle2, Shield, Leaf, Heart as HeartIcon, Bell, Sparkles, Zap, Star, Quote, MapPin, MessageCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ProductCardImageCarousel from '../components/ProductCardImageCarousel';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -8,6 +8,22 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+
+const getInitials = (name) => {
+    if (!name) return 'LP';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+};
+
+const avatarColors = [
+    'bg-[#FEF2F2] text-[#E51A22] border-rose-200',
+    'bg-[#FFFBEB] text-[#B45309] border-amber-200',
+    'bg-[#ECFDF5] text-[#047857] border-emerald-200',
+    'bg-[#EFF6FF] text-[#1D4ED8] border-blue-200',
+    'bg-[#FAF5FF] text-[#7E22CE] border-purple-200',
+    'bg-[#FFF7ED] text-[#C2410C] border-orange-200',
+];
 
 const Dashboard = () => {
     const { addToCart, waitlistItems, toggleWaitlist, shippingSettings, websiteSettings } = useCart();
@@ -86,10 +102,10 @@ const Dashboard = () => {
     }, []);
 
     const platformBanners = banners.filter(b => b.platform === (isMobile ? 'Mobile' : 'PC'));
-    const activeBanners = platformBanners.length > 0 
-        ? platformBanners 
-        : (banners.filter(b => b.platform === 'All' || !b.platform).length > 0 
-            ? banners.filter(b => b.platform === 'All' || !b.platform) 
+    const activeBanners = platformBanners.length > 0
+        ? platformBanners
+        : (banners.filter(b => b.platform === 'All' || !b.platform).length > 0
+            ? banners.filter(b => b.platform === 'All' || !b.platform)
             : banners);
 
     useEffect(() => {
@@ -174,67 +190,61 @@ const Dashboard = () => {
             {
                 name: 'Pooja Patel',
                 location: 'Surat, Gujarat',
-                title: 'Super smooth wood & completely plastic-free!',
-                product: 'Wooden Montessori Animal Puzzle',
-                childAge: 'Mother of 3yo Boy',
+                headline: 'Zero splinters & completely toddler-safe wood',
+                product: 'Montessori Wooden Animal Puzzle',
                 rating: 5,
-                text: 'Ordered this puzzle for my 3-year-old. The finish is unbelievably smooth with zero splinters or chemical smell. We even visited their Surat store in Mota Varachha, extremely polite and helpful team!',
-                avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&q=80',
+                date: '3 days ago',
+                text: 'We visited their Surat showroom at Sudama Chowk with our 3-year-old son. The staff was incredibly welcoming and let him explore at the open play table. The puzzle has silky-smooth hand-sanded edges and zero chemical smell. Exceptional craftsmanship!',
                 badge: 'Verified Buyer'
             },
             {
                 name: 'Rahul Shah',
                 location: 'Ahmedabad, Gujarat',
-                title: 'Keeps kids engaged for hours without phones',
-                product: '120-Piece STEM Building Blocks',
-                childAge: 'Father of 4yo & 6yo',
+                headline: 'Replaced mobile screen time with creative building',
+                product: '120-Piece STEM Building Set',
                 rating: 5,
-                text: 'Delivered in Ahmedabad in just 2 days. The plastic is thick, durable and snaps together firmly. Both my kids now spend evenings making towers and castles instead of watching TV or mobile screens.',
-                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&q=80',
+                date: '5 days ago',
+                text: 'Delivered to Ahmedabad in just 2 days. The plastic blocks are thick, durable, and snap together with a solid grip. Both my kids now spend evenings building towers and bridges instead of asking for smartphones.',
+                badge: 'Verified Buyer'
+            },
+            {
+                name: 'Bhavik Vaghani',
+                location: 'Surat, Gujarat',
+                headline: 'Survives heavy drops and tile crashes without a scratch',
+                product: '360° Double-Sided RC Stunt Car',
+                rating: 5,
+                date: '1 week ago',
+                text: 'Bought as a birthday gift for my nephew. It flips, tumbles over tile floors, and takes heavy impact easily. Battery life is a solid 40 minutes of non-stop fun. Honest pricing and fantastic build quality.',
                 badge: 'Verified Buyer'
             },
             {
                 name: 'Sneha Joshi',
                 location: 'Mumbai, Maharashtra',
-                title: 'Safest baby rattles & fast delivery',
+                headline: '100% peace of mind for teething babies',
                 product: 'Pastel Wooden Sensory Rattle Set',
-                childAge: 'Mother of 9-Month Baby',
                 rating: 5,
-                text: 'Best online toy shopping experience! The packaging was bubble-wrapped with utmost care. The non-toxic water-based food-grade colors gave me complete peace of mind when my baby teethed on them.',
-                avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&q=80',
-                badge: 'Verified Buyer'
-            },
-            {
-                name: 'Ananya Verma',
-                location: 'Bangalore, Karnataka',
-                title: 'High quality flash cards & craft activities',
-                product: 'Early Learning Smart Flashcards',
-                childAge: 'Mother of 2.5yo Girl',
-                rating: 5,
-                text: 'Thick, laminated waterproof cards that toddler hands cannot tear easily. The illustrations are vivid and cute. Little Joys has officially become my favorite place for birthday gifting.',
-                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&q=80',
+                date: '2 weeks ago',
+                text: 'My 9-month-old puts every toy straight into her mouth. The food-grade non-toxic water colors and smooth wood gave me complete peace of mind. Very lightweight, easy to grip, and sounds gentle.',
                 badge: 'Verified Buyer'
             },
             {
                 name: 'Dhaval Mehta',
                 location: 'Vadodara, Gujarat',
-                title: 'Rugged RC stunt car survives every drop',
-                product: '360° Double-Sided RC Stunt Car',
-                childAge: 'Uncle of 5yo Kid',
+                headline: 'Thick, waterproof cards that toddlers cannot tear',
+                product: 'Early Learning Smart Flashcards',
                 rating: 5,
-                text: 'Bought as a birthday surprise for my nephew. This car flips, rolls over stairs and survives heavy crashes without a scratch. Battery life is solid 40 minutes and customer support on WhatsApp is super quick!',
-                avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&q=80',
+                date: '2 weeks ago',
+                text: 'Asked for age suggestions on WhatsApp before ordering and received immediate, helpful recommendations with clear photos. The flashcards are thick, laminated, and wipe clean easily. Best customer support!',
                 badge: 'Verified Buyer'
             },
             {
                 name: 'Meera Desai',
                 location: 'Rajkot, Gujarat',
-                title: 'Educational & brain stimulating games',
+                headline: 'Heirloom quality wood — beats flimsy plastic toys',
                 product: 'Multi-Color Wooden Abacus & Beads',
-                childAge: 'Mother of 4yo Girl',
                 rating: 5,
-                text: 'Such a refreshing difference from noisy electronic toys. These classic toys develop real focus and cognitive thinking. Truly premium craftsmanship at very reasonable prices.',
-                avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&q=80',
+                date: '3 weeks ago',
+                text: 'So much better than cheap noisy battery toys that break within two days. This abacus is solid plantation wood with smooth sliding beads. True tactile learning that keeps children focused.',
                 badge: 'Verified Buyer'
             }
         ];
@@ -637,7 +647,7 @@ const Dashboard = () => {
             </div>
 
             {/* Hero Section - Multi-Banner Carousel */}
-            <div className="w-full bg-[#FFFDF9] pt-4 md:pt-8 pb-8 overflow-hidden border-b border-slate-200/90 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.03)]">
+            <div className="w-full bg-[#FFFDF9] pt-3 md:pt-5 pb-4 md:pb-6 overflow-hidden border-b border-slate-200/90 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.03)]">
                 <div className="w-full mx-auto px-4 relative group/hero">
                     <Swiper
                         modules={[Navigation, Pagination, Autoplay]}
@@ -700,17 +710,17 @@ const Dashboard = () => {
 
 
             {/* Categories */}
-            <div className="w-full pt-8 sm:pt-10 pb-8 sm:pb-10 text-center bg-white border-b border-slate-200/90 relative">
+            <div className="w-full pt-6 sm:pt-7 md:pt-8 pb-5 sm:pb-6 md:pb-7 text-center bg-white border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-red-100 shadow-2xs">
                         🎯 EXPLORE BY INTEREST
                     </span>
                     <h2 className="text-[26px] md:text-[36px] font-black text-[#111] mb-1.5 tracking-tight uppercase">Toy Categories</h2>
-                    <p className="text-[#666] text-[13.5px] md:text-[14.5px] mb-5 sm:mb-6 font-semibold uppercase tracking-wider">Everything your little one needs to learn, imagine & play</p>
+                    <p className="text-[#666] text-[13.5px] md:text-[14.5px] mb-3 sm:mb-4 font-semibold uppercase tracking-wider">Everything your little one needs to learn, imagine & play</p>
                 </div>
 
                 <div
-                    className="relative w-full py-4 group/slider bg-white"
+                    className="relative w-full py-1 group/slider bg-white"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
@@ -746,7 +756,7 @@ const Dashboard = () => {
                     </style>
                     <div
                         ref={categoryContainerRef}
-                        className={`flex overflow-x-auto hide-scrollbar pt-6 pb-6 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                        className={`flex overflow-x-auto hide-scrollbar pt-3 pb-3 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
                         style={{ gap: `${dynamicGap}px` }}
                         onMouseDown={handleMouseDown}
                         onMouseLeave={handleMouseLeaveDrag}
@@ -771,11 +781,11 @@ const Dashboard = () => {
 
                                         {/* Main Circular Mask */}
                                         <div className="w-full h-full rounded-full overflow-hidden border-[3px] border-slate-100 group-hover:border-[#E51A22] bg-gray-50 shadow-sm transition-all duration-500 relative z-10 flex items-center justify-center">
-                                            <img 
-                                                src={getImageUrl(cat.image)} 
-                                                alt={cat.name} 
-                                                draggable="false" 
-                                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-112 pointer-events-none" 
+                                            <img
+                                                src={getImageUrl(cat.image)}
+                                                alt={cat.name}
+                                                draggable="false"
+                                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-112 pointer-events-none"
                                             />
                                         </div>
                                     </div>
@@ -792,9 +802,9 @@ const Dashboard = () => {
             </div>
 
             {/* Best Selling Picks - Ranked with Most Selling First */}
-            <div className="w-full bg-[#F8FAFC] pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 border-b border-slate-200/90 relative">
+            <div className="w-full bg-[#F8FAFC] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
-                    <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-8">
+                    <div className="flex flex-col items-center justify-center text-center mb-4 sm:mb-5">
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-amber-200/80 shadow-2xs">
                             🏆 TOP-RANKED FAVORITES
                         </span>
@@ -865,7 +875,7 @@ const Dashboard = () => {
                                         <Link to={`/product/${product._id}`} className="font-bold text-[#1A1A24] text-[13px] sm:text-[15px] md:text-[16px] mb-1 hover:text-[#E51A22] transition-colors leading-snug line-clamp-1">
                                             {product.name}
                                         </Link>
-                                        
+
                                         <div className="text-[12px] text-gray-500/90 mb-3 leading-relaxed">
                                             <p className={expandedProductDescIds[product._id] ? "" : "line-clamp-2 overflow-hidden"}>
                                                 {getCleanCardDescription(product)}
@@ -950,7 +960,7 @@ const Dashboard = () => {
                             ))}
                     </div>
 
-                    <div className="flex justify-center items-center mt-6 sm:mt-8 px-4 md:px-0">
+                    <div className="flex justify-center items-center mt-5 sm:mt-6 px-4 md:px-0">
                         <Link to="/products?sort=bestseller" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm">
                             View All Best Sellers
                             <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
@@ -960,7 +970,7 @@ const Dashboard = () => {
             </div>
 
             {/* Shop By Age - Continuous Running Line ("Aekdhari Line") */}
-            <div className="w-full bg-[#FFFBF5] pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 border-b border-amber-200/70 relative overflow-hidden">
+            <div className="w-full bg-[#FFFBF5] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-amber-200/70 relative overflow-hidden">
                 {/* Global SVG Clip Definitions (Defined once to eliminate duplicate ID bugs) */}
                 <svg width="0" height="0" className="absolute pointer-events-none">
                     <defs>
@@ -1018,7 +1028,7 @@ const Dashboard = () => {
 
                 <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
                     {/* Header */}
-                    <div className="flex flex-col items-center justify-center text-center mb-5 md:mb-7">
+                    <div className="flex flex-col items-center justify-center text-center mb-3 md:mb-4">
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-50 text-orange-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-orange-200/80 shadow-2xs">
                             🌱 DEVELOPMENT MILESTONES
                         </span>
@@ -1032,7 +1042,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Quick Milestone Tap Pills */}
-                    <div className="flex items-center justify-start sm:justify-center overflow-x-auto hide-scrollbar gap-2 mb-4 md:mb-6 px-1 w-full">
+                    <div className="flex items-center justify-start sm:justify-center overflow-x-auto hide-scrollbar gap-2 mb-3 md:mb-4 px-1 w-full">
                         {[
                             { age: '0-12', label: 'Months', emoji: '🍼' },
                             { age: '1-2', label: 'Years', emoji: '🧸' },
@@ -1052,7 +1062,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Desktop View: Clean Static 5-Column Grid (No moving line on PC) */}
-                    <div className="hidden md:grid md:grid-cols-5 gap-6 lg:gap-8 justify-items-center max-w-[1300px] mx-auto pt-2 pb-4">
+                    <div className="hidden md:grid md:grid-cols-5 gap-6 lg:gap-8 justify-items-center max-w-[1300px] mx-auto pt-1 pb-2">
                         {ageMilestones.map((item, idx) => (
                             <Link
                                 to={`/products?age=${encodeURIComponent(item.age + ' ' + item.label)}`}
@@ -1232,9 +1242,9 @@ const Dashboard = () => {
 
             {/* Promo Media (Videos & Images) - Limited Edition Style */}
             {promoMedia && promoMedia.length > 0 && (
-                <div className="w-full bg-[#F4F7FC] pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 border-b border-indigo-200/70 relative">
+                <div className="w-full bg-[#F4F7FC] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-indigo-200/70 relative">
                     <div className="w-full mx-auto px-4 md:px-8">
-                        <div className="mb-5 sm:mb-6 text-center md:text-left">
+                        <div className="mb-4 sm:mb-5 text-center md:text-left">
                             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-blue-200/80 shadow-2xs">
                                 ✨ EXCLUSIVE DROPS
                             </span>
@@ -1315,9 +1325,9 @@ const Dashboard = () => {
             )}
 
             {/* Explore Popular Toy Set */}
-            <div className="w-full bg-white pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 border-b border-slate-200/90 relative">
+            <div className="w-full bg-white pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
-                    <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-8">
+                    <div className="flex flex-col items-center justify-center text-center mb-4 sm:mb-5">
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-rose-200/80 shadow-2xs">
                             🧸 FEATURED PLAYSETS
                         </span>
@@ -1390,7 +1400,7 @@ const Dashboard = () => {
                                         <Link to={`/product/${product._id}`} className="font-bold text-[#1A1A24] text-[13px] sm:text-[15px] md:text-[16px] mb-1 hover:text-[#E51A22] transition-colors leading-snug line-clamp-1">
                                             {product.name}
                                         </Link>
-                                        
+
                                         <div className="text-[12px] text-gray-500/90 mb-3 leading-relaxed">
                                             <p className={expandedProductDescIds[product._id] ? "" : "line-clamp-2 overflow-hidden"}>
                                                 {getCleanCardDescription(product)}
@@ -1476,7 +1486,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* View All Products Button (Load More removed) */}
-                    <div className="flex justify-center items-center mt-6 sm:mt-8 px-4 md:px-0">
+                    <div className="flex justify-center items-center mt-5 sm:mt-6 px-4 md:px-0">
                         <Link to="/products" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm">
                             View All Products
                             <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
@@ -1487,8 +1497,8 @@ const Dashboard = () => {
 
             {/* Brands Marquee - Premium Continuous Ticker */}
             {brands.length > 0 && (
-                <div className="w-full pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10 md:pb-12 overflow-hidden bg-[#FFFDF9] font-sans border-b border-slate-200/90 relative">
-                    <div className="text-center mb-6 sm:mb-7 px-4 relative">
+                <div className="w-full pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 overflow-hidden bg-[#FFFDF9] font-sans border-b border-slate-200/90 relative">
+                    <div className="text-center mb-3 sm:mb-4 px-4 relative">
                         <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-300 to-transparent -z-10"></div>
                         <div className="inline-block bg-[#FFFDF9] px-6">
                             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-50 text-purple-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2 border border-purple-200/80 shadow-2xs">
@@ -1546,49 +1556,49 @@ const Dashboard = () => {
                                 const finalBorder = brand.borderColor || style.border;
 
                                 return (
-                                <div key={`brand-${idx}-${brand._id}`} className="flex items-center justify-center px-4 md:px-6 py-6">
-                                    <Link
-                                        to={`/products?brand=${encodeURIComponent(brand.name)}`}
-                                        title={`Shop ${brand.name} toys`}
-                                        className="relative w-[150px] h-[150px] md:w-[170px] md:h-[170px] flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-2 cursor-pointer group select-none block"
-                                    >
-                                        {/* Floating Toy Emojis on hover */}
-                                        <div className={`absolute ${style.pos1} z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:-translate-y-2 group-hover:-rotate-12 pointer-events-none`}>
-                                            <div className="bg-white/95 backdrop-blur-md rounded-xl p-1.5 shadow-md border border-slate-100 animate-bounce">
-                                                <span className="text-xl drop-shadow-sm">{style.emoji1}</span>
+                                    <div key={`brand-${idx}-${brand._id}`} className="flex items-center justify-center px-4 md:px-6 py-6">
+                                        <Link
+                                            to={`/products?brand=${encodeURIComponent(brand.name)}`}
+                                            title={`Shop ${brand.name} toys`}
+                                            className="relative w-[150px] h-[150px] md:w-[170px] md:h-[170px] flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-2 cursor-pointer group select-none block"
+                                        >
+                                            {/* Floating Toy Emojis on hover */}
+                                            <div className={`absolute ${style.pos1} z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:-translate-y-2 group-hover:-rotate-12 pointer-events-none`}>
+                                                <div className="bg-white/95 backdrop-blur-md rounded-xl p-1.5 shadow-md border border-slate-100 animate-bounce">
+                                                    <span className="text-xl drop-shadow-sm">{style.emoji1}</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className={`absolute ${style.pos2} z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-y-2 group-hover:rotate-12 pointer-events-none`}>
-                                            <div className="bg-white/95 backdrop-blur-md rounded-xl p-1.5 shadow-md border border-slate-100 animate-bounce" style={{ animationDelay: '0.2s' }}>
-                                                <span className="text-xl drop-shadow-sm">{style.emoji2}</span>
+                                            <div className={`absolute ${style.pos2} z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-y-2 group-hover:rotate-12 pointer-events-none`}>
+                                                <div className="bg-white/95 backdrop-blur-md rounded-xl p-1.5 shadow-md border border-slate-100 animate-bounce" style={{ animationDelay: '0.2s' }}>
+                                                    <span className="text-xl drop-shadow-sm">{style.emoji2}</span>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        {/* Background Playful Shape */}
-                                        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full z-0 drop-shadow-sm group-hover:drop-shadow-lg transition-all duration-300 group-hover:rotate-1">
-                                            <path 
-                                                d={style.path} 
-                                                fill={finalBg} 
-                                                stroke={finalBorder} 
-                                                strokeWidth="2.5" 
-                                                strokeLinecap="round" 
-                                                strokeLinejoin="round" 
-                                                className="transition-all duration-300 group-hover:stroke-[3.5px]" 
-                                            />
-                                        </svg>
-
-                                        {/* Brand Logo Container - Generous bounds with NO clipping mask so all logos (e.g. Mattel, Lego, Barbie) fit 100% completely */}
-                                        <div className="relative z-10 w-full h-full flex items-center justify-center p-6 md:p-7">
-                                            <div className="w-full h-full flex items-center justify-center max-w-[85%] max-h-[70%]">
-                                                <img
-                                                    src={brand.logo ? (brand.logo.startsWith('data:') ? brand.logo : (brand.logo.startsWith('/uploads/') ? `${baseUrl}${brand.logo}` : brand.logo)) : 'https://via.placeholder.com/150'}
-                                                    alt={brand.name}
-                                                    className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
+                                            {/* Background Playful Shape */}
+                                            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full z-0 drop-shadow-sm group-hover:drop-shadow-lg transition-all duration-300 group-hover:rotate-1">
+                                                <path
+                                                    d={style.path}
+                                                    fill={finalBg}
+                                                    stroke={finalBorder}
+                                                    strokeWidth="2.5"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    className="transition-all duration-300 group-hover:stroke-[3.5px]"
                                                 />
+                                            </svg>
+
+                                            {/* Brand Logo Container - Generous bounds with NO clipping mask so all logos (e.g. Mattel, Lego, Barbie) fit 100% completely */}
+                                            <div className="relative z-10 w-full h-full flex items-center justify-center p-6 md:p-7">
+                                                <div className="w-full h-full flex items-center justify-center max-w-[85%] max-h-[70%]">
+                                                    <img
+                                                        src={brand.logo ? (brand.logo.startsWith('data:') ? brand.logo : (brand.logo.startsWith('/uploads/') ? `${baseUrl}${brand.logo}` : brand.logo)) : 'https://via.placeholder.com/150'}
+                                                        alt={brand.name}
+                                                        className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Link>
-                                </div>
+                                        </Link>
+                                    </div>
                                 );
                             })}
                         </div>
@@ -1596,62 +1606,64 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Loved by Parents - Premium, Warm & High-Converting Design */}
-            <div className="w-full bg-gradient-to-b from-[#FFFDF9] via-[#FFF8F2] to-[#FFFDF9] pt-8 sm:pt-10 md:pt-12 pb-10 sm:pb-14 border-b border-orange-100/70 relative overflow-hidden">
-                {/* Gentle Ambient Warm Glows */}
-                <div className="absolute -top-12 left-10 w-96 h-96 bg-amber-100/30 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -bottom-12 right-10 w-96 h-96 bg-rose-100/30 rounded-full blur-3xl pointer-events-none" />
+            {/* Real Customer Stories - Modern, Premium & English */}
+            <div className="w-full bg-[#FAF8F5] pt-7 sm:pt-8 md:pt-10 pb-8 sm:pb-9 md:pb-11 border-b border-orange-100/80 relative font-sans">
+                <div className="max-w-[1360px] mx-auto px-4 sm:px-6 md:px-8 relative">
 
-                <div className="max-w-[1400px] mx-auto px-3 sm:px-6 md:px-8 font-sans relative">
-                    {/* Centered Section Header */}
+                    {/* Header: Clean, Trustworthy & Beautiful */}
                     <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-8 px-4 max-w-2xl mx-auto">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-100/70 text-[#E51A22] text-[11px] sm:text-[12px] font-bold uppercase tracking-wider mb-2">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-50 text-[#E51A22] text-[11.5px] font-black uppercase tracking-wider mb-2.5 border border-rose-200/80 shadow-2xs">
                             <Heart className="w-3.5 h-3.5 fill-[#E51A22]" />
-                            Real Parents, Genuine Smiles
+                            Real Parent Experiences
                         </span>
-                        <h2 className="text-[26px] sm:text-[34px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-1.5 tracking-tight">
-                            Loved by 10,000+ Happy Families
+                        <h2 className="text-[26px] sm:text-[34px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-2 tracking-tight">
+                            Loved by Families Across India
                         </h2>
-                        <p className="text-slate-600 font-medium text-[13.5px] sm:text-[15px] leading-relaxed">
-                            Hear real stories from parents in Surat, Ahmedabad, and across India who trust Little Joys for screen-free, durable, and child-safe play.
+                        <p className="text-slate-600 text-[14px] sm:text-[15.5px] leading-relaxed max-w-xl mx-auto">
+                            Honest feedback from parents who trust Little Joys for safe, screen-free, and heirloom-quality toys.
                         </p>
-                        {/* Trust Strip - Clean Individual Badges */}
-                        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 md:gap-5 mt-4 text-xs sm:text-sm font-semibold text-slate-700">
-                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-orange-100/90 shadow-2xs">
+
+                        {/* Unified Modern Trust Bar */}
+                        <div className="inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-4 px-5 py-2 rounded-2xl bg-white border border-slate-200/90 shadow-2xs text-xs sm:text-sm font-semibold text-slate-700">
+                            <div className="flex items-center gap-1.5">
                                 <span className="text-amber-500 font-bold">★★★★★</span>
-                                <span>4.9 / 5 Rating</span>
-                            </span>
-                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-orange-100/90 shadow-2xs">
+                                <span className="font-extrabold text-[#1A1A24]">4.9 / 5</span>
+                                <span className="text-slate-400 font-normal hidden sm:inline">(1,200+ Reviews)</span>
+                            </div>
+                            <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-300" />
+                            <div className="flex items-center gap-1.5 text-emerald-700">
                                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                                <span>100% Verified Purchases</span>
-                            </span>
-                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-orange-100/90 shadow-2xs">
+                                <span>100% Verified Buyers</span>
+                            </div>
+                            <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-300" />
+                            <div className="flex items-center gap-1.5 text-[#E51A22]">
                                 <Shield className="w-4 h-4 text-[#E51A22]" />
-                                <span>100% Non-Toxic & Safe</span>
-                            </span>
+                                <span>BIS Safe & Non-Toxic</span>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Review Slider with Left and Right Navigation Arrows */}
-                    <div className="relative w-full py-2 sm:py-3 px-2 sm:px-4 md:px-6 group/reviewSlider">
-                        {/* Left Side Arrow Button */}
+                    {/* Review Slider with Hover-Only Navigation Arrows */}
+                    <div className="relative w-full py-2 px-1 sm:px-4 md:px-6 group/reviewSlider">
+
+                        {/* Left Side Arrow Button - Only visible on hover over review slider */}
                         <button
                             onClick={handlePrevTestimonial}
-                            className="absolute -left-1 sm:-left-2 md:-left-3 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-700 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_24px_rgba(229,26,34,0.3)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
+                            className="absolute -left-2 sm:-left-3 md:-left-5 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/95 backdrop-blur-md text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 opacity-0 pointer-events-none group-hover/reviewSlider:opacity-100 group-hover/reviewSlider:pointer-events-auto transition-all duration-300 ease-out flex items-center justify-center cursor-pointer -translate-x-3 group-hover/reviewSlider:translate-x-0"
                             title="Previous Review"
                             aria-label="Previous Review"
                         >
-                            <ChevronLeft className="w-5 h-5 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200" />
+                            <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
                         </button>
 
-                        {/* Right Side Arrow Button */}
+                        {/* Right Side Arrow Button - Only visible on hover over review slider */}
                         <button
                             onClick={handleNextTestimonial}
-                            className="absolute -right-1 sm:-right-2 md:-right-3 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-700 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_24px_rgba(229,26,34,0.3)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer group"
+                            className="absolute -right-2 sm:-right-3 md:-right-5 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/95 backdrop-blur-md text-slate-800 hover:bg-[#E51A22] hover:text-white border border-slate-200/90 shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 opacity-0 pointer-events-none group-hover/reviewSlider:opacity-100 group-hover/reviewSlider:pointer-events-auto transition-all duration-300 ease-out flex items-center justify-center cursor-pointer translate-x-3 group-hover/reviewSlider:translate-x-0"
                             title="Next Review"
                             aria-label="Next Review"
                         >
-                            <ChevronRight className="w-5 h-5 stroke-[2.5] text-slate-700 group-hover:text-white transition-all duration-200" />
+                            <ChevronRight className="w-6 h-6 stroke-[2.5]" />
                         </button>
 
                         {testimonials.length > 0 && (
@@ -1667,96 +1679,122 @@ const Dashboard = () => {
                                     768: { slidesPerView: 2, spaceBetween: 20 },
                                     1024: { slidesPerView: 3, spaceBetween: 24 },
                                 }}
-                                autoplay={{ delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true }}
+                                autoplay={{ delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true }}
                                 loop={testimonials.length >= 3}
-                                className="w-full !overflow-hidden pb-4 px-1"
+                                className="w-full !overflow-hidden pt-3 sm:pt-4 pb-5 px-1 sm:px-2"
                             >
-                                {testimonials.map((test, index) => (
-                                    <SwiperSlide key={`${test._id || test.name}-${index}`} className="!h-auto flex">
-                                        <div className="bg-white border border-orange-100/90 rounded-[24px] p-6 sm:p-7 md:p-8 text-left shadow-[0_4px_22px_-4px_rgba(229,26,34,0.05)] hover:shadow-[0_16px_36px_-6px_rgba(229,26,34,0.13)] hover:border-rose-200 hover:-translate-y-1.5 transition-all duration-300 w-full flex flex-col justify-between h-full group relative">
-                                            <div>
-                                                {/* Top Row: 5 Golden Stars + Verified Badge */}
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <div className="flex items-center gap-1 text-amber-400">
-                                                        {[1, 2, 3, 4, 5].map((star) => (
-                                                            <Star 
-                                                                key={star} 
-                                                                className={`w-4 h-4 ${
-                                                                    star <= (test.rating || 5) 
-                                                                        ? 'fill-amber-400 text-amber-400' 
+                                {testimonials.map((test, index) => {
+                                    const initials = getInitials(test.name);
+                                    const avatarColor = avatarColors[index % avatarColors.length];
+                                    const hasRealAvatar = test.avatar && !test.avatar.includes('unsplash');
+                                    const headlineClean = (test.headline || test.title || 'Wonderful Quality & Safe for Kids!').replace(/^["']|["']$/g, '');
+
+                                    return (
+                                        <SwiperSlide key={`${test._id || test.name}-${index}`} className="!h-auto flex py-3.5 px-1">
+                                            <div className="bg-white border-2 border-slate-200/80 rounded-3xl p-6 sm:p-7 text-left shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-8px_rgba(229,26,34,0.18)] hover:border-[#E51A22] transition-all duration-300 w-full flex flex-col justify-between h-full relative overflow-hidden group/card cursor-pointer">
+
+                                                {/* Decorative Subtle Quote Watermark */}
+                                                <Quote className="absolute right-5 top-5 w-10 h-10 text-slate-100 group-hover/card:text-rose-100/70 transition-colors pointer-events-none opacity-80" />
+
+                                                <div className="relative z-10">
+                                                    {/* Top Row: Stars + Rating Number & Verified Badge */}
+                                                    <div className="flex items-center justify-between mb-3.5">
+                                                        <div className="flex items-center gap-1 text-amber-400">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <Star
+                                                                    key={star}
+                                                                    className={`w-4 h-4 ${star <= (test.rating || 5)
+                                                                        ? 'fill-amber-400 text-amber-400'
                                                                         : 'fill-slate-200 text-slate-200'
-                                                                }`} 
+                                                                        }`}
+                                                                />
+                                                            ))}
+                                                            <span className="ml-1 text-xs font-bold text-slate-800">5.0</span>
+                                                        </div>
+                                                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80 shadow-2xs">
+                                                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                                            {test.badge || 'Verified Buyer'}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Clean Review Headline */}
+                                                    <h3 className="font-extrabold text-[#1A1A24] text-[16px] sm:text-[17px] leading-snug mb-2.5 group-hover/card:text-[#E51A22] transition-colors">
+                                                        "{headlineClean}"
+                                                    </h3>
+
+                                                    {/* Review Body */}
+                                                    <p className="text-slate-600 font-normal text-[13.5px] sm:text-[14px] leading-relaxed line-clamp-4 min-h-[64px]">
+                                                        {test.text}
+                                                    </p>
+
+                                                </div>
+
+                                                {/* Bottom Footer: Author Profile & Date */}
+                                                <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                                                    <div className="flex items-center gap-3 min-w-0">
+                                                        {hasRealAvatar ? (
+                                                            <img
+                                                                src={test.avatar}
+                                                                alt={test.name}
+                                                                className="w-10 h-10 rounded-full object-cover ring-2 ring-rose-100 shadow-2xs shrink-0"
                                                             />
-                                                        ))}
+                                                        ) : (
+                                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs sm:text-sm border shadow-2xs shrink-0 ${avatarColor}`}>
+                                                                {initials}
+                                                            </div>
+                                                        )}
+                                                        <div className="min-w-0">
+                                                            <span className="font-extrabold text-[#1A1A24] text-[14.5px] block truncate">
+                                                                {test.name}
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-emerald-100">
-                                                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                                        Verified Buyer
-                                                    </span>
-                                                </div>
 
-                                                {/* Purchased Toy Product Chip */}
-                                                {test.product && (
-                                                    <div className="mb-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-orange-50/90 border border-orange-200/60 text-[11.5px] font-bold text-orange-900 max-w-full">
-                                                        <span>🧸</span>
-                                                        <span className="truncate">{test.product}</span>
-                                                    </div>
-                                                )}
-
-                                                {/* Bold Review Highlight Title */}
-                                                <h3 className="font-extrabold text-[#1A1A24] text-[15.5px] sm:text-[16.5px] leading-snug mb-2 group-hover:text-[#E51A22] transition-colors">
-                                                    {test.title || "Wonderful Quality & Safe for Kids!"}
-                                                </h3>
-
-                                                {/* Review Body */}
-                                                <p className="text-slate-600 font-normal text-[14px] sm:text-[14.5px] leading-relaxed min-h-[68px]">
-                                                    "{test.text}"
-                                                </p>
-                                            </div>
-
-                                            {/* Bottom Footer: Parent Profile */}
-                                            <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
-                                                <div className="flex items-center gap-3 min-w-0">
-                                                    <img 
-                                                        src={test.avatar} 
-                                                        alt={test.name} 
-                                                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover ring-2 ring-orange-100 group-hover:ring-rose-200 transition-all shadow-2xs shrink-0" 
-                                                    />
-                                                    <div className="flex flex-col min-w-0">
-                                                        <span className="font-extrabold text-[#1A1A24] text-[14.5px] sm:text-[15px] leading-snug truncate">
-                                                            {test.name}
+                                                    {test.date && (
+                                                        <span className="text-[11px] font-medium text-slate-400 shrink-0">
+                                                            {test.date}
                                                         </span>
-                                                        <span className="text-[12px] font-medium text-slate-500 flex items-center gap-1 mt-0.5 truncate">
-                                                            <MapPin className="w-3 h-3 text-[#E51A22] shrink-0" />
-                                                            <span>{test.location}</span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="text-[11px] font-semibold text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-lg shrink-0">
-                                                    {test.childAge || test.badge || 'Verified Parent'}
+                                                    )}
                                                 </div>
                                             </div>
-                                        </div>
-                                    </SwiperSlide>
-                                ))}
+                                        </SwiperSlide>
+                                    );
+                                })}
                             </Swiper>
                         )}
                     </div>
 
-                    {/* Reassurance Callout */}
-                    <div className="mt-6 max-w-xl mx-auto text-center px-4">
-                        <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 bg-white/90 backdrop-blur-sm px-5 py-2 rounded-full border border-orange-100 shadow-2xs">
-                            <span>✨ Want to see our most loved toys?</span>
-                            <Link to="/products" className="text-[#E51A22] font-bold hover:underline inline-flex items-center gap-0.5">
+                    {/* Bottom Action Strip: Real Feedback & Shop Callout */}
+                    <div className="mt-6 pt-5 border-t border-orange-100/90 max-w-2xl mx-auto text-center px-4">
+                        <p className="text-xs sm:text-sm font-bold text-[#1A1A24] mb-1">
+                            Have you shopped with Little Joys? We value your real experience!
+                        </p>
+                        <p className="text-xs text-slate-500 mb-3.5">
+                            Share your feedback with our family team on WhatsApp or explore our most loved toys.
+                        </p>
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                            <a
+                                href="https://wa.me/918347640423?text=Hello%20Little%20Joys,%20I%20would%20like%20to%20share%20my%20review/feedback!"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs sm:text-sm font-bold py-2.5 px-5 rounded-full shadow-xs transition-all cursor-pointer hover:scale-105"
+                            >
+                                <MessageCircle className="w-4 h-4" />
+                                Share Feedback on WhatsApp
+                            </a>
+                            <Link
+                                to="/products"
+                                className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs sm:text-sm font-semibold py-2.5 px-5 rounded-full shadow-2xs transition-all hover:scale-105"
+                            >
                                 Explore Best Sellers →
                             </Link>
                         </div>
                     </div>
+
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
 };
 
 export default Dashboard;

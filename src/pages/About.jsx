@@ -1,197 +1,232 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-    Heart, 
     MapPin, 
-    Phone, 
-    Clock, 
     ArrowRight, 
     ShieldCheck, 
     Sparkles, 
-    Check, 
-    ChevronDown, 
     MessageCircle, 
     ShoppingBag, 
     Truck, 
     RotateCcw,
     Compass,
-    Eye,
+    CheckCircle2,
+    Smile,
+    Check,
     Target,
-    Milestone,
-    Calendar,
-    Award
+    Eye,
+    HeartHandshake,
+    Leaf,
+    Milestone
 } from 'lucide-react';
 import Breadcrumb from '../components/Breadcrumb';
 
 const About = () => {
-    const [openFaq, setOpenFaq] = useState(0);
-    const [activeTab, setActiveTab] = useState('toddlers');
-
-    const journeyMilestones = [
+    // 4 Visual Feature Cards with Real Photos
+    const features = [
         {
-            year: "Late 2022",
-            badge: "The Living Room Spark",
-            title: "Frustrated Parents in Mota Varachha, Surat",
-            desc: "Like most parents, our living room floor was covered with noisy plastic battery gadgets that cracked in two days while our children stayed glued to smartphones. We knew Indian children deserved real, tactile wonder."
+            title: "100% Solid Natural Wood",
+            subtitle: "Neem & Beechwood",
+            desc: "Zero MDF, zero toxic glues, and zero plastic odor. Silky hand-sanded edges safe for curious hands.",
+            image: "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=800&q=80",
+            badge: "Natural Timber",
+            badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200"
         },
         {
-            year: "Early 2023",
-            badge: "The First 25 Toys",
-            title: "Montessori & Sensory Woodwork",
-            desc: "We curated and tested 25 splinter-free, natural wooden puzzles with our own children, nieces, and neighborhood families in Surat. The genuine joy and hours of focused play convinced us to turn this passion into Little Joys."
+            title: "Saliva-Safe Food Grade Dyes",
+            subtitle: "100% BIS Certified",
+            desc: "Babies explore with their mouths first. Organic water-based vegetable colors that never peel or chip.",
+            image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=800&q=80",
+            badge: "Teething Safe",
+            badgeColor: "bg-rose-50 text-[#E51A22] border-rose-200"
         },
         {
-            year: "Late 2023",
-            badge: "The Physical Showroom",
-            title: "Doors Open at Tulsi Arcade, Sudama Chowk",
-            desc: "We opened our Surat experience store with dedicated open play tables. Parents and children could sit together, touch the wood, solve puzzles, and see what truly sparked their interest before buying."
+            title: "Screen-Free Brain Building",
+            subtitle: "Open-Ended Montessori",
+            desc: "No loud flashing lights or dead-end electronics. The child imagines, balances, builds, and solves.",
+            image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=800&q=80",
+            badge: "Active Play",
+            badgeColor: "bg-amber-50 text-amber-800 border-amber-200"
         },
         {
-            year: "Today & Beyond",
-            badge: "Nationwide Community",
-            title: "15,000+ Happy Homes Across India",
-            desc: "Now shipping to over 19,000 pin codes across every Indian state, with over 1,000+ curated screen-free educational toys, STEM kits, and puzzles that create lifelong childhood memories."
+            title: "Built to Survive Childhood",
+            subtitle: "Heirloom Durability",
+            desc: "Drop-tested for hard floor crashes and rough toddler play. Made to be proudly passed down to siblings.",
+            image: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=800&q=80",
+            badge: "Drop Tested",
+            badgeColor: "bg-blue-50 text-blue-700 border-blue-200"
         }
     ];
 
-    const ageCategories = {
-        toddlers: {
-            title: "Toddlers & Preschoolers (Ages 1 - 4)",
-            summary: "Gentle wooden stacking rings, sensory tactile blocks, and chunky animal puzzles designed for little hands still learning to grasp, balance, and explore without screens.",
-            highlights: [
-                "100% natural plantation wood with silky hand-sanded edges",
-                "Food-grade, saliva-safe water-based organic colors",
-                "Promotes fine motor dexterity and spatial discovery"
-            ],
-            image: "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=1000&auto=format&fit=crop",
-            link: "/products?search=wooden"
+    // Journey Milestones Data
+    const journeyMilestones = [
+        {
+            year: "2022",
+            badge: "The Living Room Spark",
+            location: "Surat, Gujarat",
+            title: "Frustrated by Screen Time & Fragile Plastic",
+            desc: "Tired of noisy plastic toys that broke within days, our founders hand-sanded 10 wooden puzzle sets for their own toddlers at home.",
+            highlight: "10 Wooden Prototypes"
         },
-        explorers: {
-            title: "Curious Builders (Ages 4 - 8)",
-            summary: "Magnetic building tiles, architectural wooden planks, and memory-matching games that turn living room floors into majestic fortresses, bridges, and endless stories.",
-            highlights: [
-                "Heavy-duty encased magnets that will not come loose",
-                "Open-ended play: build a castle today, a spaceship tomorrow",
-                "Encourages collaborative play with siblings and parents"
-            ],
-            image: "https://images.unsplash.com/photo-1581557991964-125469da3b8a?q=80&w=1000&auto=format&fit=crop",
-            link: "/products?search=building"
+        {
+            year: "2023",
+            badge: "The First Toy Studio",
+            location: "Mota Varachha, Surat",
+            title: "Open Play Tables & Community Testing",
+            desc: "We opened our Surat experience store with a simple premise: children can sit, drop, stack, and test toys freely before parents purchase.",
+            highlight: "Surat Flagship Studio"
         },
-        inventors: {
-            title: "Young Thinkers & STEM (Ages 7 - 12+)",
-            summary: "Mechanical gear assemblies, physics puzzle mazes, and brain-teasing strategy games that teach real scientific intuition while keeping kids completely engaged.",
-            highlights: [
-                "Step-by-step pictorial guides written for independent learning",
-                "Hands-on physics and mechanical principles in action",
-                "Proven to replace smartphone and tablet screen time"
-            ],
-            image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?q=80&w=1000&auto=format&fit=crop",
-            link: "/products?search=stem"
+        {
+            year: "2024",
+            badge: "Pan-India Reach",
+            location: "19,000+ Pin Codes",
+            title: "Safe Express Delivery Across India",
+            desc: "Word of mouth among conscious mothers grew our community. We instituted shock-proof eco packaging and quick doorstep shipping.",
+            highlight: "10,000+ Parcels Shipped"
+        },
+        {
+            year: "Today",
+            badge: "A Trusted Movement",
+            location: "All Over India",
+            title: "15,000+ Happy Homes & Growing",
+            desc: "Over 50+ BIS-certified designs, 1,200+ five-star parent reviews, and a steadfast promise to keep childhood active, tactile, and pure.",
+            highlight: "15,000+ Screen-Free Homes"
         }
-    };
+    ];
 
-    const faqs = [
+    // Store & Studio Gallery Photos
+    const studioGallery = [
         {
-            q: "Are your wooden toys really safe if my toddler puts them in their mouth?",
-            a: "Yes, completely. Every wooden toy in our catalog uses natural plantation wood, hand-smoothed corners with zero splinters, and 100% food-grade, water-based non-toxic vegetable paints compliant with Bureau of Indian Standards (BIS) safety norms."
+            title: "Open Play Tables",
+            tag: "Test Before You Buy",
+            image: "/gallery/img2.jpg"
         },
         {
-            q: "Can we visit your showroom in Surat with our children?",
-            a: "We would love to host you! Our store at Tulsi Arcade, Sudama Chowk (Mota Varachha) has an open play table where children can sit, touch, build, and test toys freely before you decide to buy anything."
+            title: "Curated Toy Displays",
+            tag: "Handcrafted in Gujarat",
+            image: "https://images.unsplash.com/photo-1545558014-8692077e9b5c?auto=format&fit=crop&w=800&q=80"
         },
         {
-            q: "What if a toy arrives damaged or has a missing piece?",
-            a: "We have an honest, zero-hassle replacement promise. Simply message us on WhatsApp (8347640423) with a quick photo of the parcel. We will dispatch a free replacement or the missing piece immediately, no arguments."
+            title: "Carefully Packaged",
+            tag: "Shockproof Pan-India Shipping",
+            image: "/gallery/img1.jpg"
         },
         {
-            q: "Do you deliver all over India, and how long does it take?",
-            a: "We ship to over 19,000 pin codes across India. Orders within Gujarat usually arrive in 24 to 48 hours, and other major cities within 3 to 4 working days with live SMS and WhatsApp tracking."
+            title: "Real Child Smiles",
+            tag: "15,000+ Happy Families",
+            image: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=800&q=80"
         }
     ];
 
     return (
-        <div className="bg-[#FAF8F5] min-h-screen text-[#1E2022] font-sans selection:bg-red-100 selection:text-red-700">
+        <div className="bg-[#FAF8F5] min-h-screen text-[#1A1A24] font-sans selection:bg-rose-100 selection:text-rose-700">
             {/* Breadcrumb Navigation */}
             <Breadcrumb items={[{ label: 'About Us', link: null }]} />
 
-            {/* 1. EDITORIAL HERO SECTION - Warm, Human & Grounded */}
-            <section className="relative pt-10 pb-14 md:pt-16 md:pb-20 border-b border-[#E8E2D9]">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            {/* 1. VISUAL HERO SECTION (Hamleys / Modern E-Commerce Style) */}
+            <section className="relative overflow-hidden pt-6 pb-10 sm:pt-8 sm:pb-14 border-b border-orange-100/70 bg-gradient-to-b from-[#FFFDF9] to-[#FAF8F5]">
+                <div className="max-w-[1360px] mx-auto px-4 sm:px-6 md:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                         
-                        {/* Left Column: Sincere Headline & Manifesto */}
-                        <div className="lg:col-span-7 space-y-5">
-                            <div className="inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-[#E51A22] bg-[#FCE8E8] px-3.5 py-1.5 rounded-full">
-                                <span>A Family Toy Studio · Surat, Gujarat</span>
+                        {/* Left: Punchy Headline & Visual Stats */}
+                        <div className="lg:col-span-6 space-y-5">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-rose-200/90 shadow-2xs text-[#E51A22] text-xs font-black uppercase tracking-wider">
+                                <Smile className="w-3.5 h-3.5 fill-[#E51A22]" />
+                                <span>A Family Toy Workshop · Surat, Gujarat</span>
                             </div>
 
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#1A1A24] tracking-tight leading-[1.2]">
-                                We believe childhood should be filled with wonder, <br className="hidden sm:inline" />
-                                <span className="text-[#E51A22]">not glowing screens.</span>
+                            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-[#1A1A24] tracking-tight leading-[1.12]">
+                                Screen-Free Wonder for Curious <br className="hidden sm:inline" />
+                                <span className="text-[#E51A22] relative inline-block">
+                                    Little Minds.
+                                    <svg className="absolute -bottom-2 left-0 w-full h-3 text-[#E51A22]/25 -z-10" viewBox="0 0 100 20" preserveAspectRatio="none">
+                                        <path d="M0 15 Q 50 0 100 15" stroke="currentColor" strokeWidth="6" fill="transparent"/>
+                                    </svg>
+                                </span>
                             </h1>
 
-                            <p className="text-base sm:text-lg text-gray-700 leading-relaxed font-normal">
-                                Little Joys started in our own living room in Surat. Like many parents, we were tired of noisy, breakable plastic toys that end up in the trash after three days while kids stay glued to mobile phones.
+                            <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-normal max-w-xl">
+                                We make heirloom wooden toys, Montessori activity sets, and tactile STEM games that replace mindless smartphone scrolling with real living-room curiosity.
                             </p>
 
-                            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                                We set out to find toys that do the opposite: natural wooden puzzles, durable magnetic builders, and thoughtful STEM sets that spark real curiosity and bring parents and kids back to the living room rug together.
-                            </p>
-
-                            {/* Human Touch Actions */}
-                            <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
+                            {/* Action Buttons */}
+                            <div className="pt-1 flex flex-wrap items-center gap-3 sm:gap-4">
                                 <Link 
                                     to="/products"
-                                    className="bg-[#E51A22] hover:bg-[#c9141b] text-white text-sm sm:text-base font-bold py-3 px-7 rounded-xl shadow-sm transition-all hover:shadow-md flex items-center gap-2"
+                                    className="bg-[#E51A22] hover:bg-[#c9141b] text-white text-sm sm:text-base font-black py-3.5 px-8 rounded-2xl shadow-md hover:shadow-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-2 cursor-pointer"
                                 >
                                     <ShoppingBag className="w-4 h-4" />
-                                    Explore Our Toys
+                                    Explore Handcrafted Toys
                                 </Link>
                                 <a 
-                                    href="https://wa.me/918347640423?text=Hello%20Little%20Joys,%20can%20you%20help%20me%20pick%20the%20best%20toy%20for%20my%20child?" 
+                                    href="https://wa.me/918347640423?text=Hi%20Little%20Joys,%20can%20you%20help%20me%20choose%20a%20toy%20for%20my%20child?" 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 text-sm sm:text-base font-semibold py-3 px-6 rounded-xl transition-all shadow-xs flex items-center gap-2"
+                                    className="bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-200 text-sm sm:text-base font-bold py-3.5 px-6 rounded-2xl transition-all shadow-2xs hover:shadow-sm flex items-center gap-2 cursor-pointer"
                                 >
                                     <MessageCircle className="w-4 h-4 text-emerald-600" />
-                                    Ask a Parent on WhatsApp
+                                    WhatsApp Helpline
                                 </a>
                             </div>
 
-                            {/* Honest Reassurances */}
-                            <div className="pt-4 border-t border-[#E8E2D9] grid grid-cols-3 gap-4 text-left">
-                                <div>
-                                    <span className="block text-xl sm:text-2xl font-black text-[#1A1A24]">15,000+</span>
-                                    <span className="text-xs text-gray-600 font-medium">Families Across India</span>
+                            {/* Trust Stats Bar */}
+                            <div className="pt-5 border-t border-slate-200/80 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-2xs">
+                                    <span className="block text-2xl font-black text-[#1A1A24]">15,000+</span>
+                                    <span className="text-[11.5px] text-slate-500 font-semibold">Indian Homes</span>
                                 </div>
-                                <div>
-                                    <span className="block text-xl sm:text-2xl font-black text-emerald-700">100%</span>
-                                    <span className="text-xs text-gray-600 font-medium">BIS Safe & Non-Toxic</span>
+                                <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-2xs">
+                                    <span className="block text-2xl font-black text-emerald-600">100%</span>
+                                    <span className="text-[11.5px] text-slate-500 font-semibold">BIS Non-Toxic</span>
                                 </div>
-                                <div>
-                                    <span className="block text-xl sm:text-2xl font-black text-[#E51A22]">Surat Store</span>
-                                    <span className="text-xs text-gray-600 font-medium">Open Play Tables</span>
+                                <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-2xs">
+                                    <span className="block text-2xl font-black text-amber-500">4.9 ★</span>
+                                    <span className="text-[11.5px] text-slate-500 font-semibold">1,200+ Reviews</span>
+                                </div>
+                                <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-2xs">
+                                    <span className="block text-2xl font-black text-[#E51A22]">Surat</span>
+                                    <span className="text-[11.5px] text-slate-500 font-semibold">Flagship Store</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Column: Warm Candid Photography Collage */}
-                        <div className="lg:col-span-5 relative">
-                            <div className="relative rounded-3xl overflow-hidden shadow-lg border-4 border-white bg-white">
+                        {/* Right: Dynamic Visual Collage (Hamleys Style) */}
+                        <div className="lg:col-span-6 grid grid-cols-12 gap-3 sm:gap-4 relative">
+                            {/* Main Large Image */}
+                            <div className="col-span-8 rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-white group">
                                 <img 
                                     src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=900&auto=format&fit=crop" 
-                                    alt="Child playing with wooden toys" 
-                                    className="w-full aspect-[4/5] object-cover"
+                                    alt="Kids playing with wooden train" 
+                                    className="w-full aspect-[4/4.5] object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
-                                <div className="p-4 sm:p-5 bg-white border-t border-gray-100">
-                                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                                        <MapPin className="w-3.5 h-3.5 text-[#E51A22]" />
-                                        <span>Photographed at our Surat studio</span>
-                                    </div>
-                                    <p className="text-sm font-bold text-gray-900 leading-snug">
-                                        "A toy should be 10% toy and 90% child. That is where real imagination begins."
-                                    </p>
+                                <div className="p-3 bg-white text-xs font-bold text-slate-800 flex items-center justify-between">
+                                    <span>🧸 Tested at our Surat Play Tables</span>
+                                    <span className="text-[#E51A22]">100% Solid Wood</span>
                                 </div>
+                            </div>
+
+                            {/* Stacked Small Images */}
+                            <div className="col-span-4 space-y-3 sm:space-y-4 flex flex-col justify-between">
+                                <div className="rounded-2xl overflow-hidden shadow-md border-3 border-white bg-white group">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=600&auto=format&fit=crop" 
+                                        alt="Toddler stacking wooden rings" 
+                                        className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                </div>
+                                <div className="rounded-2xl overflow-hidden shadow-md border-3 border-white bg-white group">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?q=80&w=600&auto=format&fit=crop" 
+                                        alt="Child building blocks tower" 
+                                        className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Floating Reassurance Badge */}
+                            <div className="absolute -bottom-3 left-6 sm:left-10 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl py-2 px-4 shadow-xl flex items-center gap-2">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                <span className="text-xs font-black text-slate-900">Saliva-Safe & Non-Toxic</span>
                             </div>
                         </div>
 
@@ -199,465 +234,291 @@ const About = () => {
                 </div>
             </section>
 
-            {/* 2. OUR FOUNDER'S NOTE - Authentic, Sincere Storytelling */}
-            <section className="max-w-4xl mx-auto px-4 sm:px-6 py-14 md:py-18">
-                <div className="bg-white rounded-3xl p-6 sm:p-10 md:p-12 border border-[#E8E2D9] shadow-xs relative">
-                    <div className="max-w-2xl mx-auto">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-full bg-[#FCE8E8] text-[#E51A22] flex items-center justify-center font-bold text-lg">
-                                ❤
-                            </div>
-                            <div>
-                                <h2 className="text-xl sm:text-2xl font-black text-gray-900">An Open Note from Our Family</h2>
-                                <p className="text-xs text-gray-500">Why we started Little Joys in Mota Varachha, Surat</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4 text-gray-700 text-sm sm:text-base leading-relaxed">
-                            <p>
-                                <em>Dear Fellow Parent,</em>
-                            </p>
-                            <p>
-                                If your home looks anything like ours did a couple of years ago, you know the feeling. The living room floor is scattered with battery-operated gadgets that blast loud sirens, repeat the same annoying songs, and break into pieces within a week.
-                            </p>
-                            <p>
-                                Even worse, when children get bored of these noisy toys, the only thing that seems to hold their attention is a smartphone screen.
-                            </p>
-                            <p>
-                                We wanted something better for our own kids. We wanted toys that children could hold, explore, build, toss, and imagine with for hours without needing a charger or a screen.
-                            </p>
-                            <p>
-                                That is how <strong>Little Joys</strong> was born. We started with just 25 carefully selected wooden puzzles and STEM kits in Surat. We tested each one with our own children, nieces, and neighborhood friends. If a toy couldn't hold a child's interest for at least an hour of open play, we didn't offer it.
-                            </p>
-                            <p>
-                                Today, we are humbled to ship to thousands of homes across India every month. But our rule hasn't changed: <strong>we only sell toys we are proud to place in our own children's hands.</strong>
-                            </p>
-                        </div>
-
-                        {/* Founder Sign-off */}
-                        <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div>
-                                <p className="font-bold text-gray-900 text-sm sm:text-base">Adheer & The Little Joys Team</p>
-                                <p className="text-xs text-gray-500">Parents, Curators & Founders · Surat, Gujarat</p>
-                            </div>
-                            <div>
-                                <span className="inline-block text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                                    Parent Tested & Approved
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* 3. OUR VISION & PURPOSE (Dedicated, Inspiring & Authentic) */}
-            <section className="bg-white border-y border-[#E8E2D9] py-14 md:py-20">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6">
-                    <div className="max-w-3xl mx-auto text-center mb-12">
-                        <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#E51A22] bg-[#FCE8E8] px-3.5 py-1.5 rounded-full mb-3">
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>Our Guiding Compass</span>
-                        </div>
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
-                            Our Vision: Nurturing 100,000+ Screen-Free Childhoods
-                        </h2>
-                        <p className="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed">
-                            We envision an India where children grow up with dirt on their hands, wonder in their eyes, and an insatiable curiosity to build, solve, and create in the real physical world.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-                        {/* Vision Card 1 */}
-                        <div className="bg-[#FAF8F5] p-6 sm:p-8 rounded-3xl border border-[#E8E2D9] hover:border-red-200 transition-all flex flex-col justify-between group">
-                            <div className="space-y-4">
-                                <div className="w-12 h-12 rounded-2xl bg-[#FCE8E8] text-[#E51A22] flex items-center justify-center font-bold">
-                                    <Eye className="w-6 h-6" />
-                                </div>
-                                <h3 className="text-lg font-black text-gray-900 leading-snug">
-                                    The Vision
-                                </h3>
-                                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                                    To replace mindless scrolling and fragile plastic waste with heirloom-quality toys that awaken deep focus, cognitive problem-solving, and shared family playtime across homes in India.
-                                </p>
-                            </div>
-                            <div className="mt-6 pt-4 border-t border-gray-200/60 text-xs font-bold text-[#E51A22] flex items-center gap-1.5">
-                                <Check className="w-3.5 h-3.5 text-emerald-600" /> Focus on Real Imagination
-                            </div>
-                        </div>
-
-                        {/* Vision Card 2 - The Mission */}
-                        <div className="bg-[#FAF8F5] p-6 sm:p-8 rounded-3xl border border-[#E8E2D9] hover:border-emerald-200 transition-all flex flex-col justify-between group">
-                            <div className="space-y-4">
-                                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
-                                    <Target className="w-6 h-6" />
-                                </div>
-                                <h3 className="text-lg font-black text-gray-900 leading-snug">
-                                    Our Mission
-                                </h3>
-                                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                                    To design, hand-inspect, and dispatch 100% BIS-certified, chemical-free wooden and STEM toys directly from Surat to every corner of India at honest, accessible family prices.
-                                </p>
-                            </div>
-                            <div className="mt-6 pt-4 border-t border-gray-200/60 text-xs font-bold text-emerald-700 flex items-center gap-1.5">
-                                <Check className="w-3.5 h-3.5 text-emerald-600" /> Honest Pricing & Safe Materials
-                            </div>
-                        </div>
-
-                        {/* Vision Card 3 - The Core Commitment */}
-                        <div className="bg-[#FAF8F5] p-6 sm:p-8 rounded-3xl border border-[#E8E2D9] hover:border-amber-200 transition-all flex flex-col justify-between group">
-                            <div className="space-y-4">
-                                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
-                                    <Award className="w-6 h-6" />
-                                </div>
-                                <h3 className="text-lg font-black text-gray-900 leading-snug">
-                                    Our 100% Parent Promise
-                                </h3>
-                                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                                    Every toy in our catalog must first pass our own children's 100-hour playroom test. If it doesn't inspire curiosity or can't survive real drops, we refuse to sell it.
-                                </p>
-                            </div>
-                            <div className="mt-6 pt-4 border-t border-gray-200/60 text-xs font-bold text-amber-800 flex items-center gap-1.5">
-                                <Check className="w-3.5 h-3.5 text-emerald-600" /> Tested by Real Children
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* 4. OUR JOURNEY (Authentic Timeline Storytelling) */}
-            <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-20">
-                <div className="text-center max-w-xl mx-auto mb-12">
-                    <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#E51A22] bg-[#FCE8E8] px-3.5 py-1.5 rounded-full mb-3">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span>How We Got Here</span>
-                    </div>
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
-                        Our Journey: Step by Step
+            {/* 2. OUR VISION & OUR MISSION (Handcrafted, Human-Centered, NOT Generic AI) */}
+            <section className="pt-8 pb-5 md:pt-10 md:pb-6 max-w-[1360px] mx-auto px-4 sm:px-6 md:px-8">
+                <div className="text-center max-w-2xl mx-auto mb-6 md:mb-8">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#E51A22] bg-rose-50 border border-rose-200 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5 mb-2">
+                        <Compass className="w-3.5 h-3.5 text-[#E51A22]" />
+                        Our Purpose & Guiding Principles
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#1A1A24] tracking-tight">
+                        Built for Wonder. Crafted for Real Childhoods.
                     </h2>
-                    <p className="mt-2 text-sm text-gray-600">
-                        From a small living room in Surat to over 15,000 family playrooms across India.
+                    <p className="mt-1.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        We don't manufacture disposable plastic knick-knacks. We build sensory childhood memories that nurture genuine creativity and survive generations.
                     </p>
                 </div>
 
-                <div className="space-y-6 sm:space-y-8 relative before:absolute before:inset-0 before:left-5 sm:before:left-1/2 before:w-0.5 before:bg-[#E8E2D9] before:-translate-x-1/2 before:hidden sm:before:block">
-                    {journeyMilestones.map((item, idx) => {
-                        const isEven = idx % 2 === 0;
-                        return (
-                            <div 
-                                key={idx} 
-                                className={`relative flex flex-col sm:flex-row items-center gap-6 ${
-                                    isEven ? 'sm:flex-row-reverse' : ''
-                                }`}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+                    {/* Vision Card */}
+                    <div className="bg-white rounded-3xl p-6 sm:p-7 md:p-8 border-2 border-rose-100 shadow-2xs hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between group">
+                        <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-rose-50 rounded-full blur-2xl pointer-events-none -z-0"></div>
+                        
+                        <div className="relative z-10 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-[#E51A22] border border-rose-200 text-xs font-black uppercase tracking-wider">
+                                    <Eye className="w-3.5 h-3.5" />
+                                    Our Vision
+                                </span>
+                                <span className="text-xs font-bold text-slate-400">Where We Are Going</span>
+                            </div>
+
+                            <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#1A1A24] leading-snug">
+                                Nurturing 100,000+ screen-free, wonder-filled childhoods across Indian homes.
+                            </h3>
+
+                            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                                In a world where toddlers are handed touchscreens before they can walk, we envision living rooms filled once again with the clatter of wooden blocks, curious giggles, and focused hands-on problem solving.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Mission Card */}
+                    <div className="bg-white rounded-3xl p-6 sm:p-7 md:p-8 border-2 border-emerald-100 shadow-2xs hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between group">
+                        <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-emerald-50 rounded-full blur-2xl pointer-events-none -z-0"></div>
+
+                        <div className="relative z-10 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black uppercase tracking-wider">
+                                    <Target className="w-3.5 h-3.5" />
+                                    Our Mission
+                                </span>
+                                <span className="text-xs font-bold text-slate-400">What We Build Every Day</span>
+                            </div>
+
+                            <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#1A1A24] leading-snug">
+                                Crafting safe, heirloom-quality developmental toys that parents trust unconditionally.
+                            </h3>
+
+                            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                                We combine age-old Gujarat carpentry with modern child development research. Every edge is hand-beveled, every coat is tested against saliva, and every design sparks open-ended thinking.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* The Parent Promise Strip */}
+                <div className="mt-5 bg-gradient-to-r from-amber-50/70 via-orange-50/70 to-rose-50/70 border border-amber-200/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 text-center sm:text-left">
+                        <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+                            <HeartHandshake className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <span className="text-[11px] font-black uppercase tracking-wider text-amber-800 block">The Little Joys Family Pledge</span>
+                            <p className="text-xs sm:text-sm font-semibold text-slate-800">
+                                "If a toy is not 100% safe, durable, and inspiring enough for our own children in Surat, it will never enter our shelves."
+                            </p>
+                        </div>
+                    </div>
+                    <Link
+                        to="/products"
+                        className="shrink-0 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5"
+                    >
+                        See the Collection
+                        <ArrowRight className="w-3.5 h-3.5 text-[#E51A22]" />
+                    </Link>
+                </div>
+            </section>
+
+            {/* 3. THE 4 REASONS PARENTS CHOOSE US (Visual Photo Cards - Clickable Links) */}
+            <section className="py-7 md:py-9 bg-white border-y border-orange-100/80">
+                <div className="max-w-[1360px] mx-auto px-4 sm:px-6 md:px-8">
+                    <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-7 gap-3">
+                        <div>
+                            <span className="text-xs font-black uppercase tracking-wider text-[#E51A22] bg-rose-50 border border-rose-200 px-3.5 py-1 rounded-full inline-block mb-1.5">
+                                The Little Joys Standard
+                            </span>
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#1A1A24] tracking-tight">
+                                Why Indian Parents Trust Us
+                            </h2>
+                        </div>
+                        <p className="text-xs sm:text-sm text-slate-500 max-w-xs">
+                            Every single toy is designed for real play, drop durability, and zero screens.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        {features.map((item, idx) => (
+                            <Link 
+                                to="/products"
+                                key={idx}
+                                className="bg-[#FAF8F5] border-2 border-slate-200/80 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:border-[#E51A22] hover:-translate-y-1.5 transition-all duration-300 flex flex-col group cursor-pointer block text-inherit no-underline"
                             >
-                                {/* Content Card */}
-                                <div className="w-full sm:w-[calc(50%-2.5rem)]">
-                                    <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E8E2D9] shadow-xs hover:shadow-md transition-shadow">
-                                        <div className="flex items-center justify-between gap-2 mb-3">
-                                            <span className="text-2xl font-black text-[#E51A22] tracking-tight">{item.year}</span>
-                                            <span className="text-[11px] font-bold text-[#E51A22] bg-red-50 border border-red-100 px-3 py-1 rounded-full uppercase tracking-wider">
-                                                {item.badge}
-                                            </span>
-                                        </div>
-                                        <h3 className="font-extrabold text-gray-900 text-base sm:text-lg mb-2">
+                                {/* Card Photo Header */}
+                                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                                    <img 
+                                        src={item.image} 
+                                        alt={item.title} 
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                    <span className={`absolute top-3 left-3 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border shadow-2xs backdrop-blur-xs ${item.badgeColor}`}>
+                                        {item.badge}
+                                    </span>
+                                </div>
+
+                                {/* Card Content */}
+                                <div className="p-4 sm:p-5 flex flex-col justify-between flex-1">
+                                    <div>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                                            {item.subtitle}
+                                        </span>
+                                        <h3 className="font-black text-base sm:text-lg text-[#1A1A24] group-hover:text-[#E51A22] transition-colors leading-snug mb-2">
                                             {item.title}
                                         </h3>
-                                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
                                             {item.desc}
                                         </p>
                                     </div>
-                                </div>
 
-                                {/* Center Dot on Timeline */}
-                                <div className="hidden sm:flex absolute left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white border-4 border-[#E51A22] items-center justify-center shadow-xs z-10">
-                                    <div className="w-2 h-2 rounded-full bg-[#E51A22]" />
+                                    <div className="mt-4 pt-3 border-t border-slate-200/70 flex items-center justify-between text-xs font-bold text-[#E51A22]">
+                                        <span className="flex items-center gap-1 text-emerald-700 font-semibold">
+                                            <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[3]" /> BIS Compliant
+                                        </span>
+                                        <span className="flex items-center gap-1 text-[#E51A22] group-hover:underline">
+                                            Explore <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                        </span>
+                                    </div>
                                 </div>
-
-                                {/* Spacer for symmetrical balance */}
-                                <div className="hidden sm:block w-[calc(50%-2.5rem)]" />
-                            </div>
-                        );
-                    })}
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </section>
 
-            {/* 5. OUR THREE SIMPLE PROMISES (Not a generic AI card grid) */}
-            <section className="bg-white border-y border-[#E8E2D9] py-14 md:py-18">
-                <div className="max-w-5xl mx-auto px-4 sm:px-6">
-                    <div className="text-center max-w-xl mx-auto mb-10">
-                        <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-                            What Makes Our Toys Different
+            {/* 4. OUR JOURNEY (Milestone Cards - Real, Grounded & Human) */}
+            <section className="py-7 md:py-9 max-w-[1360px] mx-auto px-4 sm:px-6 md:px-8">
+                <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#E51A22] bg-rose-50 border border-rose-200 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5 mb-2">
+                        <Milestone className="w-3.5 h-3.5 text-[#E51A22]" />
+                        Our Journey & Milestones
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#1A1A24] tracking-tight">
+                        From a Living Room in Surat to 15,000+ Homes
+                    </h2>
+                    <p className="mt-1 text-xs sm:text-sm text-slate-600">
+                        How a simple parenting problem grew into one of Gujarat's most loved wooden toy brands.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+                    {journeyMilestones.map((step, idx) => (
+                        <div 
+                            key={idx} 
+                            className="bg-white p-6 sm:p-7 rounded-3xl border-2 border-slate-200/80 shadow-xs hover:shadow-lg hover:border-[#E51A22] transition-all flex flex-col justify-between group relative"
+                        >
+                            <div>
+                                {/* Year Header with pill badge */}
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-2xl font-black text-[#E51A22] tracking-tight">
+                                        {step.year}
+                                    </span>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                                        {step.badge}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-2">
+                                    <MapPin className="w-3 h-3 text-[#E51A22]" />
+                                    <span>{step.location}</span>
+                                </div>
+
+                                <h3 className="font-black text-base sm:text-lg text-slate-900 group-hover:text-[#E51A22] transition-colors leading-snug mb-2.5">
+                                    {step.title}
+                                </h3>
+
+                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                                    {step.desc}
+                                </p>
+                            </div>
+
+                            <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                <span className="font-bold text-slate-800 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
+                                    {step.highlight}
+                                </span>
+                                <span className="text-slate-400 font-black">
+                                    0{idx + 1}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* 5. VISUAL PHOTO GALLERY & SURAT FLAGSHIP STORE */}
+            <section className="py-7 md:py-9 bg-white border-t border-orange-100/80">
+                <div className="max-w-[1360px] mx-auto px-4 sm:px-6 md:px-8">
+                    <div className="text-center max-w-xl mx-auto mb-6 sm:mb-7">
+                        <span className="text-xs font-black uppercase tracking-wider text-[#E51A22] bg-rose-50 border border-rose-200 px-3.5 py-1 rounded-full inline-block mb-1.5">
+                            Surat Flagship Studio
+                        </span>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#1A1A24] tracking-tight">
+                            Come Sit, Touch & Play with Us
                         </h2>
-                        <p className="mt-2 text-sm text-gray-600">
-                            Three simple rules we never compromise on, from our workshop to your home.
+                        <p className="mt-1 text-xs sm:text-sm text-slate-600">
+                            We have dedicated open play tables where kids can build and test toys freely.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Rule 1 */}
-                        <div className="space-y-3 bg-[#FAF8F5] p-6 rounded-2xl border border-gray-200/80">
-                            <div className="w-12 h-12 rounded-2xl bg-[#FCE8E8] text-[#E51A22] flex items-center justify-center font-bold text-lg mb-4">
-                                <Sparkles className="w-6 h-6" />
-                            </div>
-                            <h3 className="text-lg font-bold text-gray-900">1. Screen-Free & Open-Ended</h3>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                                Our toys do not play by themselves. There are no flashing lights that entertain passively. The child is the storyteller, builder, and problem solver.
-                            </p>
-                        </div>
-
-                        {/* Rule 2 */}
-                        <div className="space-y-3 bg-[#FAF8F5] p-6 rounded-2xl border border-gray-200/80">
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-lg mb-4">
-                                <ShieldCheck className="w-6 h-6" />
-                            </div>
-                            <h3 className="text-lg font-bold text-gray-900">2. Safe for Teething Toddlers</h3>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                                Natural woods, food-grade non-toxic water stains, and silky hand-sanded edges. Zero chemical odors, heavy metals, or hazardous sharp edges.
-                            </p>
-                        </div>
-
-                        {/* Rule 3 */}
-                        <div className="space-y-3 bg-[#FAF8F5] p-6 rounded-2xl border border-gray-200/80">
-                            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-lg mb-4">
-                                <RotateCcw className="w-6 h-6" />
-                            </div>
-                            <h3 className="text-lg font-bold text-gray-900">3. Built to Be Handed Down</h3>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                                Toys should survive childhood. We build and source solid materials that withstand accidental drops, throws, and years of play so they can be passed to younger siblings.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* 6. EXPLORE BY AGE & STAGE - Interactive, Clean & Thoughtful */}
-            <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-18">
-                <div className="text-center max-w-xl mx-auto mb-8">
-                    <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-                        Thoughtful Toys for Every Milestone
-                    </h2>
-                    <p className="mt-2 text-sm text-gray-600">
-                        Pick your child's age group to see how our toys nurture natural curiosity.
-                    </p>
-                </div>
-
-                {/* Tab Switcher */}
-                <div className="flex justify-center mb-8">
-                    <div className="inline-flex bg-white p-1.5 rounded-2xl border border-gray-200 shadow-2xs">
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('toddlers')}
-                            className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                                activeTab === 'toddlers' 
-                                    ? 'bg-[#E51A22] text-white shadow-xs' 
-                                    : 'text-gray-600 hover:text-gray-900'
-                            }`}
-                        >
-                            Ages 1 - 4
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('explorers')}
-                            className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                                activeTab === 'explorers' 
-                                    ? 'bg-[#E51A22] text-white shadow-xs' 
-                                    : 'text-gray-600 hover:text-gray-900'
-                            }`}
-                        >
-                            Ages 4 - 8
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('inventors')}
-                            className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                                activeTab === 'inventors' 
-                                    ? 'bg-[#E51A22] text-white shadow-xs' 
-                                    : 'text-gray-600 hover:text-gray-900'
-                            }`}
-                        >
-                            Ages 7 - 12+
-                        </button>
-                    </div>
-                </div>
-
-                {/* Tab Content Box */}
-                <div className="bg-white rounded-3xl border border-[#E8E2D9] p-6 sm:p-10 shadow-xs">
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-                        <div className="md:col-span-7 space-y-4">
-                            <span className="text-xs font-bold uppercase tracking-wider text-[#E51A22]">
-                                Developmental Milestone
-                            </span>
-                            <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
-                                {ageCategories[activeTab].title}
-                            </h3>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                                {ageCategories[activeTab].summary}
-                            </p>
-
-                            <ul className="space-y-2.5 pt-2">
-                                {ageCategories[activeTab].highlights.map((item, idx) => (
-                                    <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-gray-700">
-                                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <div className="pt-4">
-                                <Link
-                                    to={ageCategories[activeTab].link}
-                                    className="inline-flex items-center gap-2 text-sm font-bold text-[#E51A22] hover:text-[#c9141b] group"
-                                >
-                                    Browse this age collection <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                            </div>
-                        </div>
-
-                        <div className="md:col-span-5">
-                            <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-gray-100 border border-gray-100 shadow-xs">
+                    {/* 4-Image Grid Showcase */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 mb-8">
+                        {studioGallery.map((item, idx) => (
+                            <div key={idx} className="relative rounded-2xl overflow-hidden aspect-[4/3] group shadow-sm">
                                 <img 
-                                    src={ageCategories[activeTab].image} 
-                                    alt={ageCategories[activeTab].title}
-                                    className="w-full h-full object-cover" 
+                                    src={item.image} 
+                                    alt={item.title} 
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex flex-col justify-end p-3 sm:p-4 text-white">
+                                    <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider">{item.tag}</span>
+                                    <h4 className="text-xs sm:text-sm font-extrabold leading-tight">{item.title}</h4>
+                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
-                </div>
-            </section>
 
-            {/* 7. VISIT OUR SURAT STORE - Authentic Local Anchor */}
-            <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-14 md:pb-18">
-                <div className="bg-[#FAF4ED] border border-[#E8DEC8] rounded-3xl p-6 sm:p-10 md:p-12">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                        
-                        <div className="lg:col-span-7 space-y-4">
-                            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-3 py-1 rounded-full">
-                                <MapPin className="w-3.5 h-3.5" />
-                                <span>Our Physical Experience Store</span>
-                            </div>
-
-                            <h3 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-                                Come Visit Our Play Tables in Surat
-                            </h3>
-
-                            <p className="text-sm text-gray-700 leading-relaxed">
-                                We believe children should touch, build, and test toys before parents buy them. Our Surat store has an open play area where kids can sit, build, and play freely without any pressure to buy.
-                            </p>
-
-                            <div className="space-y-2.5 pt-2 text-xs sm:text-sm text-gray-800">
-                                <div className="flex items-start gap-2.5">
-                                    <MapPin className="w-4 h-4 text-[#E51A22] shrink-0 mt-0.5" />
-                                    <span><strong>Address:</strong> Tulsi Arcade, Sudama Chowk, Mota Varachha, Surat, Gujarat 394101</span>
+                    {/* Store Address & Contact Card */}
+                    <div className="bg-[#FAF8F5] border-2 border-slate-200/90 rounded-3xl p-6 sm:p-8 md:p-10 shadow-sm">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                            <div className="lg:col-span-8 space-y-3">
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-[#E51A22] text-xs font-bold">
+                                    <MapPin className="w-3.5 h-3.5" />
+                                    <span>Physical Experience Store</span>
                                 </div>
-                                <div className="flex items-start gap-2.5">
-                                    <Clock className="w-4 h-4 text-[#E51A22] shrink-0 mt-0.5" />
-                                    <span><strong>Timings:</strong> Monday – Saturday: 10:00 AM – 8:30 PM (Sunday Closed)</span>
-                                </div>
-                                <div className="flex items-start gap-2.5">
-                                    <Phone className="w-4 h-4 text-[#E51A22] shrink-0 mt-0.5" />
-                                    <span><strong>Helpline:</strong> +91 8347640423 (WhatsApp / Call)</span>
+                                <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                                    Little Joys Experience Store · Mota Varachha, Surat
+                                </h3>
+                                <div className="space-y-1.5 text-xs sm:text-sm text-slate-600">
+                                    <p><strong>Address:</strong> Tulsi Arcade, Sudama Chowk, Mota Varachha, Surat, Gujarat 394101</p>
+                                    <p><strong>Timings:</strong> Monday to Saturday: 10:00 AM – 8:30 PM (Sunday by appointment)</p>
+                                    <p><strong>Direct Helpline / WhatsApp:</strong> +91 8347640423</p>
                                 </div>
                             </div>
 
-                            <div className="pt-3 flex flex-wrap gap-3">
+                            <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
                                 <a 
                                     href="https://maps.google.com/?q=Tulsi+Arcade,+Sudama+Chowk,+Mota+Varachha,+Surat"
-                                    target="_blank"
+                                    target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="bg-[#1A1A24] hover:bg-black text-white text-xs sm:text-sm font-bold py-2.5 px-5 rounded-xl transition-all flex items-center gap-2"
+                                    className="w-full bg-[#1A1A24] hover:bg-black text-white font-bold text-xs sm:text-sm py-3 px-5 rounded-2xl transition-all flex items-center justify-center gap-2"
                                 >
                                     <Compass className="w-4 h-4" />
-                                    Open in Google Maps
+                                    Get Directions on Google Maps
                                 </a>
                                 <a 
-                                    href="tel:+918347640423"
-                                    className="bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 text-xs sm:text-sm font-semibold py-2.5 px-5 rounded-xl transition-all flex items-center gap-2"
+                                    href="https://wa.me/918347640423?text=Hello%20Little%20Joys%20Store"
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm py-3 px-5 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-xs"
                                 >
-                                    <Phone className="w-4 h-4 text-emerald-600" />
-                                    Call Store
+                                    <MessageCircle className="w-4 h-4" />
+                                    WhatsApp Store Team
                                 </a>
                             </div>
                         </div>
-
-                        {/* Right: Pan-India Delivery Card */}
-                        <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-gray-200/80 shadow-2xs space-y-3 text-center sm:text-left">
-                            <div className="w-10 h-10 rounded-xl bg-red-50 text-[#E51A22] flex items-center justify-center mb-2 mx-auto sm:mx-0">
-                                <Truck className="w-5 h-5" />
-                            </div>
-                            <h4 className="font-bold text-gray-900 text-base">Not in Surat? We Ship Pan-India</h4>
-                            <p className="text-xs text-gray-600 leading-relaxed">
-                                Every order is hand-checked and bubble-wrapped securely. Free delivery across India on orders above ₹500 with live parcel tracking.
-                            </p>
-                            <div className="pt-2">
-                                <Link 
-                                    to="/products"
-                                    className="w-full bg-[#E51A22] hover:bg-[#c9141b] text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-1.5"
-                                >
-                                    Shop Online Catalog <ArrowRight className="w-3.5 h-3.5" />
-                                </Link>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </section>
 
-            {/* 8. HONEST PARENT FAQS - Direct, Helpful, Non-Gimmicky */}
-            <section className="max-w-3xl mx-auto px-4 sm:px-6 pb-20">
-                <div className="text-center mb-8">
-                    <h2 className="text-2xl font-black text-gray-900 tracking-tight">
-                        Frequently Asked Questions
-                    </h2>
-                    <p className="mt-1 text-xs sm:text-sm text-gray-500">
-                        Honest answers to the things parents ask us most.
-                    </p>
-                </div>
-
-                <div className="space-y-3">
-                    {faqs.map((faq, idx) => {
-                        const isOpen = openFaq === idx;
-                        return (
-                            <div 
-                                key={idx}
-                                className="bg-white rounded-2xl border border-gray-200/90 overflow-hidden transition-all shadow-2xs"
-                            >
-                                <button
-                                    type="button"
-                                    onClick={() => setOpenFaq(isOpen ? null : idx)}
-                                    className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-gray-900 text-sm sm:text-base cursor-pointer hover:text-[#E51A22] transition-colors"
-                                >
-                                    <span>{faq.q}</span>
-                                    <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-200 text-gray-400 ${isOpen ? 'rotate-180 text-[#E51A22]' : ''}`} />
-                                </button>
-                                {isOpen && (
-                                    <div className="px-4 pb-4 sm:px-5 sm:pb-5 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
-                                        {faq.a}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {/* Direct Personal Contact */}
-                <div className="mt-8 text-center p-6 bg-white rounded-2xl border border-gray-200/70 shadow-2xs">
-                    <p className="text-xs sm:text-sm font-semibold text-gray-800 mb-1">
-                        Have a specific question about a toy or need a recommendation?
-                    </p>
-                    <p className="text-xs text-gray-500 mb-3">
-                        We are real parents and we are happy to help you choose the right toy for your child.
-                    </p>
-                    <a
-                        href="https://wa.me/918347640423?text=Hi%20Little%20Joys,%20I%20have%20a%20question%20about%20your%20toys"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-2.5 px-5 rounded-xl transition-all shadow-xs"
-                    >
-                        <MessageCircle className="w-4 h-4" />
-                        Chat Directly on WhatsApp (+91 8347640423)
-                    </a>
-                </div>
-            </section>
         </div>
     );
 };
