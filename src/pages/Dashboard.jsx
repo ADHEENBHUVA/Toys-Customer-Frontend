@@ -1305,7 +1305,9 @@ const Dashboard = () => {
                                                 )}
                                                 <div className="flex flex-col justify-center overflow-hidden">
                                                     <span className="font-bold text-[#1A1A24] text-[13px] truncate w-full leading-tight">{media.title || 'Exclusive Toy'}</span>
-                                                    <span className="font-bold text-[#E51A22] text-[11px] truncate w-full leading-tight mt-0.5">{media.subtitle || 'Explore Now'}</span>
+                                                    {media.subtitle && !media.subtitle.toLowerCase().includes('club') && (
+                                                        <span className="font-bold text-[#E51A22] text-[11px] truncate w-full leading-tight mt-0.5">{media.subtitle}</span>
+                                                    )}
                                                 </div>
                                             </Link>
                                         </div>
