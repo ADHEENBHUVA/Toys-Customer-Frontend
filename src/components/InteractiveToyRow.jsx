@@ -803,59 +803,173 @@ const InteractiveToyRow = () => {
                             </div>
                         )}
 
-                        <svg viewBox="0 0 78 78" fill="none" className="w-[41px] h-[41px] xs:w-[50px] xs:h-[50px] sm:w-[63px] sm:h-[63px] md:w-[78px] md:h-[78px] filter drop-shadow-md relative z-10 overflow-visible">
+                        <svg viewBox="0 0 88 62" fill="none" className="w-[46px] h-[36px] xs:w-[56px] xs:h-[44px] sm:w-[70px] sm:h-[54px] md:w-[88px] md:h-[62px] filter drop-shadow-md relative z-10 overflow-visible">
                             <defs>
-                                <linearGradient id="car3DGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#EF4444" />
-                                    <stop offset="60%" stopColor="#DC2626" />
+                                {/* Metallic Racing Red 3D Body Gradient */}
+                                <linearGradient id="toyCarRedGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stopColor="#FF4D4D" />
+                                    <stop offset="25%" stopColor="#EF4444" />
+                                    <stop offset="70%" stopColor="#DC2626" />
                                     <stop offset="100%" stopColor="#991B1B" />
                                 </linearGradient>
+
+                                {/* Glossy Specular Highlight on Roof & Hood */}
+                                <linearGradient id="toyCarGloss" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.75" />
+                                    <stop offset="60%" stopColor="#FFFFFF" stopOpacity="0.1" />
+                                    <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+                                </linearGradient>
+
+                                {/* Glass Windshield Gradient */}
+                                <linearGradient id="toyCarGlass" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#E0F2FE" />
+                                    <stop offset="40%" stopColor="#7DD3FC" />
+                                    <stop offset="100%" stopColor="#38BDF8" />
+                                </linearGradient>
+
+                                {/* Chrome Metallic Gradient */}
+                                <linearGradient id="toyCarChrome" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stopColor="#FFFFFF" />
+                                    <stop offset="45%" stopColor="#E2E8F0" />
+                                    <stop offset="55%" stopColor="#94A3B8" />
+                                    <stop offset="100%" stopColor="#CBD5E1" />
+                                </linearGradient>
+
+                                {/* Gold Rim Gradient */}
+                                <radialGradient id="toyCarGoldRim" cx="40%" cy="35%" r="65%">
+                                    <stop offset="0%" stopColor="#FEF08A" />
+                                    <stop offset="40%" stopColor="#FBBF24" />
+                                    <stop offset="90%" stopColor="#D97706" />
+                                    <stop offset="100%" stopColor="#92400E" />
+                                </radialGradient>
+
+                                {/* Headlight Beam Projection */}
+                                <linearGradient id="toyCarBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stopColor="#FEF08A" stopOpacity="0.95" />
+                                    <stop offset="60%" stopColor="#FEF9C3" stopOpacity="0.45" />
+                                    <stop offset="100%" stopColor="#FEF08A" stopOpacity="0" />
+                                </linearGradient>
                             </defs>
-                            {/* Driver Mascot (Tiny Bear Silhouette) */}
-                            <circle cx="40" cy="30" r="8" fill="#B45309" stroke="#78350F" strokeWidth="1.5" />
-                            <circle cx="38" cy="28" r="1.5" fill="#0F172A" />
-                            <circle cx="35" cy="24" r="3" fill="#B45309" />
-                            <circle cx="45" cy="24" r="3" fill="#B45309" />
 
-                            {/* Windshield */}
-                            <path d="M46 36 L52 44 L44 44 Z" fill="#BAE6FD" opacity="0.8" stroke="#38BDF8" strokeWidth="1.5" />
-
-                            {/* 3D Curvy Car Body */}
-                            <path d="M12 56 C12 46 22 44 32 44 L48 44 C58 44 68 48 70 56 Z" fill="url(#car3DGrad)" stroke="#7F1D1D" strokeWidth="2.5" />
-                            <rect x="8" y="55" width="64" height="9" rx="3" fill="#B91C1C" stroke="#7F1D1D" strokeWidth="1.5" />
-
-                            {/* White Racing Stripe */}
-                            <path d="M14 53 L68 53" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" />
-                            
-                            {/* Number 7 Decal */}
-                            <circle cx="38" cy="53" r="6" fill="#FFFFFF" stroke="#DC2626" strokeWidth="1" />
-                            <text x="38" y="56.5" fill="#B91C1C" fontSize="8" fontWeight="900" textAnchor="middle">7</text>
-
-                            {/* Bright Headlight Beam Cone Projected onto Road */}
+                            {/* BRIGHT HEADLIGHT BEAM CONE (Active) */}
                             {activeIdx === 3 && (
-                                <polygon points="69,54 88,48 88,62 69,56" fill="#FEF08A" opacity="0.85" className="car-headlight-cone pointer-events-none" />
+                                <polygon points="80,38 106,24 106,50 80,42" fill="url(#toyCarBeam)" className="car-headlight-cone pointer-events-none" />
                             )}
 
-                            {/* Front Headlight */}
-                            <circle cx="69" cy="55" r="3.5" fill="#FEF08A" stroke="#EAB308" strokeWidth="1.5" />
+                            {/* REAR SPORT SPOILER */}
+                            <path d="M4 27 L14 27 L12 32 L2 32 Z" fill="#DC2626" stroke="#991B1B" strokeWidth="1.2" strokeLinejoin="round" />
+                            <line x1="5" y1="32" x2="6" y2="38" stroke="#7F1D1D" strokeWidth="2" strokeLinecap="round" />
+                            <line x1="11" y1="32" x2="11" y2="38" stroke="#7F1D1D" strokeWidth="2" strokeLinecap="round" />
 
-                            {/* Front Bumper Grill */}
-                            <rect x="69" y="58" width="4" height="4" rx="1" fill="#94A3B8" />
+                            {/* REAR BUMPER & EXHAUST */}
+                            <rect x="2" y="44" width="4" height="6" rx="2" fill="url(#toyCarChrome)" stroke="#64748B" strokeWidth="0.8" />
+                            <circle cx="3" cy="48" r="1.5" fill="#1E293B" stroke="#64748B" strokeWidth="0.6" />
 
-                            {/* Beechwood Wheels (Spokes Visibly Spin Rapidly) */}
-                            <g style={{ transformOrigin: '23px 65px' }} className={activeIdx === 3 ? "car-wheel-spin" : ""}>
-                                <circle cx="23" cy="65" r="9" fill="#FBBF24" stroke="#B45309" strokeWidth="2.5" />
-                                <circle cx="23" cy="65" r="4.5" fill="#1E293B" />
-                                <line x1="23" y1="56" x2="23" y2="74" stroke="#B45309" strokeWidth="1.2" />
-                                <line x1="14" y1="65" x2="32" y2="65" stroke="#B45309" strokeWidth="1.2" />
-                                <circle cx="23" cy="65" r="1.8" fill="#FFFFFF" />
+                            {/* MAIN CAR BODY SHELL (Sleek aerodynamic curves) */}
+                            <path d="
+                                M 6 44 
+                                C 4 41, 6 36, 12 34 
+                                C 16 33, 20 23, 27 16 
+                                C 33 11, 46 11, 52 16 
+                                C 56 20, 60 27, 65 31 
+                                L 77 35 
+                                C 81 37, 84 40, 84 44 
+                                L 83 48 
+                                C 83 50, 80 50, 77 50 
+                                L 74 50 
+                                C 74 42, 60 42, 60 50 
+                                L 32 50 
+                                C 32 42, 18 42, 18 50 
+                                L 8 50 
+                                C 6 50, 6 47, 6 44 
+                                Z" 
+                                fill="url(#toyCarRedGrad)" 
+                                stroke="#7F1D1D" 
+                                strokeWidth="2" 
+                                strokeLinejoin="round" 
+                            />
+
+                            {/* GLOSSY SPECULAR HIGHLIGHT ALONG ROOF & HOOD */}
+                            <path d="M 28 17 C 34 13, 44 13, 49 17 C 46 19, 31 19, 28 17 Z" fill="url(#toyCarGloss)" />
+                            <path d="M 64 33 L 76 37 C 72 38, 62 36, 64 33 Z" fill="url(#toyCarGloss)" />
+
+                            {/* CABIN WINDOWS (Tinted Glass with Chrome Pillars) */}
+                            {/* Rear side quarter window */}
+                            <path d="M 24 30 L 29 18 C 33 17, 36 17, 37 17 L 37 30 Z" fill="url(#toyCarGlass)" stroke="#64748B" strokeWidth="1" strokeLinejoin="round" />
+                            {/* Front side window & windshield */}
+                            <path d="M 40 17 C 45 17, 49 19, 52 23 L 60 30 L 40 30 Z" fill="url(#toyCarGlass)" stroke="#64748B" strokeWidth="1" strokeLinejoin="round" />
+                            
+                            {/* Window Gloss Glare Streaks */}
+                            <polygon points="45,18 48,18 43,29 40,29" fill="#FFFFFF" opacity="0.65" />
+                            <polygon points="51,21 53,21 49,29 47,29" fill="#FFFFFF" opacity="0.45" />
+
+                            {/* SPORTY STEERING WHEEL SILHOUETTE INSIDE CABIN */}
+                            <circle cx="52" cy="27" r="3.5" fill="none" stroke="#1E293B" strokeWidth="1.2" />
+                            <circle cx="52" cy="27" r="1" fill="#1E293B" />
+
+                            {/* RACING STRIPES (Dual Crisp White & Gold stripes) */}
+                            <path d="M 8 41 L 81 41" stroke="#FFFFFF" strokeWidth="3.2" strokeLinecap="round" />
+                            <path d="M 8 43.5 L 81 43.5" stroke="#FBBF24" strokeWidth="1" strokeLinecap="round" />
+
+                            {/* RACING BADGE NUMBER 7 */}
+                            <circle cx="44" cy="41" r="6.5" fill="#FFFFFF" stroke="#DC2626" strokeWidth="1.5" />
+                            <text x="44" y="44.2" fill="#B91C1C" fontSize="8.5" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">7</text>
+
+                            {/* CAR DOOR PANEL SEAM & CHROME HANDLE */}
+                            <path d="M 38 31 L 38 48" stroke="#991B1B" strokeWidth="1.2" strokeLinecap="round" />
+                            <rect x="28" y="34" width="4.5" height="1.5" rx="0.75" fill="url(#toyCarChrome)" stroke="#78350F" strokeWidth="0.5" />
+
+                            {/* SIDE-VIEW MIRROR */}
+                            <ellipse cx="58" cy="30" rx="3" ry="2" fill="#DC2626" stroke="#7F1D1D" strokeWidth="1" />
+                            <ellipse cx="58" cy="30" rx="1.8" ry="1.2" fill="#BAE6FD" />
+
+                            {/* FRONT CHROME BUMPER & RADIATOR GRILLE */}
+                            <rect x="80" y="42" width="4.5" height="7" rx="2" fill="url(#toyCarChrome)" stroke="#64748B" strokeWidth="0.8" />
+                            <line x1="81" y1="44" x2="84" y2="44" stroke="#475569" strokeWidth="0.8" />
+                            <line x1="81" y1="46" x2="84" y2="46" stroke="#475569" strokeWidth="0.8" />
+                            <line x1="81" y1="48" x2="84" y2="48" stroke="#475569" strokeWidth="0.8" />
+
+                            {/* FRONT HEADLIGHT (Bright crystal lens with chrome rim) */}
+                            <ellipse cx="79" cy="38" rx="4" ry="4.5" fill="url(#toyCarChrome)" stroke="#64748B" strokeWidth="0.8" />
+                            <ellipse cx="79" cy="38" rx="3.2" ry="3.6" fill="#FEF08A" stroke="#EAB308" strokeWidth="1.2" />
+                            <circle cx="78" cy="37" r="1.5" fill="#FFFFFF" />
+
+                            {/* REAR RUBY TAILLIGHT */}
+                            <rect x="5" y="38" width="2.5" height="4.5" rx="1" fill="#EF4444" stroke="#991B1B" strokeWidth="0.8" />
+                            <rect x="5.5" y="39" width="1.5" height="2" rx="0.5" fill="#FCA5A5" />
+
+                            {/* WHEEL 1: REAR WHEEL (Center: 25, 49) */}
+                            <g style={{ transformOrigin: '25px 49px' }} className={activeIdx === 3 ? "car-wheel-spin" : ""}>
+                                {/* Deep Grip Rubber Tire */}
+                                <circle cx="25" cy="49" r="10.5" fill="#1E293B" stroke="#0F172A" strokeWidth="1.5" />
+                                {/* Inner Tire Ring */}
+                                <circle cx="25" cy="49" r="8.5" fill="#334155" />
+                                {/* Golden Star Alloy Rim */}
+                                <circle cx="25" cy="49" r="6.8" fill="url(#toyCarGoldRim)" stroke="#78350F" strokeWidth="0.8" />
+                                {/* 5-Star Sport Alloy Spokes */}
+                                <line x1="25" y1="42.5" x2="25" y2="55.5" stroke="#FEF08A" strokeWidth="1.8" strokeLinecap="round" />
+                                <line x1="18.5" y1="47" x2="31.5" y2="51" stroke="#FEF08A" strokeWidth="1.8" strokeLinecap="round" />
+                                <line x1="20" y1="53" x2="30" y2="45" stroke="#FEF08A" strokeWidth="1.8" strokeLinecap="round" />
+                                {/* Center Chrome Nut */}
+                                <circle cx="25" cy="49" r="2.4" fill="url(#toyCarChrome)" stroke="#475569" strokeWidth="0.8" />
+                                <circle cx="25" cy="49" r="1" fill="#0F172A" />
                             </g>
-                            <g style={{ transformOrigin: '58px 65px' }} className={activeIdx === 3 ? "car-wheel-spin" : ""}>
-                                <circle cx="58" cy="65" r="9" fill="#FBBF24" stroke="#B45309" strokeWidth="2.5" />
-                                <circle cx="58" cy="65" r="4.5" fill="#1E293B" />
-                                <line x1="58" y1="56" x2="58" y2="74" stroke="#B45309" strokeWidth="1.2" />
-                                <line x1="49" y1="65" x2="67" y2="65" stroke="#B45309" strokeWidth="1.2" />
-                                <circle cx="58" cy="65" r="1.8" fill="#FFFFFF" />
+
+                            {/* WHEEL 2: FRONT WHEEL (Center: 67, 49) */}
+                            <g style={{ transformOrigin: '67px 49px' }} className={activeIdx === 3 ? "car-wheel-spin" : ""}>
+                                {/* Deep Grip Rubber Tire */}
+                                <circle cx="67" cy="49" r="10.5" fill="#1E293B" stroke="#0F172A" strokeWidth="1.5" />
+                                {/* Inner Tire Ring */}
+                                <circle cx="67" cy="49" r="8.5" fill="#334155" />
+                                {/* Golden Star Alloy Rim */}
+                                <circle cx="67" cy="49" r="6.8" fill="url(#toyCarGoldRim)" stroke="#78350F" strokeWidth="0.8" />
+                                {/* 5-Star Sport Alloy Spokes */}
+                                <line x1="67" y1="42.5" x2="67" y2="55.5" stroke="#FEF08A" strokeWidth="1.8" strokeLinecap="round" />
+                                <line x1="60.5" y1="47" x2="73.5" y2="51" stroke="#FEF08A" strokeWidth="1.8" strokeLinecap="round" />
+                                <line x1="62" y1="53" x2="72" y2="45" stroke="#FEF08A" strokeWidth="1.8" strokeLinecap="round" />
+                                {/* Center Chrome Nut */}
+                                <circle cx="67" cy="49" r="2.4" fill="url(#toyCarChrome)" stroke="#475569" strokeWidth="0.8" />
+                                <circle cx="67" cy="49" r="1" fill="#0F172A" />
                             </g>
                         </svg>
                     </div>
