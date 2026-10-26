@@ -54,265 +54,17 @@ const getAudioContext = () => {
     return globalAudioCtx;
 };
 
-// Procedural Web Audio API sound synthesizers (100% reliable instant fallback)
-const playSynthToySound = (index, ctx, duration = 4.0) => {
-    if (!ctx) return;
-    try {
-        const now = ctx.currentTime;
-        const masterGain = ctx.createGain();
-        masterGain.gain.setValueAtTime(0.001, now);
-        masterGain.gain.linearRampToValueAtTime(0.85, now + 0.02);
-        masterGain.connect(ctx.destination);
 
-        if (index === 3) {
-            // CAR: Clean Purring Motor Rev + Crisp Dual-Tone Horn (Zero static/noise, velvety clean)
-            // Low-pass filtered warm engine purr
-            const filter = ctx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(260, now);
-            filter.frequency.exponentialRampToValueAtTime(420, now + 1.2);
-            filter.frequency.exponentialRampToValueAtTime(220, now + duration);
-
-            // Engine fundamental warm sine oscillator
-            const oscEng = ctx.createOscillator();
-            const gainEng = ctx.createGain();
-            oscEng.type = 'triangle';
-            oscEng.frequency.setValueAtTime(75, now);
-            oscEng.frequency.exponentialRampToValueAtTime(160, now + 1.2);
-            oscEng.frequency.exponentialRampToValueAtTime(90, now + duration);
-
-            gainEng.gain.setValueAtTime(0.01, now);
-            gainEng.gain.linearRampToValueAtTime(0.32, now + 0.1);
-            gainEng.gain.linearRampToValueAtTime(0.38, now + 1.2);
-            gainEng.gain.exponentialRampToValueAtTime(0.01, now + duration);
-
-            // Sub-bass warm purr
-            const oscSub = ctx.createOscillator();
-            const gainSub = ctx.createGain();
-            oscSub.type = 'sine';
-            oscSub.frequency.setValueAtTime(37.5, now);
-            oscSub.frequency.exponentialRampToValueAtTime(80, now + 1.2);
-            gainSub.gain.setValueAtTime(0.22, now);
-            gainSub.gain.exponentialRampToValueAtTime(0.01, now + duration);
-
-            oscEng.connect(filter);
-            oscSub.connect(filter);
-            filter.connect(gainEng);
-            gainEng.connect(masterGain);
-
-            oscEng.start(now);
-            oscSub.start(now);
-            oscEng.stop(now + duration);
-            oscSub.stop(now + duration);
-
-            // Melodic Crisp Dual-Tone Horn (Beep-Beep at C5 523Hz + E5 659Hz)
-            [1.8, 2.3].forEach((delay) => {
-                const horn1 = ctx.createOscillator();
-                const horn2 = ctx.createOscillator();
-                const hornGain = ctx.createGain();
-                horn1.type = 'sine';
-                horn2.type = 'sine';
-                horn1.frequency.setValueAtTime(523.25, now + delay);
-                horn2.frequency.setValueAtTime(659.25, now + delay);
-
-                hornGain.gain.setValueAtTime(0.01, now + delay);
-                hornGain.gain.linearRampToValueAtTime(0.35, now + delay + 0.03);
-                hornGain.gain.setValueAtTime(0.35, now + delay + 0.22);
-                hornGain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.28);
-
-                horn1.connect(hornGain);
-                horn2.connect(hornGain);
-                hornGain.connect(masterGain);
-
-                horn1.start(now + delay);
-                horn2.start(now + delay);
-                horn1.stop(now + delay + 0.32);
-                horn2.stop(now + delay + 0.32);
-            });
-        } else if (index === 5) {
-            // DHOL: Indian Dhol Beats (Bass Dha + Treble Ta)
-            const dholBeats = [0.0, 0.4, 0.7, 1.1, 1.4, 1.8, 2.1, 2.5, 2.9, 3.3];
-            dholBeats.forEach((tOffset, i) => {
-                const bTime = now + tOffset;
-                // Bass Dha Punch (65Hz sub-bass punch)
-                const bassOsc = ctx.createOscillator();
-                const bassGain = ctx.createGain();
-                bassOsc.type = 'sine';
-                bassOsc.frequency.setValueAtTime(120, bTime);
-                bassOsc.frequency.exponentialRampToValueAtTime(55, bTime + 0.22);
-                bassGain.gain.setValueAtTime(0.8, bTime);
-                bassGain.gain.exponentialRampToValueAtTime(0.01, bTime + 0.3);
-                bassOsc.connect(bassGain);
-                bassGain.connect(masterGain);
-                bassOsc.start(bTime);
-                bassOsc.stop(bTime + 0.32);
-
-                // Treble Ta Stick Strike
-                const stickOsc = ctx.createOscillator();
-                const stickGain = ctx.createGain();
-                stickOsc.type = 'triangle';
-                stickOsc.frequency.setValueAtTime(1250, bTime + (i % 2 === 0 ? 0.02 : 0.18));
-                stickGain.gain.setValueAtTime(0.5, bTime + (i % 2 === 0 ? 0.02 : 0.18));
-                stickGain.gain.exponentialRampToValueAtTime(0.01, bTime + (i % 2 === 0 ? 0.02 : 0.18) + 0.12);
-                stickOsc.connect(stickGain);
-                stickGain.connect(masterGain);
-                stickOsc.start(bTime + (i % 2 === 0 ? 0.02 : 0.18));
-                stickOsc.stop(bTime + (i % 2 === 0 ? 0.02 : 0.18) + 0.14);
-            });
-        } else if (index === 4) {
-            // PEACOCK (MOR): Majestic Indian Peacock Cry (Pee-Hoo! / ટહૂકો)
-            // Starts with gentle smooth attack, rich vocal resonance, zero harsh scratch/buzz
-            const cries = [0.12, 1.5, 2.9];
-            cries.forEach((cOffset, i) => {
-                const cTime = now + cOffset;
-                const osc = ctx.createOscillator();
-                const harm = ctx.createOscillator();
-                const gain = ctx.createGain();
-                const vibrato = ctx.createOscillator();
-                const vibratoGain = ctx.createGain();
-
-                // Gentle sine + warm triangle overtone for authentic natural bird syrinx
-                osc.type = 'sine';
-                harm.type = 'triangle';
-
-                // Natural subtle vocal throat trill (7.5 Hz, soft 16Hz depth)
-                vibrato.frequency.setValueAtTime(7.5, cTime);
-                vibratoGain.gain.setValueAtTime(16, cTime);
-                vibrato.connect(vibratoGain);
-                vibratoGain.connect(osc.frequency);
-                vibratoGain.connect(harm.frequency);
-
-                // Characteristic Indian Peacock "Pee-Hoo" frequency arc:
-                // Gentle rise (640Hz -> 1220Hz) then graceful falling slide down to 580Hz
-                const fBase = i === 1 ? 660 : 640;
-                const fPeak = i === 1 ? 1280 : 1200;
-                const fEnd = 580;
-
-                osc.frequency.setValueAtTime(fBase, cTime);
-                osc.frequency.linearRampToValueAtTime(fPeak, cTime + 0.38);
-                osc.frequency.exponentialRampToValueAtTime(fEnd, cTime + 0.95);
-
-                harm.frequency.setValueAtTime(fBase * 2, cTime);
-                harm.frequency.linearRampToValueAtTime(fPeak * 2, cTime + 0.38);
-                harm.frequency.exponentialRampToValueAtTime(fEnd * 2, cTime + 0.95);
-
-                // Smooth natural envelope: soft 70ms attack -> NO click, NO harsh electronic burst!
-                gain.gain.setValueAtTime(0.001, cTime);
-                gain.gain.linearRampToValueAtTime(0.65, cTime + 0.08);
-                gain.gain.setValueAtTime(0.65, cTime + 0.42);
-                gain.gain.exponentialRampToValueAtTime(0.001, cTime + 1.05);
-
-                const harmGain = ctx.createGain();
-                harmGain.gain.setValueAtTime(0.25, cTime);
-
-                osc.connect(gain);
-                harm.connect(harmGain);
-                harmGain.connect(gain);
-                gain.connect(masterGain);
-
-                vibrato.start(cTime);
-                osc.start(cTime);
-                harm.start(cTime);
-                vibrato.stop(cTime + 1.1);
-                osc.stop(cTime + 1.1);
-                harm.stop(cTime + 1.1);
-            });
-        } else if (index === 6) {
-            // HORSE: Galloping Hooves (clip-clop) + Neigh
-            const gallops = [0.0, 0.18, 0.5, 0.68, 1.0, 1.18, 1.5, 1.68, 2.0, 2.18, 2.6, 2.78, 3.2, 3.38];
-            gallops.forEach((gOffset, i) => {
-                const gTime = now + gOffset;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(i % 2 === 0 ? 280 : 210, gTime);
-                gain.gain.setValueAtTime(0.65, gTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, gTime + 0.1);
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.start(gTime);
-                osc.stop(gTime + 0.11);
-            });
-            // Neigh sweep
-            const neighOsc = ctx.createOscillator();
-            const neighGain = ctx.createGain();
-            neighOsc.type = 'triangle';
-            neighOsc.frequency.setValueAtTime(600, now + 0.2);
-            neighOsc.frequency.linearRampToValueAtTime(1100, now + 0.7);
-            neighOsc.frequency.linearRampToValueAtTime(550, now + 1.4);
-            neighGain.gain.setValueAtTime(0.01, now + 0.2);
-            neighGain.gain.linearRampToValueAtTime(0.4, now + 0.6);
-            neighGain.gain.linearRampToValueAtTime(0.01, now + 1.4);
-            neighOsc.connect(neighGain);
-            neighGain.connect(masterGain);
-            neighOsc.start(now + 0.2);
-            neighOsc.stop(now + 1.45);
-        } else if (index === 2) {
-            // ROBOT: Sci-Fi Mechanical Servo & Beep Sequence
-            const beepFreqs = [520, 659, 783, 1046, 783, 1318, 1046];
-            beepFreqs.forEach((freq, idx) => {
-                const bTime = now + idx * 0.22;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(freq, bTime);
-                gain.gain.setValueAtTime(0.2, bTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, bTime + 0.18);
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.start(bTime);
-                osc.stop(bTime + 0.2);
-            });
-        } else if (index === 1) {
-            // BUNNY: Cartoon Spring Boing
-            [0.1, 0.9, 1.8, 2.7].forEach((bOffset) => {
-                const bTime = now + bOffset;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(180, bTime);
-                osc.frequency.exponentialRampToValueAtTime(800, bTime + 0.35);
-                gain.gain.setValueAtTime(0.65, bTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, bTime + 0.4);
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.start(bTime);
-                osc.stop(bTime + 0.45);
-            });
-        } else if (index === 0) {
-            // TEDDY: Cute Squeaker + Giggle
-            [0.1, 0.6, 1.4, 1.9, 2.6].forEach((sOffset) => {
-                const sTime = now + sOffset;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(700, sTime);
-                osc.frequency.linearRampToValueAtTime(1350, sTime + 0.15);
-                osc.frequency.linearRampToValueAtTime(900, sTime + 0.25);
-                gain.gain.setValueAtTime(0.5, sTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, sTime + 0.3);
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.start(sTime);
-                osc.stop(sTime + 0.32);
-            });
-        }
-
-        return masterGain;
-    } catch (e) {
-        console.warn('Synth sound fallback error:', e);
-        return null;
-    }
-};
 
 const InteractiveToyRow = () => {
     const [activeIdx, setActiveIdx] = useState(null);
+    const activeIdxRef = useRef(null);
     const [animResetKey, setAnimResetKey] = useState(0);
+    const [needsInteraction, setNeedsInteraction] = useState(false);
     const sectionRef = useRef(null);
     const hoverTimerRef = useRef(null);
     const activeTimerRef = useRef(null);
     const currentAudioRef = useRef(null);
-    const activeSynthRef = useRef(null);
     const preloadedAudiosRef = useRef([]);
 
     // Preload HTML5 Audio objects for zero-latency response
@@ -322,29 +74,46 @@ const InteractiveToyRow = () => {
                 const audio = new Audio(src);
                 audio.preload = 'auto';
                 audio.volume = 0.95;
+                audio.load();
                 return audio;
             });
         } catch (e) {}
 
-        // Global unlocker listener on any user interaction
+        // Global unlocker listener on any user interaction across the page
         const unlockAudioOnGesture = () => {
+            const ctx = getAudioContext();
+            if (ctx && ctx.state === 'suspended') {
+                ctx.resume().catch(() => {});
+            }
+            setNeedsInteraction(false);
             if (!isAudioUnlocked) {
-                const ctx = getAudioContext();
-                if (ctx) {
-                    try {
-                        const buffer = ctx.createBuffer(1, 1, 22050);
-                        const source = ctx.createBufferSource();
-                        source.buffer = buffer;
-                        source.connect(ctx.destination);
-                        source.start(0);
-                        isAudioUnlocked = true;
-                    } catch (err) {}
+                isAudioUnlocked = true;
+                if (preloadedAudiosRef.current) {
+                    preloadedAudiosRef.current.forEach((a) => {
+                        try {
+                            if (a) {
+                                a.muted = true;
+                                const p = a.play();
+                                if (p) {
+                                    p.then(() => {
+                                        a.pause();
+                                        a.currentTime = 0;
+                                        a.muted = false;
+                                    }).catch(() => {
+                                        a.muted = false;
+                                    });
+                                }
+                            }
+                        } catch (err) {
+                            if (a) a.muted = false;
+                        }
+                    });
                 }
             }
         };
 
-        const events = ['click', 'touchstart', 'pointerdown', 'keydown', 'scroll', 'mousemove'];
-        events.forEach((ev) => window.addEventListener(ev, unlockAudioOnGesture, { passive: true, once: false }));
+        const events = ['click', 'touchstart', 'pointerdown', 'keydown', 'scroll', 'wheel'];
+        events.forEach((ev) => window.addEventListener(ev, unlockAudioOnGesture, { passive: true }));
 
         return () => {
             events.forEach((ev) => window.removeEventListener(ev, unlockAudioOnGesture));
@@ -368,23 +137,7 @@ const InteractiveToyRow = () => {
             } catch (e) {}
             currentAudioRef.current = null;
         }
-        if (activeSynthRef.current) {
-            try {
-                const ctx = getAudioContext();
-                if (ctx && activeSynthRef.current.gain) {
-                    const now = ctx.currentTime;
-                    activeSynthRef.current.gain.setValueAtTime(activeSynthRef.current.gain.value, now);
-                    activeSynthRef.current.gain.linearRampToValueAtTime(0.001, now + 0.015);
-                    const synthToDrop = activeSynthRef.current;
-                    setTimeout(() => {
-                        try { synthToDrop.disconnect(); } catch (e) {}
-                    }, 20);
-                } else {
-                    activeSynthRef.current.disconnect();
-                }
-            } catch (e) {}
-            activeSynthRef.current = null;
-        }
+        activeIdxRef.current = null;
         setActiveIdx(null);
     };
 
@@ -393,16 +146,22 @@ const InteractiveToyRow = () => {
         // Stop any previous sound cleanly
         stopCurrentToy();
 
+        activeIdxRef.current = index;
         setActiveIdx(index);
 
-        // Resume AudioContext
+        // Resume AudioContext synchronously inside user interaction
         const ctx = getAudioContext();
+        if (ctx && ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+        }
 
-        // Try preloaded HTML5 Audio first
+        // Preloaded HTML5 Audio for authentic real-world sound
         try {
             const audio = preloadedAudiosRef.current[index] || new Audio(TOY_SOUND_FILES[index]);
             audio.volume = 0.95;
             audio.currentTime = 0;
+            // CONTINUOUS LOOP: Keeps playing without stopping as long as toy is on screen
+            audio.loop = true;
 
             currentAudioRef.current = audio;
 
@@ -410,35 +169,32 @@ const InteractiveToyRow = () => {
             if (playPromise !== undefined) {
                 playPromise
                     .then(() => {
-                        // Playing successfully
+                        // Playing successfully!
+                        setNeedsInteraction(false);
                     })
                     .catch((err) => {
-                        // If browser autoplay policy blocks hover play, use procedural Web Audio synthesizer!
-                        console.log('HTML5 Audio notice, activating procedural synth sound:', err);
-                        if (ctx) {
-                            activeSynthRef.current = playSynthToySound(index, ctx);
+                        // If browser autoplay policy blocks sound before first gesture
+                        if (err && (err.name === 'NotAllowedError' || err.message?.includes('interact'))) {
+                            setNeedsInteraction(true);
                         }
                     });
             }
-
-            audio.onended = () => {
-                stopCurrentToy();
-            };
         } catch (e) {
-            console.error('Audio play error, falling back to synth:', e);
-            if (ctx) {
-                activeSynthRef.current = playSynthToySound(index, ctx);
-            }
+            console.error('Audio play error:', e);
         }
 
-        // Auto-stop after 5 seconds if mouse remains hovered
+        // 30 SECONDS TIMER (As requested):
+        // If user remains on the screen watching this toy, automatically stop sound & animation after 30 seconds!
+        if (activeTimerRef.current) {
+            clearTimeout(activeTimerRef.current);
+        }
         activeTimerRef.current = setTimeout(() => {
             stopCurrentToy();
-        }, 5000);
+        }, 30000);
     };
 
-    // When mouse pointer enters a toy: apply small 75ms hover intent threshold
-    // so moving NEAR or quickly passing by the toy will NOT trigger accidental sounds!
+    // When mouse pointer enters a toy on Laptop / Desktop:
+    // Execute immediately and synchronously so music and action start working!
     const handleMouseEnter = (index) => {
         if (hoverTimerRef.current) {
             clearTimeout(hoverTimerRef.current);
@@ -448,10 +204,7 @@ const InteractiveToyRow = () => {
         // If this toy is already the active one playing, do nothing
         if (activeIdx === index) return;
 
-        hoverTimerRef.current = setTimeout(() => {
-            activateToy(index);
-            hoverTimerRef.current = null;
-        }, 75);
+        activateToy(index);
     };
 
     // When mouse pointer leaves toy: IMMEDIATELY cancel timer, stop sound and return to base
@@ -466,8 +219,10 @@ const InteractiveToyRow = () => {
         }
     };
 
-    // Click on toy: Guaranteed audio trigger, or if ALREADY PLAYING, RESTART FROM 0.0s!
-    // (Zero click pop, smooth instant restart)
+    // Click / Single Tap on toy (Mobile & Desktop):
+    // 1. Single tap on any toy immediately activates it (plays authentic music + starts 3D work)
+    // 2. Single tap on the active toy stops it cleanly (Toggle behavior - user clicks again, it stops!)
+    // 3. ZERO click sound / beep / pop - pure authentic toy music only!
     const handleToyClick = (e, index) => {
         if (e) {
             e.preventDefault();
@@ -486,48 +241,54 @@ const InteractiveToyRow = () => {
             ctx.resume().catch(() => {});
         }
 
-        // IF THIS TOY IS ALREADY PLAYING:
-        // Restart the music immediately from the beginning without any click/pop sound!
+        // SINGLE TAP TOGGLE (Mobile & Desktop):
+        // If this toy is ALREADY active, clicking/tapping it again stops it immediately!
         if (activeIdx === index) {
-            if (currentAudioRef.current) {
-                try {
-                    currentAudioRef.current.currentTime = 0;
-                    currentAudioRef.current.play().catch(() => {});
-                } catch (err) {}
-            } else {
-                activateToy(index);
-            }
-
-            // Reset the 5-second timer
-            if (activeTimerRef.current) {
-                clearTimeout(activeTimerRef.current);
-            }
-            activeTimerRef.current = setTimeout(() => {
-                stopCurrentToy();
-            }, 5000);
-
-            // Re-trigger animation cleanly from frame 0
-            setAnimResetKey(prev => prev + 1);
+            stopCurrentToy();
             return;
         }
 
-        // If clicking a different toy or starting fresh:
+        setNeedsInteraction(false);
+
+        // If clicking/tapping a new toy, activate it cleanly with the 30s timer
         activateToy(index);
     };
 
-    // IntersectionObserver: When scrolled out of mobile screen view, AUTOMATICALLY STOP
+    // IntersectionObserver & Window Scroll:
+    // As long as the toy is visible on screen, sound & work continue.
+    // The exact moment the user scrolls it off screen (screen ne upar kari devathi toy na dekhay), AUTOMATICALLY STOP!
     useEffect(() => {
-        if (!sectionRef.current) return;
+        const handleScrollOrVisibility = () => {
+            if (!sectionRef.current) return;
+            const rect = sectionRef.current.getBoundingClientRect();
+            // Toy shelf is visible on screen if its bottom > 0 and top < window.innerHeight
+            const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+            if (!isVisible && activeIdxRef.current !== null) {
+                stopCurrentToy();
+            }
+        };
+
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (!entry.isIntersecting) {
+                if (!entry.isIntersecting && activeIdxRef.current !== null) {
                     stopCurrentToy();
                 }
             },
-            { threshold: 0.1 }
+            { threshold: 0 } // Triggers the instant 100% of the shelf leaves the viewport
         );
-        observer.observe(sectionRef.current);
-        return () => observer.disconnect();
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
+        window.addEventListener('scroll', handleScrollOrVisibility, { passive: true });
+        window.addEventListener('resize', handleScrollOrVisibility, { passive: true });
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', handleScrollOrVisibility);
+            window.removeEventListener('resize', handleScrollOrVisibility);
+        };
     }, []);
 
     // Stop audio if user switches tab or locks screen
@@ -832,6 +593,24 @@ const InteractiveToyRow = () => {
                 }
             `}</style>
 
+            {/* If browser requires 1 user gesture to unlock audio after fresh reload */}
+            {needsInteraction && (
+                <div className="w-full flex justify-center px-4 mb-2">
+                    <button
+                        onClick={() => {
+                            setNeedsInteraction(false);
+                            const ctx = getAudioContext();
+                            if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+                            if (activeIdx !== null) activateToy(activeIdx);
+                        }}
+                        className="px-4 py-1.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-black rounded-full shadow-md flex items-center gap-2 cursor-pointer animate-pulse z-50 pointer-events-auto transition-transform active:scale-95"
+                    >
+                        <span>🔊</span>
+                        <span>Click to Enable Audio (સાઉન્ડ ચાલુ કરવા અહીં ક્લિક કરો)</span>
+                    </button>
+                </div>
+            )}
+
             {/* 7 TOYS DISPLAY SHELF - FULL WIDTH EDGE TO EDGE, OVERFLOW VISIBLE */}
             <div className="w-full px-3 sm:px-8 md:px-12 lg:px-16 relative overflow-visible pointer-events-none">
                 <div className="w-full flex items-center justify-between sm:justify-evenly relative z-10 min-h-[125px] sm:min-h-[145px] md:min-h-[160px] pt-4 pb-2 px-1 sm:px-4 overflow-visible pointer-events-none">
@@ -841,7 +620,7 @@ const InteractiveToyRow = () => {
                     {/* ========================================================== */}
                     <div
                         key={`toy-0-${activeIdx === 0 ? animResetKey : 0}`}
-                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 0 ? 'is-active active-toy-0' : ''}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-0 ${activeIdx === 0 ? 'is-active active-toy-0' : ''}`}
                         style={getToyTransform(0)}
                         onMouseEnter={() => handleMouseEnter(0)}
                         onMouseLeave={() => handleMouseLeave(0)}
@@ -902,7 +681,7 @@ const InteractiveToyRow = () => {
                     {/* ========================================================== */}
                     <div
                         key={`toy-1-${activeIdx === 1 ? animResetKey : 0}`}
-                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 1 ? 'is-active active-toy-1' : ''}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-0 ${activeIdx === 1 ? 'is-active active-toy-1' : ''}`}
                         style={getToyTransform(1)}
                         onMouseEnter={() => handleMouseEnter(1)}
                         onMouseLeave={() => handleMouseLeave(1)}
@@ -957,7 +736,7 @@ const InteractiveToyRow = () => {
                     {/* ========================================================== */}
                     <div
                         key={`toy-2-${activeIdx === 2 ? animResetKey : 0}`}
-                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 2 ? 'is-active active-toy-2' : ''}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-0 ${activeIdx === 2 ? 'is-active active-toy-2' : ''}`}
                         style={getToyTransform(2)}
                         onMouseEnter={() => handleMouseEnter(2)}
                         onMouseLeave={() => handleMouseLeave(2)}
@@ -1011,7 +790,7 @@ const InteractiveToyRow = () => {
                     {/* ========================================================== */}
                     <div
                         key={`toy-3-${activeIdx === 3 ? animResetKey : 0}`}
-                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 3 ? 'is-active active-toy-3' : ''}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-0 ${activeIdx === 3 ? 'is-active active-toy-3' : ''}`}
                         style={getToyTransform(3)}
                         onMouseEnter={() => handleMouseEnter(3)}
                         onMouseLeave={() => handleMouseLeave(3)}
@@ -1086,7 +865,7 @@ const InteractiveToyRow = () => {
                     {/* ========================================================== */}
                     <div
                         key={`toy-4-${activeIdx === 4 ? animResetKey : 0}`}
-                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 4 ? 'is-active active-toy-4' : ''}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-0 ${activeIdx === 4 ? 'is-active active-toy-4' : ''}`}
                         style={getToyTransform(4)}
                         onMouseEnter={() => handleMouseEnter(4)}
                         onMouseLeave={() => handleMouseLeave(4)}
@@ -1253,7 +1032,7 @@ const InteractiveToyRow = () => {
                     {/* ========================================================== */}
                     <div
                         key={`toy-5-${activeIdx === 5 ? animResetKey : 0}`}
-                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 5 ? 'is-active active-toy-5' : ''}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-0 ${activeIdx === 5 ? 'is-active active-toy-5' : ''}`}
                         style={getToyTransform(5)}
                         onMouseEnter={() => handleMouseEnter(5)}
                         onMouseLeave={() => handleMouseLeave(5)}
@@ -1314,7 +1093,7 @@ const InteractiveToyRow = () => {
                     {/* ========================================================== */}
                     <div
                         key={`toy-6-${activeIdx === 6 ? animResetKey : 0}`}
-                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy toy-horse-container w-fit h-fit p-1 rounded-2xl ${activeIdx === 6 ? 'is-active active-toy-6' : ''}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy toy-horse-container w-fit h-fit p-0 ${activeIdx === 6 ? 'is-active active-toy-6' : ''}`}
                         style={getToyTransform(6)}
                         onMouseEnter={() => handleMouseEnter(6)}
                         onMouseLeave={() => handleMouseLeave(6)}
