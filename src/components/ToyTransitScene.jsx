@@ -70,7 +70,7 @@ const ToyTransitScene = () => {
                     will-change: left;
                 }
 
-                /* Fully Responsive Transit Stage Scaling Across All Screen Sizes */
+                /* Fully Responsive Transit Stage Scaling Across All Screen Sizes (320px, 375px, 425px, 768px, 1024px, 2560px 4K) */
                 .toy-transit-responsive-stage {
                     width: 100%;
                     min-width: 760px;
@@ -78,35 +78,69 @@ const ToyTransitScene = () => {
                     transition: transform 0.3s ease, margin-bottom 0.3s ease;
                 }
 
-                @media (max-width: 420px) {
+                /* 1. Small Mobile (320px - iPhone SE 1st gen / Galaxy Fold) */
+                @media (max-width: 340px) {
                     .toy-transit-responsive-stage {
-                        transform: scale(0.48);
-                        margin-bottom: -115px;
+                        transform: scale(0.40);
+                        margin-bottom: -134px;
                     }
                 }
-                @media (min-width: 421px) and (max-width: 580px) {
+
+                /* 2. Standard Mobile (375px - iPhone 12/13/SE) */
+                @media (min-width: 341px) and (max-width: 390px) {
                     .toy-transit-responsive-stage {
-                        transform: scale(0.60);
-                        margin-bottom: -88px;
+                        transform: scale(0.47);
+                        margin-bottom: -118px;
                     }
                 }
-                @media (min-width: 581px) and (max-width: 768px) {
+
+                /* 3. Large Mobile (425px - iPhone Pro Max / Galaxy Ultra / Pixel) */
+                @media (min-width: 391px) and (max-width: 480px) {
                     .toy-transit-responsive-stage {
-                        transform: scale(0.75);
-                        margin-bottom: -55px;
+                        transform: scale(0.53);
+                        margin-bottom: -105px;
                     }
                 }
-                @media (min-width: 769px) and (max-width: 1024px) {
+
+                /* 4. Small Tablet / Large Phablet (481px - 640px) */
+                @media (min-width: 481px) and (max-width: 640px) {
                     .toy-transit-responsive-stage {
-                        transform: scale(0.88);
-                        margin-bottom: -26px;
+                        transform: scale(0.64);
+                        margin-bottom: -80px;
                     }
                 }
-                @media (min-width: 1025px) {
+
+                /* 5. Standard Tablet (768px - iPad Portrait) */
+                @media (min-width: 641px) and (max-width: 820px) {
+                    .toy-transit-responsive-stage {
+                        transform: scale(0.80);
+                        margin-bottom: -44px;
+                    }
+                }
+
+                /* 6. Laptop / iPad Pro Landscape (1024px) */
+                @media (min-width: 821px) and (max-width: 1180px) {
+                    .toy-transit-responsive-stage {
+                        transform: scale(0.92);
+                        margin-bottom: -18px;
+                    }
+                }
+
+                /* 7. Standard Desktop (1181px - 1799px) */
+                @media (min-width: 1181px) and (max-width: 1799px) {
                     .toy-transit-responsive-stage {
                         min-width: 100%;
                         transform: scale(1);
                         margin-bottom: 0px;
+                    }
+                }
+
+                /* 8. Ultra-wide & 4K Displays (1800px - 2560px+) */
+                @media (min-width: 1800px) {
+                    .toy-transit-responsive-stage {
+                        min-width: 100%;
+                        transform: scale(1.20);
+                        margin-bottom: 35px;
                     }
                 }
 
@@ -427,32 +461,72 @@ const ToyTransitScene = () => {
                 .wagon3-crate { animation: wagon3CrateAnim 24s linear infinite; transform-origin: bottom center; }
 
                 /* ============================================================== */
-                /* PLATFORM DECK CRATES: APPEAR ON PLACEMENT, VANISH ON DEPARTURE */
+                /* ============================================================== */
+                /* PLATFORM DECK CRATES: APPEAR ON PLACEMENT, TRANSFER TO LEFT ON DEPARTURE */
                 /* ============================================================== */
 
-                /* Platform ABC: placed down at 37.2%, DISAPPEARS AT 50.8% WHEN TRAIN DEPARTS */
+                /* Platform ABC: stays on Left deck as Row 1 until 0.1s before train arrives (1.8%) */
                 @keyframes platformCrateAbcAnim {
-                    0%, 37.1% { opacity: 0; transform: translateY(6px) scale(0.8); }
-                    37.2%, 50.7% { opacity: 1; transform: translateY(0px) scale(1); }
-                    50.8%, 100% { opacity: 0; transform: scale(0); }
+                    0%, 1.4% { opacity: 1; transform: translate(-294px, -92px) scale(1); }
+                    1.8% { opacity: 0; transform: translate(-294px, -92px) scale(0.6); }
+                    1.9%, 37.1% { opacity: 0; transform: translateY(6px) scale(0.8); }
+                    37.2%, 50.7% { opacity: 1; transform: translate(0px, 0px) scale(1); }
+                    50.8% { transform: translate(0px, 0px) scale(1); }
+                    52.8%, 100% { opacity: 1; transform: translate(-294px, -92px) scale(1); }
                 }
-                .platform-crate-abc { animation: platformCrateAbcAnim 24s linear infinite; transform-origin: bottom center; }
+                @media (max-width: 639px) {
+                    @keyframes platformCrateAbcAnim {
+                        0%, 1.4% { opacity: 1; transform: translate(-226px, -84px) scale(1); }
+                        1.8% { opacity: 0; transform: translate(-226px, -84px) scale(0.6); }
+                        1.9%, 37.1% { opacity: 0; transform: translateY(6px) scale(0.8); }
+                        37.2%, 50.7% { opacity: 1; transform: translate(0px, 0px) scale(1); }
+                        50.8% { transform: translate(0px, 0px) scale(1); }
+                        52.8%, 100% { opacity: 1; transform: translate(-226px, -84px) scale(1); }
+                    }
+                }
+                .platform-crate-abc { animation: platformCrateAbcAnim 24s cubic-bezier(0.25, 1, 0.5, 1) infinite; transform-origin: bottom center; will-change: transform; }
 
-                /* Platform DEF: placed down at 44.0%, DISAPPEARS AT 50.8% WHEN TRAIN DEPARTS */
+                /* Platform DEF: stays on Left deck as Row 2 until 0.1s before train arrives (1.8%) */
                 @keyframes platformCrateDefAnim {
-                    0%, 43.9% { opacity: 0; transform: translateY(6px) scale(0.8); }
-                    44.0%, 50.7% { opacity: 1; transform: translateY(0px) scale(1); }
-                    50.8%, 100% { opacity: 0; transform: scale(0); }
+                    0%, 1.4% { opacity: 1; transform: translate(-422px, -46px) scale(1); }
+                    1.8% { opacity: 0; transform: translate(-422px, -46px) scale(0.6); }
+                    1.9%, 43.9% { opacity: 0; transform: translateY(6px) scale(0.8); }
+                    44.0%, 50.7% { opacity: 1; transform: translate(0px, 0px) scale(1); }
+                    50.8% { transform: translate(0px, 0px) scale(1); }
+                    52.8%, 100% { opacity: 1; transform: translate(-422px, -46px) scale(1); }
                 }
-                .platform-crate-def { animation: platformCrateDefAnim 24s linear infinite; transform-origin: bottom center; }
+                @media (max-width: 639px) {
+                    @keyframes platformCrateDefAnim {
+                        0%, 1.4% { opacity: 1; transform: translate(-338px, -42px) scale(1); }
+                        1.8% { opacity: 0; transform: translate(-338px, -42px) scale(0.6); }
+                        1.9%, 43.9% { opacity: 0; transform: translateY(6px) scale(0.8); }
+                        44.0%, 50.7% { opacity: 1; transform: translate(0px, 0px) scale(1); }
+                        50.8% { transform: translate(0px, 0px) scale(1); }
+                        52.8%, 100% { opacity: 1; transform: translate(-338px, -42px) scale(1); }
+                    }
+                }
+                .platform-crate-def { animation: platformCrateDefAnim 24s cubic-bezier(0.25, 1, 0.5, 1) infinite; transform-origin: bottom center; will-change: transform; }
 
-                /* Platform GHI: placed down at 37.2%, DISAPPEARS AT 50.8% WHEN TRAIN DEPARTS */
+                /* Platform GHI: stays on Left deck as Row 3 until 0.1s before train arrives (1.8%) */
                 @keyframes platformCrateGhiAnim {
-                    0%, 37.1% { opacity: 0; transform: translateY(6px) scale(0.8); }
-                    37.2%, 50.7% { opacity: 1; transform: translateY(0px) scale(1); }
-                    50.8%, 100% { opacity: 0; transform: scale(0); }
+                    0%, 1.4% { opacity: 1; transform: translate(-550px, 0px) scale(1); }
+                    1.8% { opacity: 0; transform: translate(-550px, 0px) scale(0.6); }
+                    1.9%, 37.1% { opacity: 0; transform: translateY(6px) scale(0.8); }
+                    37.2%, 50.7% { opacity: 1; transform: translate(0px, 0px) scale(1); }
+                    50.8% { transform: translate(0px, 0px) scale(1); }
+                    52.8%, 100% { opacity: 1; transform: translate(-550px, 0px) scale(1); }
                 }
-                .platform-crate-ghi { animation: platformCrateGhiAnim 24s linear infinite; transform-origin: bottom center; }
+                @media (max-width: 639px) {
+                    @keyframes platformCrateGhiAnim {
+                        0%, 1.4% { opacity: 1; transform: translate(-450px, 0px) scale(1); }
+                        1.8% { opacity: 0; transform: translate(-450px, 0px) scale(0.6); }
+                        1.9%, 37.1% { opacity: 0; transform: translateY(6px) scale(0.8); }
+                        37.2%, 50.7% { opacity: 1; transform: translate(0px, 0px) scale(1); }
+                        50.8% { transform: translate(0px, 0px) scale(1); }
+                        52.8%, 100% { opacity: 1; transform: translate(-450px, 0px) scale(1); }
+                    }
+                }
+                .platform-crate-ghi { animation: platformCrateGhiAnim 24s cubic-bezier(0.25, 1, 0.5, 1) infinite; transform-origin: bottom center; will-change: transform; }
 
                 /* High-Visibility Station Clock Ticking Red Second Hand */
                 @keyframes clockSecondHandTick {
@@ -1027,10 +1101,10 @@ const ToyTransitScene = () => {
                             </div>
 
                             {/* ============================================================== */}
-                            {/* DELIVERED TOY BLOCKS RESTING PROUDLY ON THE TOY PLATFORM DECK  */}
-                            {/* Elevated platform ensures delivered crates are 100% visible    */}
+                            {/* DELIVERED TOY BLOCKS: UNLOADED HORIZONTALLY, GLIDES TO 3x3 ON LEFT */}
+                            {/* Initially placed at wagons, then transfers to Left Deck at 50.8% */}
                             {/* ============================================================== */}
-                            <div className="absolute bottom-full left-[37%] sm:left-[38%] flex items-end gap-2 sm:gap-3 z-26 pointer-events-none mb-1 filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+                            <div className="platform-cargo-cluster absolute bottom-full left-[37%] sm:left-[38%] flex items-end gap-2 sm:gap-3 z-26 pointer-events-none mb-1 filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
                                 {/* 1st Toy Crate: [A] [B] [C] (Placed down by Porter 1 at 37.2%) */}
                                 <div className="flex items-center gap-1 p-1 bg-red-100/95 border-2 border-red-500 rounded-md shadow-md platform-crate-abc">
                                     <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-red-600 text-[13px] sm:text-[14px] font-black text-white flex items-center justify-center shadow-xs border border-red-700">A</div>

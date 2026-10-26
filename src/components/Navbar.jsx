@@ -7,10 +7,44 @@ import { useCart } from '../context/CartContext';
 const Navbar = () => {
     const { getCartCount, getWaitlistCount } = useCart();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isShopMenuOpen, setIsShopMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const location = useLocation();
     const navigate = useNavigate();
+
+    const [activeDropdown, setActiveDropdown] = useState(null);
+    const dropdownTimeoutRef = React.useRef(null);
+
+    const handleMouseEnter = (name) => {
+        if (dropdownTimeoutRef.current) {
+            clearTimeout(dropdownTimeoutRef.current);
+            dropdownTimeoutRef.current = null;
+        }
+        setActiveDropdown(name);
+    };
+
+    const handleMouseLeave = () => {
+        dropdownTimeoutRef.current = setTimeout(() => {
+            setActiveDropdown(null);
+        }, 180);
+    };
+
+    const ageMilestones = [
+        { label: '0-6 Months', sub: 'Infants', icon: '👶' },
+        { label: '6-12 Months', sub: 'Babies', icon: '🍼' },
+        { label: '1-2 Years', sub: 'Toddlers', icon: '🧸' },
+        { label: '3-5 Years', sub: 'Preschool', icon: '🎨' },
+        { label: '6-8 Years', sub: 'Early School', icon: '🚀' },
+        { label: '9-12 Years', sub: 'Pre-Teens', icon: '🧩' },
+        { label: '12+ Years', sub: 'Teens & Up', icon: '🎮' }
+    ];
+
+    const priceRanges = [
+        { label: 'Under ₹299', sub: 'Pocket Friendly', query: 'maxPrice=299' },
+        { label: 'Under ₹499', sub: 'Value Picks', query: 'maxPrice=499' },
+        { label: 'Under ₹699', sub: 'Popular Choice', query: 'maxPrice=699' },
+        { label: 'Under ₹999', sub: 'Premium Sets', query: 'maxPrice=999' },
+        { label: 'Above ₹999', sub: 'Deluxe Toys', query: 'minPrice=1000' }
+    ];
 
     const [categories, setCategories] = useState([]);
     const [collections, setCollections] = useState([]);
@@ -227,97 +261,187 @@ const Navbar = () => {
             </div>
 
             {/* 3. Bottom White Navigation */}
-            <div className={`hidden lg:block w-full bg-white border-b border-gray-100 shadow-sm relative z-40 transition-all duration-300 ${isScrolled ? 'h-11' : 'h-14'}`}>
-                <div className={`max-w-[1400px] mx-auto px-4 md:px-8 flex items-center justify-between text-[14px] font-bold text-gray-700 transition-all duration-300 ${isScrolled ? 'h-11' : 'h-14'}`}>
+            {/* 3. Bottom White Navigation */}
+            <div className={`hidden lg:block w-full bg-white border-b border-gray-100 shadow-xs relative z-40 transition-all duration-300 ${isScrolled ? 'h-11' : 'h-13'}`}>
+                <div className={`max-w-[1450px] mx-auto px-4 md:px-6 flex items-center justify-between text-[13.5px] xl:text-[14px] font-bold text-gray-700 transition-all duration-300 ${isScrolled ? 'h-11' : 'h-13'}`}>
                     
                     {/* Left: Quick Contact */}
-                    <div className="flex-1 flex items-center gap-2 text-gray-500 hover:text-[#E51A22] transition-colors cursor-pointer">
-                        <Mail className="w-4 h-4" />
-                        <a href="mailto:support@littlejoys.com" className="tracking-wide text-[13px]">support@littlejoys.com</a>
+                    <div className="hidden 2xl:flex items-center gap-1.5 text-gray-500 hover:text-[#E51A22] transition-colors cursor-pointer shrink-0">
+                        <Mail className="w-3.5 h-3.5" />
+                        <a href="mailto:support@littlejoys.com" className="tracking-wide text-[12.5px]">support@littlejoys.com</a>
                     </div>
 
-                    {/* Center: Main Navigation */}
-                    <nav className="flex items-center justify-center gap-8 shrink-0">
+                    {/* Center: Main Navigation with SEPARATE Shop By Age, Categories, Collections & Price */}
+                    <nav className="flex items-center justify-center gap-4 xl:gap-6 2xl:gap-7 flex-1">
                         <Link to="/" className={getLinkClass('/')}>Home</Link>
                         
+                        {/* 1. SEPARATE: Shop By Age Dropdown */}
                         <div 
-                            className="h-full flex items-center cursor-pointer py-4"
-                            onMouseEnter={() => setIsShopMenuOpen(true)}
-                            onMouseLeave={() => setIsShopMenuOpen(false)}
+                            className="relative h-full flex items-center cursor-pointer py-3"
+                            onMouseEnter={() => handleMouseEnter('age')}
+                            onMouseLeave={handleMouseLeave}
                         >
-                            <Link to="/products" onClick={() => setIsShopMenuOpen(false)} className={`${getLinkClass('/products')} flex items-center gap-1.5`}>
-                                Shop <span className={`text-[10px] transition-colors ${isShopMenuOpen ? 'text-[#E51A22]' : 'text-gray-400'}`}>▼</span>
+                            <Link to="/products" className={`flex items-center gap-1 font-semibold py-1 transition-colors ${activeDropdown === 'age' || location.search.includes('age=') ? 'text-[#E51A22]' : 'text-gray-700 hover:text-[#E51A22]'}`}>
+                                <span>Shop By Age</span>
+                                <span className={`text-[8.5px] transition-transform duration-200 ${activeDropdown === 'age' ? 'rotate-180 text-[#E51A22]' : 'text-gray-400'}`}>▼</span>
                             </Link>
-                            
-                            {/* Mega Menu */}
-                            <div className={`absolute top-full left-0 w-full flex justify-center transition-all duration-300 z-50 ${isShopMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible pointer-events-none -translate-y-2'}`}>
-                                <div className="w-full max-w-[1200px] bg-white shadow-2xl border border-gray-100 rounded-b-2xl overflow-hidden">
-                                    <div className="grid grid-cols-4 divide-x divide-gray-100 p-8">
-                                        {/* Col 1: Shop By Age */}
-                                        <div className="px-6 flex flex-col items-center">
-                                            <h3 className="text-[13px] font-black text-gray-400 uppercase tracking-widest mb-6 text-center">Shop By Age</h3>
-                                            <div className="flex flex-col gap-4 text-center w-full">
-                                                {['0-6 Months', '6-12 Months', '1-2 Years', '3-5 Years', '6-8 Years', '9-12 Years', '12+ Years'].map(age => (
-                                                    <Link key={age} to={`/products?age=${encodeURIComponent(age)}`} onClick={() => setIsShopMenuOpen(false)} className="text-[14.5px] font-bold text-gray-700 hover:text-[#E51A22] transition-colors">{age}</Link>
-                                                ))}
-                                            </div>
+                            <AnimatePresence>
+                                {activeDropdown === 'age' && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 6 }}
+                                        transition={{ duration: 0.16 }}
+                                        className="absolute top-full left-0 w-56 bg-white/98 backdrop-blur-md shadow-2xl border border-gray-100 rounded-2xl p-2 z-50 overflow-hidden"
+                                    >
+                                        <div className="flex flex-col gap-0.5">
+                                            {ageMilestones.map(age => (
+                                                <Link 
+                                                    key={age.label} 
+                                                    to={`/products?age=${encodeURIComponent(age.label)}`}
+                                                    onClick={() => setActiveDropdown(null)}
+                                                    className="flex items-center px-3 py-2 rounded-xl text-[13.5px] font-bold text-gray-700 hover:text-[#E51A22] hover:bg-rose-50/80 transition-all"
+                                                >
+                                                    <span className="flex items-center gap-2.5">
+                                                        <span className="text-base">{age.icon}</span>
+                                                        <span>{age.label}</span>
+                                                    </span>
+                                                </Link>
+                                            ))}
                                         </div>
-
-                                        {/* Col 2: Categories */}
-                                        <div className="px-6 flex flex-col items-center">
-                                            <h3 className="text-[13px] font-black text-gray-400 uppercase tracking-widest mb-6 text-center">Toy Categories</h3>
-                                            <div className="flex flex-col gap-4 text-center w-full">
-                                                {categories.slice(0, 8).map(cat => (
-                                                    <Link key={cat._id} to={`/products?category=${encodeURIComponent(cat.name)}`} onClick={() => setIsShopMenuOpen(false)} className="text-[14.5px] font-bold text-gray-700 hover:text-[#E51A22] transition-colors truncate">
-                                                        {cat.name}
-                                                    </Link>
-                                                ))}
-                                            </div>
-                                            <div className="mt-auto pt-6 text-center">
-                                                <Link to="/categories" onClick={() => setIsShopMenuOpen(false)} className="text-[13px] font-bold text-[#E51A22] hover:underline flex items-center justify-center gap-1">View All Categories <span className="text-lg">→</span></Link>
-                                            </div>
-                                        </div>
-
-                                        {/* Col 3: Collections */}
-                                        <div className="px-6 flex flex-col items-center">
-                                            <h3 className="text-[13px] font-black text-gray-400 uppercase tracking-widest mb-6 text-center">Collections</h3>
-                                            <div className="flex flex-col gap-4 text-center w-full">
-                                                {collections.map(col => (
-                                                    <Link key={col._id} to={`/products?collection=${col._id}`} onClick={() => setIsShopMenuOpen(false)} className="text-[14.5px] font-bold text-gray-700 hover:text-[#E51A22] transition-colors truncate">
-                                                        {col.name}
-                                                    </Link>
-                                                ))}
-                                            </div>
-                                            <div className="mt-auto pt-6 text-center">
-                                                <Link to="/collections" onClick={() => setIsShopMenuOpen(false)} className="text-[13px] font-bold text-[#E51A22] hover:underline flex items-center justify-center gap-1">View All Collections <span className="text-lg">→</span></Link>
-                                            </div>
-                                        </div>
-
-                                        {/* Col 4: Shop By Price */}
-                                        <div className="px-6 flex flex-col items-center">
-                                            <h3 className="text-[13px] font-black text-gray-400 uppercase tracking-widest mb-6 text-center">Shop By Price</h3>
-                                            <div className="flex flex-col gap-4 text-center w-full">
-                                                <Link to="/products?maxPrice=299" onClick={() => setIsShopMenuOpen(false)} className="text-[14.5px] font-bold text-gray-700 hover:text-[#E51A22] transition-colors">Under ₹299</Link>
-                                                <Link to="/products?maxPrice=499" onClick={() => setIsShopMenuOpen(false)} className="text-[14.5px] font-bold text-gray-700 hover:text-[#E51A22] transition-colors">Under ₹499</Link>
-                                                <Link to="/products?maxPrice=699" onClick={() => setIsShopMenuOpen(false)} className="text-[14.5px] font-bold text-gray-700 hover:text-[#E51A22] transition-colors">Under ₹699</Link>
-                                                <Link to="/products?maxPrice=999" onClick={() => setIsShopMenuOpen(false)} className="text-[14.5px] font-bold text-gray-700 hover:text-[#E51A22] transition-colors">Under ₹999</Link>
-                                                <Link to="/products?minPrice=1000" onClick={() => setIsShopMenuOpen(false)} className="text-[14.5px] font-bold text-gray-700 hover:text-[#E51A22] transition-colors">Above ₹999</Link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
-                        <Link to="/products?category=Educational" className={getLinkClass('/products', 'Educational', 'category')}>Educational</Link>
+                        {/* 2. SEPARATE: Toy Categories Dropdown */}
+                        <div 
+                            className="relative h-full flex items-center cursor-pointer py-3"
+                            onMouseEnter={() => handleMouseEnter('categories')}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            <Link to="/categories" className={`flex items-center gap-1 font-semibold py-1 transition-colors ${activeDropdown === 'categories' || location.pathname === '/categories' ? 'text-[#E51A22]' : 'text-gray-700 hover:text-[#E51A22]'}`}>
+                                <span>Toy Categories</span>
+                                <span className={`text-[8.5px] transition-transform duration-200 ${activeDropdown === 'categories' ? 'rotate-180 text-[#E51A22]' : 'text-gray-400'}`}>▼</span>
+                            </Link>
+                            <AnimatePresence>
+                                {activeDropdown === 'categories' && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 6 }}
+                                        transition={{ duration: 0.16 }}
+                                        className="absolute top-full left-0 w-64 bg-white/98 backdrop-blur-md shadow-2xl border border-gray-100 rounded-2xl p-2 z-50 overflow-hidden"
+                                    >
+                                        <div className="flex flex-col gap-0.5 max-h-[380px] overflow-y-auto pr-1">
+                                            {categories.map(cat => (
+                                                <Link 
+                                                    key={cat._id} 
+                                                    to={`/products?category=${encodeURIComponent(cat.name)}`}
+                                                    onClick={() => setActiveDropdown(null)}
+                                                    className="flex items-center px-3 py-2 rounded-xl text-[13.5px] font-bold text-gray-700 hover:text-[#E51A22] hover:bg-rose-50/80 transition-all"
+                                                >
+                                                    <span className="truncate flex items-center gap-2.5">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-[#E51A22] shrink-0"></span>
+                                                        <span>{cat.name}</span>
+                                                    </span>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* 3. SEPARATE: Collections Dropdown */}
+                        <div 
+                            className="relative h-full flex items-center cursor-pointer py-3"
+                            onMouseEnter={() => handleMouseEnter('collections')}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            <Link to="/collections" className={`flex items-center gap-1 font-semibold py-1 transition-colors ${activeDropdown === 'collections' || location.pathname === '/collections' ? 'text-[#E51A22]' : 'text-gray-700 hover:text-[#E51A22]'}`}>
+                                <span>Collections</span>
+                                <span className={`text-[8.5px] transition-transform duration-200 ${activeDropdown === 'collections' ? 'rotate-180 text-[#E51A22]' : 'text-gray-400'}`}>▼</span>
+                            </Link>
+                            <AnimatePresence>
+                                {activeDropdown === 'collections' && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 6 }}
+                                        transition={{ duration: 0.16 }}
+                                        className="absolute top-full left-0 w-60 bg-white/98 backdrop-blur-md shadow-2xl border border-gray-100 rounded-2xl p-2 z-50 overflow-hidden"
+                                    >
+                                        <div className="flex flex-col gap-0.5 max-h-[380px] overflow-y-auto pr-1">
+                                            {collections.length > 0 ? (
+                                                collections.map(col => (
+                                                    <Link 
+                                                        key={col._id} 
+                                                        to={`/products?collection=${col._id}`}
+                                                        onClick={() => setActiveDropdown(null)}
+                                                        className="flex items-center px-3 py-2 rounded-xl text-[13.5px] font-bold text-gray-700 hover:text-[#E51A22] hover:bg-rose-50/80 transition-all"
+                                                    >
+                                                        <span className="truncate flex items-center gap-2.5">
+                                                            <span>✨</span>
+                                                            <span>{col.name}</span>
+                                                        </span>
+                                                    </Link>
+                                                ))
+                                            ) : (
+                                                <div className="px-3 py-2 text-xs text-gray-400 italic">No collections yet</div>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* 4. SEPARATE: Shop By Price Dropdown */}
+                        <div 
+                            className="relative h-full flex items-center cursor-pointer py-3"
+                            onMouseEnter={() => handleMouseEnter('price')}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            <Link to="/products" className={`flex items-center gap-1 font-semibold py-1 transition-colors ${activeDropdown === 'price' || location.search.includes('Price=') ? 'text-[#E51A22]' : 'text-gray-700 hover:text-[#E51A22]'}`}>
+                                <span>Shop By Price</span>
+                                <span className={`text-[8.5px] transition-transform duration-200 ${activeDropdown === 'price' ? 'rotate-180 text-[#E51A22]' : 'text-gray-400'}`}>▼</span>
+                            </Link>
+                            <AnimatePresence>
+                                {activeDropdown === 'price' && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 6 }}
+                                        transition={{ duration: 0.16 }}
+                                        className="absolute top-full left-0 w-56 bg-white/98 backdrop-blur-md shadow-2xl border border-gray-100 rounded-2xl p-2 z-50 overflow-hidden"
+                                    >
+                                        <div className="flex flex-col gap-0.5">
+                                            {priceRanges.map(price => (
+                                                <Link 
+                                                    key={price.label} 
+                                                    to={`/products?${price.query}`}
+                                                    onClick={() => setActiveDropdown(null)}
+                                                    className="flex items-center px-3 py-2 rounded-xl text-[13.5px] font-bold text-gray-700 hover:text-[#E51A22] hover:bg-rose-50/80 transition-all"
+                                                >
+                                                    <span className="flex items-center gap-2.5">
+                                                        <span>🏷️</span>
+                                                        <span>{price.label}</span>
+                                                    </span>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
                         <Link to="/products?gender=Boys" className={getLinkClass('/products', 'Boys', 'gender')}>Boys</Link>
                         <Link to="/products?gender=Girls" className={getLinkClass('/products', 'Girls', 'gender')}>Girls</Link>
-                        <Link to="/about" className={getLinkClass('/about')}>About Us</Link>
                         <Link to="/contact" className={getLinkClass('/contact')}>Contact Us</Link>
                     </nav>
 
-                    {/* Right: Empty space to balance the nav */}
-                    <div className="flex-1 flex justify-end">
+                    {/* Right: Empty space to balance */}
+                    <div className="hidden 2xl:flex items-center justify-end shrink-0 w-36">
                     </div>
 
                 </div>
@@ -340,15 +464,44 @@ const Navbar = () => {
                                 <span>All Products</span>
                                 <span className="text-slate-400">›</span>
                             </Link>
+
+                            {/* Mobile: Shop By Age */}
+                            <div className="my-1 border-t border-slate-100" />
+                            <div className="text-xs font-black uppercase tracking-wider text-slate-400 px-3">Shop By Age</div>
+                            <div className="grid grid-cols-2 gap-1.5 px-3">
+                                {ageMilestones.map(age => (
+                                    <Link key={age.label} to={`/products?age=${encodeURIComponent(age.label)}`} onClick={() => setIsMobileMenuOpen(false)} className="py-1.5 px-2 bg-slate-50 text-slate-700 rounded-lg font-bold text-xs hover:bg-rose-50 hover:text-[#E51A22] transition-colors flex items-center gap-1.5 truncate">
+                                        <span>{age.icon}</span>
+                                        <span className="truncate">{age.label}</span>
+                                    </Link>
+                                ))}
+                            </div>
+
+                            {/* Mobile: Categories & Collections */}
+                            <div className="my-1 border-t border-slate-100" />
                             <Link to="/categories" onClick={() => setIsMobileMenuOpen(false)} className="py-2 px-3 rounded-xl hover:bg-slate-50 hover:text-[#E51A22] transition-colors flex items-center justify-between">
-                                <span>Categories</span>
+                                <span>Toy Categories</span>
                                 <span className="text-slate-400">›</span>
                             </Link>
                             <Link to="/collections" onClick={() => setIsMobileMenuOpen(false)} className="py-2 px-3 rounded-xl hover:bg-slate-50 hover:text-[#E51A22] transition-colors flex items-center justify-between">
                                 <span>Collections</span>
                                 <span className="text-slate-400">›</span>
                             </Link>
-                            <div className="my-2 border-t border-slate-100" />
+
+                            {/* Mobile: Shop By Price */}
+                            <div className="my-1 border-t border-slate-100" />
+                            <div className="text-xs font-black uppercase tracking-wider text-slate-400 px-3">Shop By Price</div>
+                            <div className="grid grid-cols-2 gap-1.5 px-3">
+                                {priceRanges.map(price => (
+                                    <Link key={price.label} to={`/products?${price.query}`} onClick={() => setIsMobileMenuOpen(false)} className="py-1.5 px-2 bg-slate-50 text-slate-700 rounded-lg font-bold text-xs hover:bg-rose-50 hover:text-[#E51A22] transition-colors flex items-center gap-1.5 truncate">
+                                        <span>🏷️</span>
+                                        <span className="truncate">{price.label}</span>
+                                    </Link>
+                                ))}
+                            </div>
+
+                            {/* Mobile: Gender */}
+                            <div className="my-1 border-t border-slate-100" />
                             <div className="text-xs font-black uppercase tracking-wider text-slate-400 px-3">Shop By Gender</div>
                             <div className="grid grid-cols-2 gap-2 px-3">
                                 <Link to="/products?gender=Boys" onClick={() => setIsMobileMenuOpen(false)} className="py-2 text-center bg-blue-50 text-blue-700 rounded-xl font-bold text-sm hover:bg-blue-100 transition-colors">
@@ -361,10 +514,6 @@ const Navbar = () => {
                             <div className="my-2 border-t border-slate-100" />
                             <Link to="/orders" onClick={() => setIsMobileMenuOpen(false)} className="py-2 px-3 rounded-xl hover:bg-slate-50 hover:text-[#E51A22] transition-colors flex items-center justify-between">
                                 <span>My Orders</span>
-                                <span className="text-slate-400">›</span>
-                            </Link>
-                            <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="py-2 px-3 rounded-xl hover:bg-slate-50 hover:text-[#E51A22] transition-colors flex items-center justify-between">
-                                <span>About Us</span>
                                 <span className="text-slate-400">›</span>
                             </Link>
                             <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="py-2 px-3 rounded-xl hover:bg-slate-50 hover:text-[#E51A22] transition-colors flex items-center justify-between">

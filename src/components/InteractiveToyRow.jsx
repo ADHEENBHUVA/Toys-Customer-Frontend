@@ -60,7 +60,8 @@ const playSynthToySound = (index, ctx, duration = 4.0) => {
     try {
         const now = ctx.currentTime;
         const masterGain = ctx.createGain();
-        masterGain.gain.setValueAtTime(0.85, now);
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(0.85, now + 0.02);
         masterGain.connect(ctx.destination);
 
         if (index === 3) {
@@ -306,7 +307,9 @@ const playSynthToySound = (index, ctx, duration = 4.0) => {
 
 const InteractiveToyRow = () => {
     const [activeIdx, setActiveIdx] = useState(null);
+    const [animResetKey, setAnimResetKey] = useState(0);
     const sectionRef = useRef(null);
+    const hoverTimerRef = useRef(null);
     const activeTimerRef = useRef(null);
     const currentAudioRef = useRef(null);
     const activeSynthRef = useRef(null);
@@ -350,6 +353,10 @@ const InteractiveToyRow = () => {
 
     // Stop currently active toy sound and reset state immediately
     const stopCurrentToy = () => {
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+            hoverTimerRef.current = null;
+        }
         if (activeTimerRef.current) {
             clearTimeout(activeTimerRef.current);
             activeTimerRef.current = null;
@@ -363,7 +370,18 @@ const InteractiveToyRow = () => {
         }
         if (activeSynthRef.current) {
             try {
-                activeSynthRef.current.disconnect();
+                const ctx = getAudioContext();
+                if (ctx && activeSynthRef.current.gain) {
+                    const now = ctx.currentTime;
+                    activeSynthRef.current.gain.setValueAtTime(activeSynthRef.current.gain.value, now);
+                    activeSynthRef.current.gain.linearRampToValueAtTime(0.001, now + 0.015);
+                    const synthToDrop = activeSynthRef.current;
+                    setTimeout(() => {
+                        try { synthToDrop.disconnect(); } catch (e) {}
+                    }, 20);
+                } else {
+                    activeSynthRef.current.disconnect();
+                }
             } catch (e) {}
             activeSynthRef.current = null;
         }
@@ -371,8 +389,8 @@ const InteractiveToyRow = () => {
     };
 
     // Activate toy with authentic sound effect and 3D action
-    const activateToy = (index, forceClick = false) => {
-        // Stop any previous sound
+    const activateToy = (index) => {
+        // Stop any previous sound cleanly
         stopCurrentToy();
 
         setActiveIdx(index);
@@ -380,20 +398,19 @@ const InteractiveToyRow = () => {
         // Resume AudioContext
         const ctx = getAudioContext();
 
-        let playedSuccessfully = false;
-
         // Try preloaded HTML5 Audio first
         try {
             const audio = preloadedAudiosRef.current[index] || new Audio(TOY_SOUND_FILES[index]);
             audio.volume = 0.95;
             audio.currentTime = 0;
 
+            currentAudioRef.current = audio;
+
             const playPromise = audio.play();
             if (playPromise !== undefined) {
                 playPromise
                     .then(() => {
-                        playedSuccessfully = true;
-                        currentAudioRef.current = audio;
+                        // Playing successfully
                     })
                     .catch((err) => {
                         // If browser autoplay policy blocks hover play, use procedural Web Audio synthesizer!
@@ -402,8 +419,6 @@ const InteractiveToyRow = () => {
                             activeSynthRef.current = playSynthToySound(index, ctx);
                         }
                     });
-            } else {
-                currentAudioRef.current = audio;
             }
 
             audio.onended = () => {
@@ -416,31 +431,88 @@ const InteractiveToyRow = () => {
             }
         }
 
-        // If from click, also ensure Web Audio is triggered if HTML5 didn't play instantly
-        if (forceClick && ctx && !playedSuccessfully) {
-            activeSynthRef.current = playSynthToySound(index, ctx);
-        }
-
         // Auto-stop after 5 seconds if mouse remains hovered
         activeTimerRef.current = setTimeout(() => {
             stopCurrentToy();
         }, 5000);
     };
 
-    // When mouse pointer leaves toy: IMMEDIATELY stop sound and return to base
-    const handleMouseLeave = () => {
-        stopCurrentToy();
+    // When mouse pointer enters a toy: apply small 75ms hover intent threshold
+    // so moving NEAR or quickly passing by the toy will NOT trigger accidental sounds!
+    const handleMouseEnter = (index) => {
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+            hoverTimerRef.current = null;
+        }
+
+        // If this toy is already the active one playing, do nothing
+        if (activeIdx === index) return;
+
+        hoverTimerRef.current = setTimeout(() => {
+            activateToy(index);
+            hoverTimerRef.current = null;
+        }, 75);
     };
 
-    // Single-tap / click on toy: Guaranteed audio trigger
-    const handleToyClick = (index) => {
+    // When mouse pointer leaves toy: IMMEDIATELY cancel timer, stop sound and return to base
+    const handleMouseLeave = (index) => {
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+            hoverTimerRef.current = null;
+        }
+
+        if (activeIdx === index) {
+            stopCurrentToy();
+        }
+    };
+
+    // Click on toy: Guaranteed audio trigger, or if ALREADY PLAYING, RESTART FROM 0.0s!
+    // (Zero click pop, smooth instant restart)
+    const handleToyClick = (e, index) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Cancel any pending hover timer
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+            hoverTimerRef.current = null;
+        }
+
         // Ensure audio context is running
         const ctx = getAudioContext();
         if (ctx && ctx.state === 'suspended') {
-            ctx.resume();
+            ctx.resume().catch(() => {});
         }
-        // Force play sound on click
-        activateToy(index, true);
+
+        // IF THIS TOY IS ALREADY PLAYING:
+        // Restart the music immediately from the beginning without any click/pop sound!
+        if (activeIdx === index) {
+            if (currentAudioRef.current) {
+                try {
+                    currentAudioRef.current.currentTime = 0;
+                    currentAudioRef.current.play().catch(() => {});
+                } catch (err) {}
+            } else {
+                activateToy(index);
+            }
+
+            // Reset the 5-second timer
+            if (activeTimerRef.current) {
+                clearTimeout(activeTimerRef.current);
+            }
+            activeTimerRef.current = setTimeout(() => {
+                stopCurrentToy();
+            }, 5000);
+
+            // Re-trigger animation cleanly from frame 0
+            setAnimResetKey(prev => prev + 1);
+            return;
+        }
+
+        // If clicking a different toy or starting fresh:
+        activateToy(index);
     };
 
     // IntersectionObserver: When scrolled out of mobile screen view, AUTOMATICALLY STOP
@@ -761,18 +833,19 @@ const InteractiveToyRow = () => {
             `}</style>
 
             {/* 7 TOYS DISPLAY SHELF - FULL WIDTH EDGE TO EDGE, OVERFLOW VISIBLE */}
-            <div className="w-full px-3 sm:px-8 md:px-12 lg:px-16 relative overflow-visible">
-                <div className="w-full flex items-center justify-between sm:justify-evenly relative z-10 min-h-[125px] sm:min-h-[145px] md:min-h-[160px] pt-4 pb-2 px-1 sm:px-4 overflow-visible">
+            <div className="w-full px-3 sm:px-8 md:px-12 lg:px-16 relative overflow-visible pointer-events-none">
+                <div className="w-full flex items-center justify-between sm:justify-evenly relative z-10 min-h-[125px] sm:min-h-[145px] md:min-h-[160px] pt-4 pb-2 px-1 sm:px-4 overflow-visible pointer-events-none">
                     
                     {/* ========================================================== */}
                     {/* TOY 1: CLASSIC CARAMEL TEDDY BEAR (PLUSH SQUEAK + GIGGLE)  */}
                     {/* ========================================================== */}
                     <div
-                        className={`flex flex-col items-center cursor-pointer group relative mobile-flow-toy ${activeIdx === 0 ? 'is-active active-toy-0' : ''}`}
+                        key={`toy-0-${activeIdx === 0 ? animResetKey : 0}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 0 ? 'is-active active-toy-0' : ''}`}
                         style={getToyTransform(0)}
-                        onMouseEnter={() => activateToy(0)}
-                        onMouseLeave={handleMouseLeave}
-                        onClick={() => handleToyClick(0)}
+                        onMouseEnter={() => handleMouseEnter(0)}
+                        onMouseLeave={() => handleMouseLeave(0)}
+                        onClick={(e) => handleToyClick(e, 0)}
                     >
                         <svg viewBox="0 0 72 78" fill="none" className="w-[38px] h-[41px] xs:w-[46px] xs:h-[50px] sm:w-[58px] sm:h-[63px] md:w-[72px] md:h-[78px] filter drop-shadow-md overflow-visible">
                             <defs>
@@ -828,11 +901,12 @@ const InteractiveToyRow = () => {
                     {/* TOY 2: FLUFFY BUNNY (CARTOON SPRING BOING + NO CLIPPING)   */}
                     {/* ========================================================== */}
                     <div
-                        className={`flex flex-col items-center cursor-pointer group relative mobile-flow-toy ${activeIdx === 1 ? 'is-active active-toy-1' : ''}`}
+                        key={`toy-1-${activeIdx === 1 ? animResetKey : 0}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 1 ? 'is-active active-toy-1' : ''}`}
                         style={getToyTransform(1)}
-                        onMouseEnter={() => activateToy(1)}
-                        onMouseLeave={handleMouseLeave}
-                        onClick={() => handleToyClick(1)}
+                        onMouseEnter={() => handleMouseEnter(1)}
+                        onMouseLeave={() => handleMouseLeave(1)}
+                        onClick={(e) => handleToyClick(e, 1)}
                     >
                         <svg viewBox="0 0 70 78" fill="none" className="w-[37px] h-[41px] xs:w-[45px] xs:h-[50px] sm:w-[57px] sm:h-[63px] md:w-[70px] md:h-[78px] filter drop-shadow-md overflow-visible">
                             {/* Long Bunny Ears */}
@@ -882,11 +956,12 @@ const InteractiveToyRow = () => {
                     {/* TOY 3: RETRO ROBOT (MECHANICAL SERVO + ROBOTIC VOICE)      */}
                     {/* ========================================================== */}
                     <div
-                        className={`flex flex-col items-center cursor-pointer group relative mobile-flow-toy ${activeIdx === 2 ? 'is-active active-toy-2' : ''}`}
+                        key={`toy-2-${activeIdx === 2 ? animResetKey : 0}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 2 ? 'is-active active-toy-2' : ''}`}
                         style={getToyTransform(2)}
-                        onMouseEnter={() => activateToy(2)}
-                        onMouseLeave={handleMouseLeave}
-                        onClick={() => handleToyClick(2)}
+                        onMouseEnter={() => handleMouseEnter(2)}
+                        onMouseLeave={() => handleMouseLeave(2)}
+                        onClick={(e) => handleToyClick(e, 2)}
                     >
                         <svg viewBox="0 0 70 78" fill="none" className="w-[37px] h-[41px] xs:w-[45px] xs:h-[50px] sm:w-[57px] sm:h-[63px] md:w-[70px] md:h-[78px] filter drop-shadow-md overflow-visible">
                             {/* Spring Antenna with Glowing Red Bulb */}
@@ -935,11 +1010,12 @@ const InteractiveToyRow = () => {
                     {/* TOY 4: VINTAGE CAR (REAL ROAD ASPHALT, WHEELS, HORN & REV) */}
                     {/* ========================================================== */}
                     <div
-                        className={`flex flex-col items-center cursor-pointer group relative mobile-flow-toy ${activeIdx === 3 ? 'is-active active-toy-3' : ''}`}
+                        key={`toy-3-${activeIdx === 3 ? animResetKey : 0}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 3 ? 'is-active active-toy-3' : ''}`}
                         style={getToyTransform(3)}
-                        onMouseEnter={() => activateToy(3)}
-                        onMouseLeave={handleMouseLeave}
-                        onClick={() => handleToyClick(3)}
+                        onMouseEnter={() => handleMouseEnter(3)}
+                        onMouseLeave={() => handleMouseLeave(3)}
+                        onClick={(e) => handleToyClick(e, 3)}
                     >
                         {/* Realistic 3D Asphalt Road Strip with Moving Highway Dashes */}
                         {activeIdx === 3 && (
@@ -1009,11 +1085,12 @@ const InteractiveToyRow = () => {
                     {/* TOY 5: 3D ROYAL WALKING PEACOCK (MOR NO TAHOOKO + STRUT)   */}
                     {/* ========================================================== */}
                     <div
-                        className={`flex flex-col items-center cursor-pointer group relative mobile-flow-toy ${activeIdx === 4 ? 'is-active active-toy-4' : ''}`}
+                        key={`toy-4-${activeIdx === 4 ? animResetKey : 0}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 4 ? 'is-active active-toy-4' : ''}`}
                         style={getToyTransform(4)}
-                        onMouseEnter={() => activateToy(4)}
-                        onMouseLeave={handleMouseLeave}
-                        onClick={() => handleToyClick(4)}
+                        onMouseEnter={() => handleMouseEnter(4)}
+                        onMouseLeave={() => handleMouseLeave(4)}
+                        onClick={(e) => handleToyClick(e, 4)}
                     >
                         {/* Royal Garden Lawn Walking Track with Moving Stepping Stones & Daisies */}
                         {activeIdx === 4 && (
@@ -1175,11 +1252,12 @@ const InteractiveToyRow = () => {
                     {/* TOY 6: 3D INDIAN DHOL (STICKS VISIBLY STRIKING DHOL BEATS) */}
                     {/* ========================================================== */}
                     <div
-                        className={`flex flex-col items-center cursor-pointer group relative mobile-flow-toy ${activeIdx === 5 ? 'is-active active-toy-5' : ''}`}
+                        key={`toy-5-${activeIdx === 5 ? animResetKey : 0}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy w-fit h-fit p-1 rounded-2xl ${activeIdx === 5 ? 'is-active active-toy-5' : ''}`}
                         style={getToyTransform(5)}
-                        onMouseEnter={() => activateToy(5)}
-                        onMouseLeave={handleMouseLeave}
-                        onClick={() => handleToyClick(5)}
+                        onMouseEnter={() => handleMouseEnter(5)}
+                        onMouseLeave={() => handleMouseLeave(5)}
+                        onClick={(e) => handleToyClick(e, 5)}
                     >
                         <svg viewBox="0 0 74 78" fill="none" className="w-[39px] h-[41px] xs:w-[47px] xs:h-[50px] sm:w-[60px] sm:h-[63px] md:w-[74px] md:h-[78px] filter drop-shadow-md overflow-visible">
                             <defs>
@@ -1235,11 +1313,12 @@ const InteractiveToyRow = () => {
                     {/* TOY 7: ROCKING HORSE (REAL NEIGH + GALLOPING CLIP-CLOP)    */}
                     {/* ========================================================== */}
                     <div
-                        className={`flex flex-col items-center cursor-pointer group relative mobile-flow-toy toy-horse-container ${activeIdx === 6 ? 'is-active active-toy-6' : ''}`}
+                        key={`toy-6-${activeIdx === 6 ? animResetKey : 0}`}
+                        className={`pointer-events-auto flex flex-col items-center cursor-pointer group relative mobile-flow-toy toy-horse-container w-fit h-fit p-1 rounded-2xl ${activeIdx === 6 ? 'is-active active-toy-6' : ''}`}
                         style={getToyTransform(6)}
-                        onMouseEnter={() => activateToy(6)}
-                        onMouseLeave={handleMouseLeave}
-                        onClick={() => handleToyClick(6)}
+                        onMouseEnter={() => handleMouseEnter(6)}
+                        onMouseLeave={() => handleMouseLeave(6)}
+                        onClick={(e) => handleToyClick(e, 6)}
                     >
                         <svg viewBox="0 0 78 78" fill="none" className="w-[41px] h-[41px] xs:w-[50px] xs:h-[50px] sm:w-[63px] sm:h-[63px] md:w-[78px] md:h-[78px] filter drop-shadow-md overflow-visible">
                             <g className="rocking-horse-body">
