@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * ToyTransitScene Component
@@ -9,9 +9,9 @@ import React from 'react';
  * 2. PROPER HIGH-VISIBILITY STATION CLOCK:
  *    - 58px vintage clock face with Roman numerals XII, III, VI, IX.
  *    - Super visible, bold hands (Kata / કાંટા):
- *      * Thick solid black antique spade Hour Hand
- *      * Long tapered black steel Minute Hand
- *      * High-visibility bright Red Ticking Second Hand
+ *      * Thick solid black antique spade Hour Hand (Live Time)
+ *      * Long tapered black steel Minute Hand (Live Time)
+ *      * High-visibility bright Red Ticking Second Hand (Live Real-Time Ticking)
  * 3. 3 CARGO WAGONS: [A][B][C], [D][E][F], [G][H][I]
  *    - Train ALWAYS arrives fully loaded.
  * 4. STRICT SIGNAL & FLAG CHOREOGRAPHY:
@@ -34,6 +34,25 @@ import React from 'react';
  *    - Dark charcoal & soot puffs emitting from locomotive smokestack.
  */
 const ToyTransitScene = () => {
+    // Live Railway Station Watch (Real-time local clock)
+    const [liveTime, setLiveTime] = useState(() => new Date());
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setLiveTime(new Date());
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const nowSeconds = liveTime.getSeconds();
+    const nowMinutes = liveTime.getMinutes();
+    const nowHours = liveTime.getHours();
+
+    // Exact live angles (degrees from 12 o'clock)
+    const secondDeg = nowSeconds * 6;
+    const minuteDeg = nowMinutes * 6 + nowSeconds * 0.1;
+    const hourDeg = ((nowHours % 12) + nowMinutes / 60 + nowSeconds / 3600) * 30;
+
     return (
         <section className="w-full relative overflow-hidden select-none bg-transparent pt-6 sm:pt-12 pb-2 sm:pb-4">
             <style>{`
@@ -528,16 +547,6 @@ const ToyTransitScene = () => {
                 }
                 .platform-crate-ghi { animation: platformCrateGhiAnim 24s cubic-bezier(0.25, 1, 0.5, 1) infinite; transform-origin: bottom center; will-change: transform; }
 
-                /* High-Visibility Station Clock Ticking Red Second Hand */
-                @keyframes clockSecondHandTick {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-                .animate-clock-second-hand {
-                    transform-origin: 32px 32px;
-                    animation: clockSecondHandTick 60s steps(60, end) infinite;
-                }
-
                 /* Billowing Black Locomotive Smoke Puffs */
                 @keyframes blackSmokePuff1 {
                     0% { transform: translate(0, 0) scale(0.25); opacity: 0; }
@@ -614,8 +623,11 @@ const ToyTransitScene = () => {
                                     </div>
                                 </div>
                                 
-                                {/* TOY STATION CLOCK (Toy Block Housing with Crisp Vintage Dial & High-Visibility Hands) */}
-                                <div className="w-[78px] h-[78px] bg-gradient-to-b from-blue-500 to-blue-600 border-3 border-blue-800 rounded-2xl flex items-center justify-center shadow-md relative p-1">
+                                {/* TOY STATION CLOCK (Toy Block Housing with Crisp Vintage Dial & High-Visibility Live Hands) */}
+                                <div 
+                                    className="w-[78px] h-[78px] bg-gradient-to-b from-blue-500 to-blue-600 border-3 border-blue-800 rounded-2xl flex items-center justify-center shadow-md relative p-1 cursor-default group/clock"
+                                    title={`Railway Station Clock (Live Time: ${liveTime.toLocaleTimeString('en-IN')})`}
+                                >
                                     {/* Toy Studs on 4 corners */}
                                     <div className="absolute top-1 left-1 w-2 h-2 rounded-full bg-yellow-400 border border-yellow-600"></div>
                                     <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-yellow-400 border border-yellow-600"></div>
@@ -652,36 +664,48 @@ const ToyTransitScene = () => {
                                         <text x="21.5" y="18.5" fill="#334155" fontSize="5.5" fontWeight="800" textAnchor="middle" fontFamily="sans-serif">11</text>
 
                                         {/* ============================================================== */}
-                                        {/* THE CLOCK HANDS (કાંટા / KATA): PROPER, BOLD & HIGH VISIBILITY  */}
+                                        {/* THE CLOCK HANDS (કાંટા / KATA): LIVE REAL-TIME CLOCK */}
                                         {/* ============================================================== */}
 
-                                        {/* 1. BOLD BLACK HOUR HAND (Pointing to ~10 o'clock: 10:10 classic aesthetic) */}
-                                        <g filter="drop-shadow(0px 1.5px 2px rgba(0,0,0,0.5))">
-                                            <line x1="32" y1="32" x2="20" y2="20" stroke="#0F172A" strokeWidth="3.8" strokeLinecap="round" />
-                                            <polygon points="20,20 18,17 17,20 19,23" fill="#0F172A" />
-                                            <circle cx="21" cy="21" r="2" fill="#0F172A" />
+                                        {/* 1. LIVE BOLD BLACK HOUR HAND (Rotates with Current Real-Time Hour) */}
+                                        <g 
+                                            transform={`rotate(${hourDeg}, 32, 32)`} 
+                                            filter="drop-shadow(0px 1.5px 2px rgba(0,0,0,0.5))"
+                                        >
+                                            <line x1="32" y1="34" x2="32" y2="20" stroke="#0F172A" strokeWidth="3.6" strokeLinecap="round" />
+                                            <polygon points="32,16 29.5,20.5 34.5,20.5" fill="#0F172A" />
+                                            <circle cx="32" cy="21" r="1.8" fill="#0F172A" />
                                         </g>
 
-                                        {/* 2. LONG TAPERED BLACK MINUTE HAND (Pointing to ~2 o'clock / 10 minutes) */}
-                                        <g filter="drop-shadow(0px 1.5px 2.5px rgba(0,0,0,0.4))">
-                                            <line x1="32" y1="32" x2="47" y2="17" stroke="#1E293B" strokeWidth="2.8" strokeLinecap="round" />
-                                            <polygon points="47,17 49,15 46,14 44,17" fill="#1E293B" />
+                                        {/* 2. LIVE LONG TAPERED BLACK MINUTE HAND (Rotates with Current Real-Time Minute) */}
+                                        <g 
+                                            transform={`rotate(${minuteDeg}, 32, 32)`} 
+                                            filter="drop-shadow(0px 1.5px 2.5px rgba(0,0,0,0.4))"
+                                        >
+                                            <line x1="32" y1="35" x2="32" y2="13" stroke="#1E293B" strokeWidth="2.6" strokeLinecap="round" />
+                                            <polygon points="32,10 30.5,13.5 33.5,13.5" fill="#1E293B" />
                                         </g>
 
-                                        {/* 3. VIBRANT RED TICKING SECOND HAND (Iconic Railway Target Needle) */}
-                                        <g className="animate-clock-second-hand" filter="drop-shadow(0px 1.5px 3px rgba(220,38,38,0.5))">
+                                        {/* 3. LIVE VIBRANT RED TICKING SECOND HAND (Ticks accurately every second) */}
+                                        <g 
+                                            transform={`rotate(${secondDeg}, 32, 32)`} 
+                                            filter="drop-shadow(0px 1px 2.5px rgba(220,38,38,0.5))"
+                                            style={{
+                                                transition: nowSeconds === 0 ? 'none' : 'transform 0.15s cubic-bezier(0.4, 2.08, 0.55, 0.44)'
+                                            }}
+                                        >
                                             {/* Red Counterweight Tail (Extended behind center) */}
-                                            <line x1="32" y1="41" x2="32" y2="10" stroke="#DC2626" strokeWidth="1.6" strokeLinecap="round" />
+                                            <line x1="32" y1="41" x2="32" y2="8.5" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" />
                                             {/* Rear Counterweight Disc */}
                                             <circle cx="32" cy="38" r="2" fill="#DC2626" />
                                             {/* Iconic Railway Lollipop Disc near tip */}
-                                            <circle cx="32" cy="15" r="3" fill="#EF4444" stroke="#DC2626" strokeWidth="0.8" />
-                                            <circle cx="32" cy="15" r="1.2" fill="#FEE2E2" />
+                                            <circle cx="32" cy="14" r="3" fill="#EF4444" stroke="#DC2626" strokeWidth="0.8" />
+                                            <circle cx="32" cy="14" r="1.2" fill="#FEE2E2" />
                                         </g>
 
                                         {/* CENTER PIVOT CAP (Golden Brass Hub) */}
                                         <circle cx="32" cy="32" r="4" fill="#F59E0B" stroke="#B45309" strokeWidth="1" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.3))" />
-                                        <circle cx="32" cy="32" r="2" fill="#FEF08A" />
+                                        <circle cx="32" cy="32" r="1.8" fill="#FEF08A" />
                                     </svg>
                                 </div>
                             </div>
