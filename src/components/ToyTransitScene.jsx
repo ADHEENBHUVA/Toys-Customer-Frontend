@@ -35,7 +35,7 @@ import React from 'react';
  */
 const ToyTransitScene = () => {
     return (
-        <section className="w-full relative overflow-hidden select-none bg-white border-t border-slate-100 pt-6 sm:pt-12 pb-2 sm:pb-4">
+        <section className="w-full relative overflow-hidden select-none bg-transparent pt-6 sm:pt-12 pb-2 sm:pb-4">
             <style>{`
                 /* Train Journey Cycle (24s Loop with EXACTLY 5.00s Station Stop from 30% to 50.8%) */
                 /* 24s * (50.833% - 30%) = 24 * 0.20833 = 5.00 seconds! */

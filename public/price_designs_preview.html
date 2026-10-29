@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Little Joys - Shop By Price Design Showcase</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF8F5;
+            color: #1E293B;
+        }
+        .font-display {
+            font-family: 'Outfit', sans-serif;
+        }
+        /* Soft Claymorphic Pod Shadow */
+        .pod-shadow {
+            box-shadow: 
+                0 12px 28px -6px rgba(0, 0, 0, 0.06),
+                0 4px 10px -2px rgba(0, 0, 0, 0.03),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.03);
+        }
+        .pod-shadow-active {
+            box-shadow: 
+                0 16px 32px -4px rgba(229, 26, 34, 0.22),
+                0 6px 14px -2px rgba(229, 26, 34, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+        .ribbon-track-shadow {
+            box-shadow: 
+                inset 0 2px 6px rgba(0, 0, 0, 0.06),
+                0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+<body class="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+
+    <!-- Top Header -->
+    <div class="max-w-5xl mx-auto text-center mb-10">
+        <div class="inline-flex items-center gap-2 bg-red-100 text-[#E51A22] px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider mb-3">
+            ✨ Little Joys • Design Showcase
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-[#1A1A24] tracking-tight font-display">
+            Shop By Price: 3 Modern Unique Concepts
+        </h1>
+        <p class="text-slate-600 mt-2 text-sm sm:text-base max-w-2xl mx-auto font-medium">
+            AI જેવું ના લાગે અને જોતાં જ કોઈપણ ગ્રાહકને ગમી જાય તે માટે નીચે ૩ અલગ-અલગ વર્લ્ડ-ક્લાસ ડિઝાઇન્સ છે. તમે ત્રણેયને ક્લિક કરીને લાઈવ ટેસ્ટ કરી શકો છો:
+        </p>
+    </div>
+
+    <div class="max-w-6xl mx-auto space-y-16">
+
+        <!-- OPTION 1: MODERN SOFT 3D TOY PODS -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-lg bg-sky-500 text-white font-black text-sm flex items-center justify-center">1</span>
+                        <h2 class="text-xl font-black text-[#1A1A24] font-display">
+                            Option 1: Modern Soft 3D Toy Pods (સોફ્ટ પોડ્સ)
+                        </h2>
+                        <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full">Recommended</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1 font-medium">
+                        પિલોવી સોફ્ટ ટચ, પેસ્ટલ ટોન, અલ્ટ્રા-ક્લિન બોલ્ડ પ્રાઇસ અને સ્મૂથ હોવર લિફ્ટ. ઝીરો કાર્ટૂન, ૧૦૦% મોર્ડન અને આકર્ષક.
+                    </p>
+                </div>
+                <div id="opt1-status" class="text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                    Status: <span class="text-slate-700 font-extrabold">All Toys Selected</span>
+                </div>
+            </div>
+
+            <!-- 5 Soft Pods Row -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5">
+                
+                <!-- Pod 1 -->
+                <div onclick="selectPod(1, 'Under ₹299', 'Pocket Treats')" id="pod-1"
+                     class="pod-item cursor-pointer select-none rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-between text-center transition-all duration-300 border-2 bg-gradient-to-b from-[#F0F9FF] to-[#E0F2FE] border-sky-200/70 pod-shadow hover:-translate-y-1.5 hover:shadow-lg">
+                    <span class="text-[10px] font-black tracking-wider uppercase text-sky-800 bg-sky-100/90 px-2.5 py-0.5 rounded-full mb-2">
+                        ★ Pocket Fun
+                    </span>
+                    <span class="text-xl sm:text-2xl font-black text-slate-900 font-display tracking-tight my-1">
+                        ₹299
+                    </span>
+                    <span class="text-xs font-bold text-sky-950 mb-3">
+                        Under ₹299
+                    </span>
+                    <div class="pod-btn w-full py-1.5 rounded-xl text-[11px] font-extrabold transition-all bg-white text-sky-900 border border-sky-200/80 shadow-xs">
+                        Select
+                    </div>
+                </div>
+
+                <!-- Pod 2 -->
+                <div onclick="selectPod(2, 'Under ₹499', 'Sweet Value')" id="pod-2"
+                     class="pod-item cursor-pointer select-none rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-between text-center transition-all duration-300 border-2 bg-gradient-to-b from-[#ECFDF5] to-[#D1FAE5] border-emerald-200/70 pod-shadow hover:-translate-y-1.5 hover:shadow-lg">
+                    <span class="text-[10px] font-black tracking-wider uppercase text-emerald-800 bg-emerald-100/90 px-2.5 py-0.5 rounded-full mb-2">
+                        ♥ Sweet Value
+                    </span>
+                    <span class="text-xl sm:text-2xl font-black text-slate-900 font-display tracking-tight my-1">
+                        ₹499
+                    </span>
+                    <span class="text-xs font-bold text-emerald-950 mb-3">
+                        Under ₹499
+                    </span>
+                    <div class="pod-btn w-full py-1.5 rounded-xl text-[11px] font-extrabold transition-all bg-white text-emerald-900 border border-emerald-200/80 shadow-xs">
+                        Select
+                    </div>
+                </div>
+
+                <!-- Pod 3 -->
+                <div onclick="selectPod(3, 'Under ₹699', 'Most Popular')" id="pod-3"
+                     class="pod-item cursor-pointer select-none rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-between text-center transition-all duration-300 border-2 bg-gradient-to-b from-[#FFFBEB] to-[#FEF3C7] border-amber-200/70 pod-shadow hover:-translate-y-1.5 hover:shadow-lg">
+                    <span class="text-[10px] font-black tracking-wider uppercase text-amber-800 bg-amber-100/90 px-2.5 py-0.5 rounded-full mb-2">
+                        🔥 Popular
+                    </span>
+                    <span class="text-xl sm:text-2xl font-black text-slate-900 font-display tracking-tight my-1">
+                        ₹699
+                    </span>
+                    <span class="text-xs font-bold text-amber-950 mb-3">
+                        Under ₹699
+                    </span>
+                    <div class="pod-btn w-full py-1.5 rounded-xl text-[11px] font-extrabold transition-all bg-white text-amber-900 border border-amber-200/80 shadow-xs">
+                        Select
+                    </div>
+                </div>
+
+                <!-- Pod 4 -->
+                <div onclick="selectPod(4, 'Under ₹999', 'Action & Tech')" id="pod-4"
+                     class="pod-item cursor-pointer select-none rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-between text-center transition-all duration-300 border-2 bg-gradient-to-b from-[#F5F3FF] to-[#EDE9FE] border-purple-200/70 pod-shadow hover:-translate-y-1.5 hover:shadow-lg">
+                    <span class="text-[10px] font-black tracking-wider uppercase text-purple-800 bg-purple-100/90 px-2.5 py-0.5 rounded-full mb-2">
+                        ⚡ Action Pick
+                    </span>
+                    <span class="text-xl sm:text-2xl font-black text-slate-900 font-display tracking-tight my-1">
+                        ₹999
+                    </span>
+                    <span class="text-xs font-bold text-purple-950 mb-3">
+                        Under ₹999
+                    </span>
+                    <div class="pod-btn w-full py-1.5 rounded-xl text-[11px] font-extrabold transition-all bg-white text-purple-900 border border-purple-200/80 shadow-xs">
+                        Select
+                    </div>
+                </div>
+
+                <!-- Pod 5 -->
+                <div onclick="selectPod(5, 'Above ₹1,000', 'Deluxe Gifts')" id="pod-5"
+                     class="pod-item cursor-pointer select-none rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-between text-center transition-all duration-300 border-2 bg-gradient-to-b from-[#FFF1F2] to-[#FFE4E6] border-rose-200/70 pod-shadow hover:-translate-y-1.5 hover:shadow-lg">
+                    <span class="text-[10px] font-black tracking-wider uppercase text-rose-800 bg-rose-100/90 px-2.5 py-0.5 rounded-full mb-2">
+                        👑 Deluxe
+                    </span>
+                    <span class="text-xl sm:text-2xl font-black text-slate-900 font-display tracking-tight my-1">
+                        ₹1,000+
+                    </span>
+                    <span class="text-xs font-bold text-rose-950 mb-3">
+                        Above ₹1,000
+                    </span>
+                    <div class="pod-btn w-full py-1.5 rounded-xl text-[11px] font-extrabold transition-all bg-white text-rose-900 border border-rose-200/80 shadow-xs">
+                        Select
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- OPTION 2: CURVED INTERACTIVE SEGMENTED BUDGET RIBBON -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-lg bg-indigo-500 text-white font-black text-sm flex items-center justify-center">2</span>
+                        <h2 class="text-xl font-black text-[#1A1A24] font-display">
+                            Option 2: Curved Segmented Budget Ribbon (સ્લીક રિબન)
+                        </h2>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1 font-medium">
+                        એપલ/એરબીએનબી સ્ટાઇલનો સ્લીક સેગમેન્ટેડ બજેટ બાર. એક જ હોરિઝોન્ટલ ટ્રેકમાં સ્મૂધ સ્લાઇડિંગ એક્ટિવ પિલ સાથે. વાપરવામાં સૌથી ફાસ્ટ અને ક્લિન.
+                    </p>
+                </div>
+                <div id="opt2-status" class="text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                    Range: <span class="text-slate-700 font-extrabold">All Prices</span>
+                </div>
+            </div>
+
+            <!-- The Segmented Ribbon Track -->
+            <div class="max-w-4xl mx-auto bg-slate-100/90 p-1.5 sm:p-2 rounded-2xl sm:rounded-full ribbon-track-shadow border border-slate-200">
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+                    
+                    <button onclick="selectRibbon(1, 'Under ₹299', 'Pocket Treats')" id="ribbon-1"
+                            class="ribbon-seg py-3 px-3 rounded-xl sm:rounded-full flex flex-col items-center justify-center text-center transition-all duration-200 bg-transparent text-slate-700 hover:text-black">
+                        <span class="text-sm sm:text-base font-black font-display tracking-tight">₹299</span>
+                        <span class="text-[10px] sm:text-[11px] font-semibold text-slate-500">Under ₹299</span>
+                    </button>
+
+                    <button onclick="selectRibbon(2, 'Under ₹499', 'Sweet Value')" id="ribbon-2"
+                            class="ribbon-seg py-3 px-3 rounded-xl sm:rounded-full flex flex-col items-center justify-center text-center transition-all duration-200 bg-transparent text-slate-700 hover:text-black">
+                        <span class="text-sm sm:text-base font-black font-display tracking-tight">₹499</span>
+                        <span class="text-[10px] sm:text-[11px] font-semibold text-slate-500">Under ₹499</span>
+                    </button>
+
+                    <button onclick="selectRibbon(3, 'Under ₹699', 'Most Popular')" id="ribbon-3"
+                            class="ribbon-seg py-3 px-3 rounded-xl sm:rounded-full flex flex-col items-center justify-center text-center transition-all duration-200 bg-transparent text-slate-700 hover:text-black">
+                        <span class="text-sm sm:text-base font-black font-display tracking-tight">₹699</span>
+                        <span class="text-[10px] sm:text-[11px] font-semibold text-slate-500">Under ₹699</span>
+                    </button>
+
+                    <button onclick="selectRibbon(4, 'Under ₹999', 'Action & Tech')" id="ribbon-4"
+                            class="ribbon-seg py-3 px-3 rounded-xl sm:rounded-full flex flex-col items-center justify-center text-center transition-all duration-200 bg-transparent text-slate-700 hover:text-black">
+                        <span class="text-sm sm:text-base font-black font-display tracking-tight">₹999</span>
+                        <span class="text-[10px] sm:text-[11px] font-semibold text-slate-500">Under ₹999</span>
+                    </button>
+
+                    <button onclick="selectRibbon(5, 'Above ₹1,000', 'Deluxe Gifts')" id="ribbon-5"
+                            class="ribbon-seg py-3 px-3 rounded-xl sm:rounded-full flex flex-col items-center justify-center text-center transition-all duration-200 bg-transparent text-slate-700 hover:text-black">
+                        <span class="text-sm sm:text-base font-black font-display tracking-tight">₹1,000+</span>
+                        <span class="text-[10px] sm:text-[11px] font-semibold text-slate-500">Above ₹1,000</span>
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Active feedback bar -->
+            <div id="ribbon-feedback" class="mt-4 text-center hidden">
+                <span class="inline-flex items-center gap-2 bg-red-50 text-[#E51A22] text-xs font-bold px-3 py-1 rounded-full border border-red-200">
+                    <span id="ribbon-feedback-text">Filtered: Under ₹499</span>
+                    <span onclick="resetRibbon()" class="cursor-pointer font-black hover:underline">✕ Reset</span>
+                </span>
+            </div>
+        </div>
+
+
+        <!-- OPTION 3: MINIMALIST PASTEL BOUTIQUE TILES -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-lg bg-amber-500 text-white font-black text-sm flex items-center justify-center">3</span>
+                        <h2 class="text-xl font-black text-[#1A1A24] font-display">
+                            Option 3: Minimalist Pastel Studio Cards (પેસ્ટલ સ્ટુડિયો કાર્ડ્સ)
+                        </h2>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1 font-medium">
+                        સ્કેન્ડિનેવિયન ડિઝાઇન: શાંત પેસ્ટલ કેનવાસ, સિગ્નેચર મિનિમલ ટોય એમ્બ્લેમ, પ્રીમિયમ વ્હાઇટ ઇનસેટ અને બોલ્ડ ટાઇપોગ્રાફી.
+                    </p>
+                </div>
+                <div id="opt3-status" class="text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                    Filter: <span class="text-slate-700 font-extrabold">None</span>
+                </div>
+            </div>
+
+            <!-- 5 Pastel Cards Row -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5">
+                
+                <!-- Card 1 -->
+                <div onclick="selectCard(1, 'Under ₹299', 'Pocket Treats')" id="card-1"
+                     class="card-item cursor-pointer select-none rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 border bg-[#F8FAFC] border-slate-200/80 hover:border-slate-400 hover:-translate-y-1 hover:shadow-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-base">🎈</span>
+                        <span class="text-[10px] font-black tracking-widest uppercase text-slate-400">TIER 01</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-extrabold uppercase text-slate-400 block tracking-wide">POCKET</span>
+                        <span class="text-2xl font-black text-slate-900 font-display block">₹299</span>
+                        <span class="text-xs font-medium text-slate-500 block mt-0.5">Sweet Treats</span>
+                    </div>
+                    <div class="card-indicator mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-slate-400">
+                        <span>Select</span>
+                        <span>→</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div onclick="selectCard(2, 'Under ₹499', 'Sweet Value')" id="card-2"
+                     class="card-item cursor-pointer select-none rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 border bg-[#F8FAFC] border-slate-200/80 hover:border-slate-400 hover:-translate-y-1 hover:shadow-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-base">🧸</span>
+                        <span class="text-[10px] font-black tracking-widest uppercase text-slate-400">TIER 02</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-extrabold uppercase text-slate-400 block tracking-wide">VALUE</span>
+                        <span class="text-2xl font-black text-slate-900 font-display block">₹499</span>
+                        <span class="text-xs font-medium text-slate-500 block mt-0.5">Great Value</span>
+                    </div>
+                    <div class="card-indicator mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-slate-400">
+                        <span>Select</span>
+                        <span>→</span>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div onclick="selectCard(3, 'Under ₹699', 'Most Popular')" id="card-3"
+                     class="card-item cursor-pointer select-none rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 border bg-[#F8FAFC] border-slate-200/80 hover:border-slate-400 hover:-translate-y-1 hover:shadow-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-base">⭐</span>
+                        <span class="text-[10px] font-black tracking-widest uppercase text-amber-600 font-extrabold">BESTSELLER</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-extrabold uppercase text-slate-400 block tracking-wide">POPULAR</span>
+                        <span class="text-2xl font-black text-slate-900 font-display block">₹699</span>
+                        <span class="text-xs font-medium text-slate-500 block mt-0.5">Most Loved</span>
+                    </div>
+                    <div class="card-indicator mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-slate-400">
+                        <span>Select</span>
+                        <span>→</span>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div onclick="selectCard(4, 'Under ₹999', 'Action & Tech')" id="card-4"
+                     class="card-item cursor-pointer select-none rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 border bg-[#F8FAFC] border-slate-200/80 hover:border-slate-400 hover:-translate-y-1 hover:shadow-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-base">🚀</span>
+                        <span class="text-[10px] font-black tracking-widest uppercase text-slate-400">TIER 04</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-extrabold uppercase text-slate-400 block tracking-wide">ACTION</span>
+                        <span class="text-2xl font-black text-slate-900 font-display block">₹999</span>
+                        <span class="text-xs font-medium text-slate-500 block mt-0.5">Tech & Action</span>
+                    </div>
+                    <div class="card-indicator mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-slate-400">
+                        <span>Select</span>
+                        <span>→</span>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div onclick="selectCard(5, 'Above ₹1,000', 'Deluxe Gifts')" id="card-5"
+                     class="card-item cursor-pointer select-none rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 border bg-[#F8FAFC] border-slate-200/80 hover:border-slate-400 hover:-translate-y-1 hover:shadow-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-base">🎁</span>
+                        <span class="text-[10px] font-black tracking-widest uppercase text-rose-600 font-extrabold">DELUXE</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-extrabold uppercase text-slate-400 block tracking-wide">PREMIUM</span>
+                        <span class="text-2xl font-black text-slate-900 font-display block">₹1,000+</span>
+                        <span class="text-xs font-medium text-slate-500 block mt-0.5">Special Gifts</span>
+                    </div>
+                    <div class="card-indicator mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-slate-400">
+                        <span>Select</span>
+                        <span>→</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Live Script for Interactivity -->
+    <script>
+        // Option 1 Logic
+        let selectedPodId = null;
+        function selectPod(id, label, sub) {
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById('pod-' + i);
+                const btn = el.querySelector('.pod-btn');
+                if (i === id && selectedPodId !== id) {
+                    el.classList.add('ring-4', 'ring-[#E51A22]/20', '!border-[#E51A22]', '-translate-y-2', 'pod-shadow-active');
+                    btn.classList.remove('bg-white', 'text-sky-900', 'text-emerald-900', 'text-amber-900', 'text-purple-900', 'text-rose-900');
+                    btn.classList.add('bg-[#E51A22]', 'text-white', 'border-[#E51A22]');
+                    btn.innerText = '✓ Active';
+                } else {
+                    el.classList.remove('ring-4', 'ring-[#E51A22]/20', '!border-[#E51A22]', '-translate-y-2', 'pod-shadow-active');
+                    btn.classList.remove('bg-[#E51A22]', 'text-white', 'border-[#E51A22]');
+                    btn.classList.add('bg-white');
+                    btn.innerText = 'Select';
+                }
+            }
+            if (selectedPodId === id) {
+                selectedPodId = null;
+                document.getElementById('opt1-status').innerHTML = 'Status: <span class="text-slate-700 font-extrabold">All Toys Selected</span>';
+            } else {
+                selectedPodId = id;
+                document.getElementById('opt1-status').innerHTML = 'Status: <span class="text-[#E51A22] font-black">' + label + ' (' + sub + ')</span>';
+            }
+        }
+
+        // Option 2 Logic
+        let selectedRibbonId = null;
+        function selectRibbon(id, label, sub) {
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById('ribbon-' + i);
+                if (i === id && selectedRibbonId !== id) {
+                    btn.classList.add('bg-white', 'shadow-md', '!text-[#E51A22]', 'ring-1', 'ring-slate-200');
+                    btn.classList.remove('bg-transparent', 'text-slate-700');
+                } else {
+                    btn.classList.remove('bg-white', 'shadow-md', '!text-[#E51A22]', 'ring-1', 'ring-slate-200');
+                    btn.classList.add('bg-transparent', 'text-slate-700');
+                }
+            }
+            const fb = document.getElementById('ribbon-feedback');
+            const fbt = document.getElementById('ribbon-feedback-text');
+            if (selectedRibbonId === id) {
+                selectedRibbonId = null;
+                fb.classList.add('hidden');
+                document.getElementById('opt2-status').innerHTML = 'Range: <span class="text-slate-700 font-extrabold">All Prices</span>';
+            } else {
+                selectedRibbonId = id;
+                fb.classList.remove('hidden');
+                fbt.innerText = 'Filtered: ' + label + ' (' + sub + ')';
+                document.getElementById('opt2-status').innerHTML = 'Range: <span class="text-[#E51A22] font-black">' + label + '</span>';
+            }
+        }
+        function resetRibbon() {
+            selectedRibbonId = null;
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById('ribbon-' + i);
+                btn.classList.remove('bg-white', 'shadow-md', '!text-[#E51A22]', 'ring-1', 'ring-slate-200');
+                btn.classList.add('bg-transparent', 'text-slate-700');
+            }
+            document.getElementById('ribbon-feedback').classList.add('hidden');
+            document.getElementById('opt2-status').innerHTML = 'Range: <span class="text-slate-700 font-extrabold">All Prices</span>';
+        }
+
+        // Option 3 Logic
+        let selectedCardId = null;
+        function selectCard(id, label, sub) {
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById('card-' + i);
+                const ind = el.querySelector('.card-indicator');
+                if (i === id && selectedCardId !== id) {
+                    el.classList.add('!bg-white', 'ring-2', 'ring-[#E51A22]', '!border-[#E51A22]', 'shadow-lg', '-translate-y-1.5');
+                    el.classList.remove('bg-[#F8FAFC]');
+                    ind.innerHTML = '<span class="text-[#E51A22] font-black">✓ Active</span><span class="text-[#E51A22] font-black">●</span>';
+                } else {
+                    el.classList.remove('!bg-white', 'ring-2', 'ring-[#E51A22]', '!border-[#E51A22]', 'shadow-lg', '-translate-y-1.5');
+                    el.classList.add('bg-[#F8FAFC]');
+                    ind.innerHTML = '<span>Select</span><span>→</span>';
+                }
+            }
+            if (selectedCardId === id) {
+                selectedCardId = null;
+                document.getElementById('opt3-status').innerHTML = 'Filter: <span class="text-slate-700 font-extrabold">None</span>';
+            } else {
+                selectedCardId = id;
+                document.getElementById('opt3-status').innerHTML = 'Filter: <span class="text-[#E51A22] font-black">' + label + '</span>';
+            }
+        }
+    </script>
+</body>
+</html>

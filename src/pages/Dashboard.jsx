@@ -25,6 +25,69 @@ const avatarColors = [
     'bg-[#FFF7ED] text-[#C2410C] border-orange-200',
 ];
 
+const CATEGORY_STYLE_THEMES = [
+    {
+        ringGradient: 'from-rose-300 via-pink-200 to-rose-100',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(244,63,94,0.3)]',
+        badgeBorder: 'border-rose-100',
+        pillBg: 'bg-rose-50 text-rose-950 border-rose-200/90',
+        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+    },
+    {
+        ringGradient: 'from-amber-300 via-yellow-200 to-amber-100',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(245,158,11,0.3)]',
+        badgeBorder: 'border-amber-100',
+        pillBg: 'bg-amber-50 text-amber-950 border-amber-200/90',
+        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+    },
+    {
+        ringGradient: 'from-sky-300 via-cyan-200 to-blue-100',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(14,165,233,0.3)]',
+        badgeBorder: 'border-sky-100',
+        pillBg: 'bg-sky-50 text-sky-950 border-sky-200/90',
+        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+    },
+    {
+        ringGradient: 'from-emerald-300 via-teal-200 to-emerald-100',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(16,185,129,0.3)]',
+        badgeBorder: 'border-emerald-100',
+        pillBg: 'bg-emerald-50 text-emerald-950 border-emerald-200/90',
+        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+    },
+    {
+        ringGradient: 'from-purple-300 via-violet-200 to-indigo-100',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(168,85,247,0.3)]',
+        badgeBorder: 'border-purple-100',
+        pillBg: 'bg-purple-50 text-purple-950 border-purple-200/90',
+        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+    },
+    {
+        ringGradient: 'from-orange-300 via-amber-200 to-orange-100',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(249,115,22,0.3)]',
+        badgeBorder: 'border-orange-100',
+        pillBg: 'bg-orange-50 text-orange-950 border-orange-200/90',
+        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+    }
+];
+
+const getCategoryEmoji = (name = '') => {
+    const n = name.toLowerCase();
+    if (n.includes('car') || n.includes('vehicle') || n.includes('rc')) return '🏎️';
+    if (n.includes('doll')) return '🎀';
+    if (n.includes('action') || n.includes('hero') || n.includes('figure')) return '🦸';
+    if (n.includes('edu') || n.includes('learn') || n.includes('puzzle') || n.includes('stem')) return '🧩';
+    if (n.includes('board') || n.includes('game')) return '🎲';
+    if (n.includes('soft') || n.includes('plush') || n.includes('teddy')) return '🧸';
+    if (n.includes('music') || n.includes('instrument')) return '🎵';
+    if (n.includes('outdoor') || n.includes('sport') || n.includes('ride')) return '⚽';
+    if (n.includes('art') || n.includes('craft') || n.includes('draw')) return '🎨';
+    if (n.includes('baby') || n.includes('infant') || n.includes('nursery')) return '🍼';
+    if (n.includes('block') || n.includes('lego') || n.includes('build')) return '🧱';
+    if (n.includes('book')) return '📚';
+    if (n.includes('robot')) return '🤖';
+    return '✨';
+};
+
 const Dashboard = () => {
     const { addToCart, waitlistItems, toggleWaitlist, shippingSettings, websiteSettings } = useCart();
     const navigate = useNavigate();
@@ -47,15 +110,6 @@ const Dashboard = () => {
     const [allProducts, setAllProducts] = useState([]);
     const [dbCategories, setDbCategories] = useState([]);
 
-    // Continuous Scroll & Drag states
-    const categoryContainerRef = React.useRef(null);
-    const animationRef = React.useRef(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
-    const [startX, setStartX] = useState(0);
-    const [scrollLeftPos, setScrollLeftPos] = useState(0);
-    const [dragDistance, setDragDistance] = useState(0);
-    const [dynamicGap, setDynamicGap] = useState(32);
 
     // Shop By Age Continuous Scroll & Drag states ("aekdhari line")
     const ageContainerRef = React.useRef(null);
@@ -65,6 +119,17 @@ const Dashboard = () => {
     const [ageStartX, setAgeStartX] = useState(0);
     const [ageScrollLeftPos, setAgeScrollLeftPos] = useState(0);
     const [ageDragDistance, setAgeDragDistance] = useState(0);
+
+    // Toy Categories Continuous Smooth Track
+    const catContainerRef = React.useRef(null);
+    const catAnimRef = React.useRef(null);
+    const [isCatHovered, setIsCatHovered] = useState(false);
+    const [isCatDragging, setIsCatDragging] = useState(false);
+    const [catStartX, setCatStartX] = useState(0);
+    const [catScrollLeftPos, setCatScrollLeftPos] = useState(0);
+    const [catDragDistance, setCatDragDistance] = useState(0);
+    const isCatManualScrollingRef = React.useRef(false);
+    const manualScrollTimeoutRef = React.useRef(null);
     // Banners
     const [banners, setBanners] = useState([]);
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
@@ -345,7 +410,8 @@ const Dashboard = () => {
         return {
             name: dbCat.name,
             count: count,
-            img: imageUrl
+            img: imageUrl,
+            icon: dbCat.icon || ''
         };
     });
 
@@ -358,6 +424,122 @@ const Dashboard = () => {
         { name: 'Clothing', count: 40, img: catImages[4] },
         { name: 'Bath & Care', count: 25, img: catImages[5] }
     ];
+
+    // Ensure plenty of slides for seamless infinite loop with zero stutter
+    const categorySlides = React.useMemo(() => {
+        const raw = dbCategories && dbCategories.length > 0 ? dbCategories : categories;
+        if (!raw || raw.length === 0) return [];
+        let items = [...raw];
+        while (items.length < 16) {
+            items = [...items, ...raw];
+        }
+        return [...items, ...items];
+    }, [dbCategories, categories]);
+
+    // Toy Categories Continuous 60fps smooth auto-scroll with ZERO lag & instant pause on click
+    useEffect(() => {
+        const animate = () => {
+            const container = catContainerRef.current;
+            if (container && container.offsetParent !== null && !isCatHovered && !isCatDragging && !isCatManualScrollingRef.current) {
+                container.scrollLeft += 0.85; // 60fps smooth continuous glide, zero lag!
+                const half = container.scrollWidth / 2;
+                if (container.scrollLeft >= half) {
+                    container.scrollLeft -= half;
+                }
+            }
+            catAnimRef.current = requestAnimationFrame(animate);
+        };
+
+        catAnimRef.current = requestAnimationFrame(animate);
+        return () => {
+            if (catAnimRef.current) cancelAnimationFrame(catAnimRef.current);
+        };
+    }, [isCatHovered, isCatDragging]);
+
+    const handleCatManualScroll = (direction) => {
+        const container = catContainerRef.current;
+        if (!container) return;
+
+        // Lock auto-glide during manual arrow scrolling so smooth scroll can finish without interruption
+        isCatManualScrollingRef.current = true;
+        if (manualScrollTimeoutRef.current) clearTimeout(manualScrollTimeoutRef.current);
+        manualScrollTimeoutRef.current = setTimeout(() => {
+            isCatManualScrollingRef.current = false;
+        }, 900);
+
+        const cardEl = container.querySelector('.cat-pod-card');
+        const stride = cardEl ? cardEl.offsetWidth + 16 : 190;
+        const current = container.scrollLeft;
+        let target = direction === 'left' ? current - stride : current + stride;
+        
+        const half = container.scrollWidth / 2;
+        if (target < 0) {
+            container.scrollLeft += half;
+            target += half;
+        } else if (target >= half) {
+            container.scrollLeft -= half;
+            target -= half;
+        }
+
+        container.scrollTo({ left: target, behavior: 'smooth' });
+    };
+
+    const handleCatMouseDown = (e) => {
+        setIsCatDragging(true);
+        setCatDragDistance(0);
+        setCatStartX(e.pageX - catContainerRef.current.offsetLeft);
+        setCatScrollLeftPos(catContainerRef.current.scrollLeft);
+    };
+
+    const handleCatMouseLeave = () => {
+        setIsCatDragging(false);
+        setIsCatHovered(false);
+    };
+
+    const handleCatMouseEnter = () => {
+        setIsCatHovered(true);
+    };
+
+    const handleCatMouseUp = () => {
+        setIsCatDragging(false);
+    };
+
+    const handleCatMouseMove = (e) => {
+        if (!isCatDragging) return;
+        e.preventDefault();
+        const x = e.pageX - catContainerRef.current.offsetLeft;
+        const walk = (x - catStartX) * 1.5;
+        setCatDragDistance(Math.abs(walk));
+        catContainerRef.current.scrollLeft = catScrollLeftPos - walk;
+    };
+
+    const handleCatTouchStart = (e) => {
+        setIsCatDragging(true);
+        setCatDragDistance(0);
+        setCatStartX(e.touches[0].pageX - catContainerRef.current.offsetLeft);
+        setCatScrollLeftPos(catContainerRef.current.scrollLeft);
+    };
+
+    const handleCatTouchMove = (e) => {
+        if (!isCatDragging) return;
+        const x = e.touches[0].pageX - catContainerRef.current.offsetLeft;
+        const walk = (x - catStartX) * 1.3;
+        setCatDragDistance(Math.abs(walk));
+        catContainerRef.current.scrollLeft = catScrollLeftPos - walk;
+    };
+
+    const handleCatTouchEnd = () => {
+        setIsCatDragging(false);
+    };
+
+    const handleCatBoxClick = (e, catName) => {
+        if (catDragDistance > 5) {
+            e.preventDefault();
+            return;
+        }
+        // 1 click immediate navigation to category products
+        navigate(`/products?category=${encodeURIComponent(catName)}`);
+    };
 
     // Shop By Age Milestones Data (2 small icons per card: decoLeft and decoRight)
     const ageMilestones = [
@@ -408,96 +590,7 @@ const Dashboard = () => {
         }
     ];
 
-    // Calculate perfect dynamic gap to ensure exactly whole categories fit on screen
-    useEffect(() => {
-        const handleResize = () => {
-            const w = window.innerWidth;
-            const targetStride = 176; // 144px width + roughly 32px gap
-            const count = Math.max(1, Math.floor(w / targetStride));
-            const leftover = w - (count * 144);
-            const gap = leftover / count;
-            // Cap the gap on mobile so they aren't too far apart, 
-            // and partial visibility helps indicate horizontal scrolling.
-            setDynamicGap(w < 768 ? 20 : gap);
-        };
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
-    // Continuous smooth auto-scroll (requestAnimationFrame)
-    useEffect(() => {
-        if (!dbCategories || dbCategories.length === 0) return;
-
-        const animate = () => {
-            const container = categoryContainerRef.current;
-            if (container && !isHovered && !isDragging) {
-                container.scrollLeft += 1; // Adjust speed here (1px per frame)
-
-                // Seamless infinite loop: jump back when reaching the middle of duplicated content
-                if (container.scrollLeft >= container.scrollWidth / 2) {
-                    container.scrollLeft = 0;
-                }
-            }
-            animationRef.current = requestAnimationFrame(animate);
-        };
-
-        animationRef.current = requestAnimationFrame(animate);
-
-        return () => {
-            if (animationRef.current) cancelAnimationFrame(animationRef.current);
-        };
-    }, [dbCategories, isHovered, isDragging]);
-
-    const handleManualScroll = (direction) => {
-        const container = categoryContainerRef.current;
-        if (!container) return;
-
-        const stride = 144 + dynamicGap;
-        const currentScroll = container.scrollLeft;
-
-        // Find nearest snap point
-        let currentIndex = Math.round(currentScroll / stride);
-        const itemsToScroll = window.innerWidth < 768 ? 1 : 3;
-
-        let targetIndex = direction === 'left' ? currentIndex - itemsToScroll : currentIndex + itemsToScroll;
-        let targetScroll = targetIndex * stride;
-
-        // Handle boundaries
-        if (direction === 'left' && targetScroll < 0) {
-            container.scrollLeft = container.scrollWidth / 2 + currentScroll;
-            targetScroll = container.scrollWidth / 2 + (targetIndex * stride);
-        } else if (direction === 'right' && targetScroll > container.scrollWidth / 2) {
-            container.scrollLeft = currentScroll - (container.scrollWidth / 2);
-            targetScroll = targetScroll - (container.scrollWidth / 2);
-        }
-
-        container.scrollTo({ left: targetScroll, behavior: 'smooth' });
-    };
-
-    const handleMouseDown = (e) => {
-        setIsDragging(true);
-        setDragDistance(0);
-        setStartX(e.pageX - categoryContainerRef.current.offsetLeft);
-        setScrollLeftPos(categoryContainerRef.current.scrollLeft);
-    };
-
-    const handleMouseLeaveDrag = () => {
-        setIsDragging(false);
-    };
-
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
-
-    const handleMouseMove = (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        const x = e.pageX - categoryContainerRef.current.offsetLeft;
-        const walk = (x - startX) * 1.5; // Scroll speed multiplier
-        setDragDistance(Math.abs(walk));
-        categoryContainerRef.current.scrollLeft = scrollLeftPos - walk;
-    };
 
     // Shop By Age Continuous smooth auto-scroll ("aekdhari line") - Mobile Only
     useEffect(() => {
@@ -506,9 +599,10 @@ const Dashboard = () => {
             if (container && container.offsetParent !== null && !isAgeHovered && !isAgeDragging) {
                 container.scrollLeft += 0.8; // Smooth 60fps continuous line
 
-                // Seamless infinite loop: reset when halfway through duplicated content
-                if (container.scrollLeft >= container.scrollWidth / 2) {
-                    container.scrollLeft = 0;
+                // Seamless infinite loop: reset smoothly when halfway through duplicated content
+                const half = container.scrollWidth / 2;
+                if (container.scrollLeft >= half) {
+                    container.scrollLeft -= half;
                 }
             }
             ageAnimationRef.current = requestAnimationFrame(animate);
@@ -709,94 +803,354 @@ const Dashboard = () => {
 
 
 
-            {/* Categories */}
-            <div className="w-full pt-6 sm:pt-7 md:pt-8 pb-5 sm:pb-6 md:pb-7 text-center bg-white border-b border-slate-200/90 relative">
-                <div className="w-full mx-auto px-4 md:px-6">
-                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-red-100 shadow-2xs">
-                        🎯 EXPLORE BY INTEREST
+            {/* Categories - Luxury 3D Toy Pods with Continuous Smooth Track */}
+            <div 
+                onMouseEnter={() => setIsCatHovered(true)}
+                onMouseLeave={() => setIsCatHovered(false)}
+                className="w-full pt-7 sm:pt-9 md:pt-10 pb-7 sm:pb-9 text-center bg-gradient-to-b from-white via-rose-50/20 to-white border-b border-slate-200/90 relative overflow-hidden group/categories"
+            >
+                <div className="w-full mx-auto px-4 md:px-6 relative z-10 mb-4 sm:mb-6">
+                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.22em] mb-2 border border-rose-200/70 shadow-2xs">
+                        ✨ EXPLORE BY INTEREST ✨
                     </span>
-                    <h2 className="text-[26px] md:text-[36px] font-black text-[#111] mb-1.5 tracking-tight uppercase">Toy Categories</h2>
-                    <p className="text-[#666] text-[13.5px] md:text-[14.5px] mb-3 sm:mb-4 font-semibold uppercase tracking-wider">Everything your little one needs to learn, imagine & play</p>
+                    <h2 className="text-[26px] md:text-[38px] font-black text-[#111] mb-1 tracking-tight uppercase">Toy Categories</h2>
+                    <p className="text-[#666] text-[13.5px] md:text-[15px] font-semibold uppercase tracking-wider">Everything your little one needs to learn, imagine & play</p>
                 </div>
 
-                <div
-                    className="relative w-full py-1 group/slider bg-white"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                >
-                    {/* Left Arrow - Centered on Image */}
+                <div className="relative w-full px-2 sm:px-4 md:px-6 lg:px-8">
+                    {/* Left Navigation Arrow - Shown ONLY on hover, hidden on mobile */}
                     <button
-                        onClick={() => handleManualScroll('left')}
-                        className="absolute left-3 top-[92px] -translate-y-1/2 z-30 w-11 h-11 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-slate-200 text-slate-800 opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] hidden md:flex items-center justify-center cursor-pointer"
-                        title="Scroll Left"
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleCatManualScroll('left');
+                        }}
+                        onMouseEnter={() => setIsCatHovered(true)}
+                        className="cat-slider-prev absolute left-1 sm:left-2 md:left-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.16)] border border-slate-200 text-slate-800 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] hidden md:flex items-center justify-center cursor-pointer opacity-0 group-hover/categories:opacity-100"
+                        title="Previous Category"
                     >
-                        <ChevronLeft className="w-6 h-6" strokeWidth={2.5} />
+                        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" strokeWidth={2.5} />
                     </button>
 
-                    {/* Right Arrow - Centered on Image */}
+                    {/* Right Navigation Arrow - Shown ONLY on hover, hidden on mobile */}
                     <button
-                        onClick={() => handleManualScroll('right')}
-                        className="absolute right-3 top-[92px] -translate-y-1/2 z-30 w-11 h-11 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-slate-200 text-slate-800 opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] hidden md:flex items-center justify-center cursor-pointer"
-                        title="Scroll Right"
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleCatManualScroll('right');
+                        }}
+                        onMouseEnter={() => setIsCatHovered(true)}
+                        className="cat-slider-next absolute right-1 sm:right-2 md:right-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.16)] border border-slate-200 text-slate-800 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] hidden md:flex items-center justify-center cursor-pointer opacity-0 group-hover/categories:opacity-100"
+                        title="Next Category"
                     >
-                        <ChevronRight className="w-6 h-6" strokeWidth={2.5} />
+                        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" strokeWidth={2.5} />
                     </button>
 
-
-                    <style>
-                        {`
-                        .hide-scrollbar::-webkit-scrollbar {
-                            display: none;
-                        }
-                        .hide-scrollbar {
-                            -ms-overflow-style: none;
-                            scrollbar-width: none;
-                        }
-                        `}
-                    </style>
+                    {/* Continuous 60fps Smooth Container - ZERO LAG, pure GPU scroll */}
                     <div
-                        ref={categoryContainerRef}
-                        className={`flex overflow-x-auto hide-scrollbar pt-3 pb-3 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
-                        style={{ gap: `${dynamicGap}px` }}
-                        onMouseDown={handleMouseDown}
-                        onMouseLeave={handleMouseLeaveDrag}
-                        onMouseUp={handleMouseUp}
-                        onMouseMove={handleMouseMove}
+                        ref={catContainerRef}
+                        onMouseEnter={handleCatMouseEnter}
+                        onMouseLeave={handleCatMouseLeave}
+                        onMouseDown={handleCatMouseDown}
+                        onMouseUp={handleCatMouseUp}
+                        onMouseMove={handleCatMouseMove}
+                        onTouchStart={handleCatTouchStart}
+                        onTouchMove={handleCatTouchMove}
+                        onTouchEnd={handleCatTouchEnd}
+                        className="flex items-start gap-3 sm:gap-3.5 md:gap-4 overflow-x-auto py-3 cursor-grab active:cursor-grabbing select-none scrollbar-none"
+                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
-                        {/* Duplicate categories exactly twice for seamless loop math */}
-                        {[...dbCategories, ...dbCategories, ...dbCategories, ...dbCategories].map((cat, idx) => {
-                            const productCount = allProducts.filter(p => p.category === cat.name).length;
-                            return (
-                                <Link
-                                    to={`/products?search=${encodeURIComponent(cat.name)}`}
-                                    key={idx}
-                                    onClick={(e) => { if (dragDistance > 5) e.preventDefault(); }}
-                                    className="group flex flex-col items-center justify-start flex-shrink-0 transition-transform duration-500 ease-out hover:-translate-y-2 cursor-pointer select-none"
-                                    style={{ width: '150px' }}
-                                >
-                                    {/* Circular Image Container with Multi-layer Glow & Border */}
-                                    <div className="relative w-36 h-36 mb-4 flex items-center justify-center">
-                                        {/* Outer Soft Ring on Hover */}
-                                        <div className="absolute inset-0 rounded-full transition-all duration-500 ease-out group-hover:scale-105 group-hover:shadow-[0_12px_28px_-6px_rgba(229,26,34,0.22)] group-hover:ring-4 group-hover:ring-[#E51A22]/20"></div>
+                        {categorySlides.map((cat, idx) => {
+                            const theme = CATEGORY_STYLE_THEMES[idx % CATEGORY_STYLE_THEMES.length];
+                            const emoji = (cat.icon && cat.icon.trim()) ? cat.icon : getCategoryEmoji(cat.name);
 
-                                        {/* Main Circular Mask */}
-                                        <div className="w-full h-full rounded-full overflow-hidden border-[3px] border-slate-100 group-hover:border-[#E51A22] bg-gray-50 shadow-sm transition-all duration-500 relative z-10 flex items-center justify-center">
+                            return (
+                                <div
+                                    key={idx}
+                                    onClick={(e) => handleCatBoxClick(e, cat.name)}
+                                    className="cat-pod-card flex-none w-[calc((100%-1*14px)/2)] sm:w-[calc((100%-2*16px)/3)] md:w-[calc((100%-3*18px)/4)] lg:w-[calc((100%-5*20px)/6)] xl:w-[calc((100%-7*20px)/8)] cursor-pointer group flex flex-col items-center select-none transition-all duration-300 hover:-translate-y-2 py-2"
+                                    title={`Explore ${cat.name}`}
+                                >
+                                    {/* Floating Pedestal Circle Container */}
+                                    <div className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-34 md:h-34 mb-3">
+                                        {/* Outer Dual-Tone Ambient Glow Ring */}
+                                        <div className={`absolute inset-0 rounded-full bg-gradient-to-tr ${theme.ringGradient} p-1 shadow-md ${theme.ringGlow} group-hover:scale-105 transition-all duration-300`}>
+                                            {/* Inner Clean Photo */}
+                                            <div className="w-full h-full rounded-full overflow-hidden border-2 border-white bg-white shadow-inner flex items-center justify-center">
+                                                <img
+                                                    src={getImageUrl(cat.image || cat.img)}
+                                                    alt={cat.name}
+                                                    draggable="false"
+                                                    loading="lazy"
+                                                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-115 pointer-events-none"
+                                                />
+                                            </div>
+                                        </div>
+                                        {/* Playful Floating Mini Badge */}
+                                        <span className={`absolute -bottom-1 right-1 w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white shadow-md border ${theme.badgeBorder} flex items-center justify-center text-sm sm:text-base group-hover:scale-125 transition-transform duration-300 select-none z-10`}>
+                                            {emoji}
+                                        </span>
+                                    </div>
+
+                                    {/* Stylish Capsule Title */}
+                                    <div className="w-full text-center px-1">
+                                        <span className={`inline-block px-3.5 py-1 rounded-full ${theme.pillBg} text-xs sm:text-[13px] font-black uppercase tracking-wider ${theme.pillHover} transition-all duration-300 shadow-2xs line-clamp-1`}>
+                                            {cat.name}
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            {/* Shop By Age - Continuous Running Line ("Aekdhari Line") */}
+            <div className="w-full bg-[#FFFBF5] pt-10 sm:pt-12 md:pt-14 pb-10 sm:pb-12 md:pb-14 border-b border-amber-200/70 relative overflow-hidden">
+                {/* Global SVG Clip Definitions (Defined once to eliminate duplicate ID bugs) */}
+                <svg width="0" height="0" className="absolute pointer-events-none">
+                    <defs>
+                        {[
+                            "M 50 5 A 16 16 0 0 1 72 12 A 16 16 0 0 1 90 32 A 16 16 0 0 1 95 56 A 16 16 0 0 1 83 78 A 16 16 0 0 1 61 93 A 16 16 0 0 1 39 93 A 16 16 0 0 1 17 78 A 16 16 0 0 1 5 56 A 16 16 0 0 1 10 32 A 16 16 0 0 1 28 12 A 16 16 0 0 1 50 5 Z",
+                            "M 50 98 A 43 43 0 0 0 90 38 A 18 18 0 0 0 65 15 A 43 43 0 0 0 35 15 A 18 18 0 0 0 10 38 A 43 43 0 0 0 50 98 Z",
+                            "M 50 5 A 45 45 0 1 1 49.99 5 Z",
+                            "M 50 5 C 85 5 95 15 95 50 C 95 85 85 95 50 95 C 15 95 5 85 5 50 C 5 15 15 5 50 5 Z",
+                            "M 5 50 A 45 45 0 0 1 95 50 L 95 85 Q 95 98 80 98 L 20 98 Q 5 98 5 85 Z"
+                        ].map((pathStr, sIdx) => (
+                            <clipPath key={`global-age-clip-${sIdx}`} id={`global-age-clip-${sIdx}`} clipPathUnits="objectBoundingBox">
+                                <path d={pathStr} transform="scale(0.01)" />
+                            </clipPath>
+                        ))}
+                    </defs>
+                </svg>
+
+                {/* 2 Small Icons per card:
+                    Stationary by default on PC.
+                    ONLY when the card is hovered on PC, its 2 small icons bounce/wiggle playfully! */}
+                <style>{`
+                    @keyframes decoBounceLeft {
+                        0%, 100% {
+                            transform: translateY(0px) rotate(-10deg) scale(1);
+                        }
+                        50% {
+                            transform: translateY(-6px) rotate(-14deg) scale(1.1);
+                        }
+                    }
+                    @keyframes decoBounceRight {
+                        0%, 100% {
+                            transform: translateY(0px) rotate(10deg) scale(1);
+                        }
+                        50% {
+                            transform: translateY(-6px) rotate(14deg) scale(1.1);
+                        }
+                    }
+                    /* On PC: Icons sit completely still by default */
+                    .age-deco-left {
+                        transform: translateY(0px) rotate(-10deg) scale(1);
+                        transition: transform 0.3s ease;
+                    }
+                    .age-deco-right {
+                        transform: translateY(0px) rotate(10deg) scale(1);
+                        transition: transform 0.3s ease;
+                    }
+                    /* ONLY when this specific card is hovered by mouse */
+                    .group\\/ageCard:hover .age-deco-left {
+                        animation: decoBounceLeft 1.2s ease-in-out infinite;
+                    }
+                    .group\\/ageCard:hover .age-deco-right {
+                        animation: decoBounceRight 1.2s ease-in-out infinite 0.2s;
+                    }
+                `}</style>
+
+                <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
+                    {/* Header */}
+                    <div className="flex flex-col items-center justify-center text-center mb-8 sm:mb-10 md:mb-12">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-50 text-orange-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-orange-200/80 shadow-2xs">
+                            🌱 DEVELOPMENT MILESTONES
+                        </span>
+                        <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2.5">
+                            Shop By Age
+                        </h2>
+                        <p className="text-[#666] text-[14px] md:text-[16px] font-medium max-w-xl mx-auto leading-relaxed">
+                            Curated developmental toys tailored precisely to your child's age group
+                        </p>
+                    </div>
+
+                    {/* Desktop View: Clean Static 5-Column Grid (No moving line on PC) */}
+                    <div className="hidden md:grid md:grid-cols-5 gap-6 lg:gap-8 justify-items-center max-w-[1300px] mx-auto pt-4 sm:pt-6 pb-6">
+                        {ageMilestones.map((item, idx) => (
+                            <Link
+                                to={`/shop-by-age?age=${encodeURIComponent(item.age + ' ' + item.label)}`}
+                                key={`age-desktop-${idx}`}
+                                className="group/ageCard flex flex-col items-center justify-start w-full transition-all duration-300 ease-out hover:-translate-y-2 cursor-pointer select-none"
+                            >
+                                {/* Organic Shape Container */}
+                                <div className="relative w-40 h-40 lg:w-44 lg:h-44 mb-5 flex items-center justify-center">
+                                    {/* 1st Small Icon (decoLeft) */}
+                                    {item.decoLeft && (
+                                        <div className={`absolute ${item.posLeft} pointer-events-none transition-transform duration-500 z-30`}>
+                                            <div
+                                                className="age-deco-left bg-white/95 backdrop-blur-md rounded-2xl w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center shadow-md border"
+                                                style={{ borderColor: `${item.border}50` }}
+                                            >
+                                                <span className="text-[17px] lg:text-[19px] select-none leading-none">{item.decoLeft}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* 2nd Small Icon (decoRight) */}
+                                    {item.decoRight && (
+                                        <div className={`absolute ${item.posRight} pointer-events-none transition-transform duration-500 z-30`}>
+                                            <div
+                                                className="age-deco-right bg-white/95 backdrop-blur-md rounded-2xl w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center shadow-md border"
+                                                style={{ borderColor: `${item.border}50` }}
+                                            >
+                                                <span className="text-[17px] lg:text-[19px] select-none leading-none">{item.decoRight}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Inner Shape with border and clipPath */}
+                                    <div className="absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover/ageCard:scale-105">
+                                        {/* Border Outline SVG */}
+                                        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-md">
+                                            <path d={item.path} fill="none" stroke={item.border} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+
+                                        {/* Masked Image */}
+                                        <div
+                                            className="absolute inset-0 w-full h-full bg-white z-10"
+                                            style={{ clipPath: `url(#global-age-clip-${idx})` }}
+                                        >
                                             <img
-                                                src={getImageUrl(cat.image)}
-                                                alt={cat.name}
+                                                src={item.img}
+                                                alt={item.title}
                                                 draggable="false"
-                                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-112 pointer-events-none"
+                                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/ageCard:scale-110 pointer-events-none"
                                             />
                                         </div>
                                     </div>
+                                </div>
 
-                                    {/* Category Label */}
-                                    <span className="font-extrabold text-[#1A1A24] text-[14px] md:text-[15px] text-center uppercase tracking-wider group-hover:text-[#E51A22] transition-colors duration-300 px-1 leading-snug">
-                                        {cat.name}
-                                    </span>
-                                </Link>
-                            );
-                        })}
+                                {/* Text Details */}
+                                <h3 className="font-extrabold text-[18px] lg:text-[20px] mb-2 flex items-center justify-center gap-2 text-center group-hover/ageCard:text-[#E51A22] transition-colors leading-normal" style={{ color: item.textPrimary }}>
+                                    <span className="text-[19px] lg:text-[21px] transition-transform duration-300 group-hover/ageCard:scale-125 inline-block shrink-0">{item.icon}</span>
+                                    <span>{item.title}</span>
+                                </h3>
+                                <p className="text-[13px] lg:text-[14px] font-bold tracking-wide text-amber-900 bg-amber-100/80 px-3.5 py-1 rounded-full shadow-2xs whitespace-nowrap">
+                                    {item.age} {item.label}
+                                </p>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Mobile View: Continuous Running Line ("Aekdhari Line" - Only on Mobile) */}
+                    <div
+                        className="block md:hidden relative w-full py-2 group/ageSlider"
+                        onMouseEnter={() => setIsAgeHovered(true)}
+                        onMouseLeave={() => setIsAgeHovered(false)}
+                    >
+                        {/* Left Navigation Chevron */}
+                        <button
+                            onClick={() => handleAgeManualScroll('left')}
+                            className="absolute left-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-amber-200/80 text-slate-800 opacity-90 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white flex items-center justify-center cursor-pointer"
+                            title="Scroll Left"
+                        >
+                            <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
+                        </button>
+
+                        {/* Right Navigation Chevron */}
+                        <button
+                            onClick={() => handleAgeManualScroll('right')}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-amber-200/80 text-slate-800 opacity-90 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white flex items-center justify-center cursor-pointer"
+                            title="Scroll Right"
+                        >
+                            <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
+                        </button>
+
+                        <div
+                            ref={ageContainerRef}
+                            className={`flex overflow-x-auto hide-scrollbar pt-4 pb-4 px-3 gap-5 ${isAgeDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                            onMouseDown={handleAgeMouseDown}
+                            onMouseLeave={handleAgeMouseLeave}
+                            onMouseUp={handleAgeMouseUp}
+                            onMouseMove={handleAgeMouseMove}
+                            onTouchStart={handleAgeTouchStart}
+                            onTouchMove={handleAgeTouchMove}
+                            onTouchEnd={handleAgeTouchEnd}
+                        >
+                            {[...ageMilestones, ...ageMilestones, ...ageMilestones, ...ageMilestones].map((item, idx) => {
+                                const clipIndex = idx % 5;
+                                return (
+                                    <Link
+                                        to={`/shop-by-age?age=${encodeURIComponent(item.age + ' ' + item.label)}`}
+                                        key={`age-mobile-${idx}`}
+                                        onClick={(e) => { if (ageDragDistance > 6) e.preventDefault(); }}
+                                        className="group flex flex-col items-center justify-start shrink-0 transition-transform duration-500 ease-out active:scale-95 cursor-pointer select-none"
+                                        style={{ width: '165px' }}
+                                    >
+                                        {/* Organic Shape Container */}
+                                        <div className="relative w-36 h-36 mb-3 flex items-center justify-center">
+                                            {/* 1st Small Icon (decoLeft) */}
+                                            {item.decoLeft && (
+                                                <div className={`absolute ${item.posLeft} pointer-events-none transition-transform duration-500 z-30`}>
+                                                    <div
+                                                        className="bg-white/95 backdrop-blur-md rounded-xl w-8 h-8 flex items-center justify-center rotate-[-10deg] shadow-md border"
+                                                        style={{ borderColor: `${item.border}50` }}
+                                                    >
+                                                        <span className="text-[14px] select-none leading-none">{item.decoLeft}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* 2nd Small Icon (decoRight) */}
+                                            {item.decoRight && (
+                                                <div className={`absolute ${item.posRight} pointer-events-none transition-transform duration-500 z-30`}>
+                                                    <div
+                                                        className="bg-white/95 backdrop-blur-md rounded-xl w-8 h-8 flex items-center justify-center rotate-[10deg] shadow-md border"
+                                                        style={{ borderColor: `${item.border}50` }}
+                                                    >
+                                                        <span className="text-[14px] select-none leading-none">{item.decoRight}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Inner Shape with border and clipPath */}
+                                            <div className="absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover/ageCard:scale-105">
+                                                {/* Border Outline SVG */}
+                                                <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-md">
+                                                    <path d={item.path} fill="none" stroke={item.border} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+
+                                                {/* Masked Image */}
+                                                <div
+                                                    className="absolute inset-0 w-full h-full bg-white z-10"
+                                                    style={{ clipPath: `url(#global-age-clip-${clipIndex})` }}
+                                                >
+                                                    <img
+                                                        src={item.img}
+                                                        alt={item.title}
+                                                        draggable="false"
+                                                        className="w-full h-full object-cover pointer-events-none"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Text Details */}
+                                        <h3 className="font-extrabold text-[16px] mb-1.5 flex items-center justify-center gap-1.5 text-center text-[#224B9C] leading-normal">
+                                            <span className="text-[17px] shrink-0">{item.icon}</span>
+                                            <span>{item.title}</span>
+                                        </h3>
+                                        <p className="text-[12px] font-bold tracking-wide text-amber-900 bg-amber-100/80 px-3 py-0.5 rounded-full shadow-2xs whitespace-nowrap">
+                                            {item.age} {item.label}
+                                        </p>
+                                    </Link>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -961,7 +1315,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className="flex justify-center items-center mt-5 sm:mt-6 px-4 md:px-0">
-                        <Link to="/products?sort=bestseller" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm">
+                        <Link to="/products?sort=bestseller" className="group bg-[#E51A22] text-white shadow-[0_4px_16px_rgba(229,26,34,0.25)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.35)] hover:bg-[#c9141b] active:scale-95 px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm cursor-pointer">
                             View All Best Sellers
                             <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
                         </Link>
@@ -969,287 +1323,20 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Shop By Age - Continuous Running Line ("Aekdhari Line") */}
-            <div className="w-full bg-[#FFFBF5] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-amber-200/70 relative overflow-hidden">
-                {/* Global SVG Clip Definitions (Defined once to eliminate duplicate ID bugs) */}
-                <svg width="0" height="0" className="absolute pointer-events-none">
-                    <defs>
-                        {[
-                            "M 50 5 A 16 16 0 0 1 72 12 A 16 16 0 0 1 90 32 A 16 16 0 0 1 95 56 A 16 16 0 0 1 83 78 A 16 16 0 0 1 61 93 A 16 16 0 0 1 39 93 A 16 16 0 0 1 17 78 A 16 16 0 0 1 5 56 A 16 16 0 0 1 10 32 A 16 16 0 0 1 28 12 A 16 16 0 0 1 50 5 Z",
-                            "M 50 98 A 43 43 0 0 0 90 38 A 18 18 0 0 0 65 15 A 43 43 0 0 0 35 15 A 18 18 0 0 0 10 38 A 43 43 0 0 0 50 98 Z",
-                            "M 50 5 A 45 45 0 1 1 49.99 5 Z",
-                            "M 50 5 C 85 5 95 15 95 50 C 95 85 85 95 50 95 C 15 95 5 85 5 50 C 5 15 15 5 50 5 Z",
-                            "M 5 50 A 45 45 0 0 1 95 50 L 95 85 Q 95 98 80 98 L 20 98 Q 5 98 5 85 Z"
-                        ].map((pathStr, sIdx) => (
-                            <clipPath key={`global-age-clip-${sIdx}`} id={`global-age-clip-${sIdx}`} clipPathUnits="objectBoundingBox">
-                                <path d={pathStr} transform="scale(0.01)" />
-                            </clipPath>
-                        ))}
-                    </defs>
-                </svg>
-
-                {/* 2 Small Icons per card:
-                    Stationary by default on PC.
-                    ONLY when the card is hovered on PC, its 2 small icons bounce/wiggle playfully! */}
-                <style>{`
-                    @keyframes decoBounceLeft {
-                        0%, 100% {
-                            transform: translateY(0px) rotate(-10deg) scale(1);
-                        }
-                        50% {
-                            transform: translateY(-6px) rotate(-14deg) scale(1.1);
-                        }
-                    }
-                    @keyframes decoBounceRight {
-                        0%, 100% {
-                            transform: translateY(0px) rotate(10deg) scale(1);
-                        }
-                        50% {
-                            transform: translateY(-6px) rotate(14deg) scale(1.1);
-                        }
-                    }
-                    /* On PC: Icons sit completely still by default */
-                    .age-deco-left {
-                        transform: translateY(0px) rotate(-10deg) scale(1);
-                        transition: transform 0.3s ease;
-                    }
-                    .age-deco-right {
-                        transform: translateY(0px) rotate(10deg) scale(1);
-                        transition: transform 0.3s ease;
-                    }
-                    /* ONLY when this specific card is hovered by mouse */
-                    .group\\/ageCard:hover .age-deco-left {
-                        animation: decoBounceLeft 1.2s ease-in-out infinite;
-                    }
-                    .group\\/ageCard:hover .age-deco-right {
-                        animation: decoBounceRight 1.2s ease-in-out infinite 0.2s;
-                    }
-                `}</style>
-
-                <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
-                    {/* Header */}
-                    <div className="flex flex-col items-center justify-center text-center mb-3 md:mb-4">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-50 text-orange-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-orange-200/80 shadow-2xs">
-                            🌱 DEVELOPMENT MILESTONES
-                        </span>
-                        <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-1.5 md:mb-2">
-                            Shop By Age
-                        </h2>
-                        <p className="text-[#666] text-[14px] md:text-[16px] font-medium max-w-xl">
-                            Curated developmental toys tailored precisely to your child's age group
-                        </p>
-                        <div className="w-16 h-1 bg-amber-400/80 rounded-full mx-auto mt-2.5 md:mt-3"></div>
-                    </div>
-
-                    {/* Quick Milestone Tap Pills */}
-                    <div className="flex items-center justify-start sm:justify-center overflow-x-auto hide-scrollbar gap-2 mb-3 md:mb-4 px-1 w-full">
-                        {[
-                            { age: '0-12', label: 'Months', emoji: '🍼' },
-                            { age: '1-2', label: 'Years', emoji: '🧸' },
-                            { age: '3-4', label: 'Years', emoji: '🎨' },
-                            { age: '5-7', label: 'Years', emoji: '🚀' },
-                            { age: '8+', label: 'Years', emoji: '🧩' },
-                        ].map((item, idx) => (
-                            <Link
-                                key={`pill-${idx}`}
-                                to={`/products?age=${encodeURIComponent(item.age + ' ' + item.label)}`}
-                                className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-amber-200/80 shadow-2xs text-[12px] font-bold text-slate-700 hover:border-[#E51A22] hover:text-[#E51A22] hover:bg-red-50/50 transition-all active:scale-95 cursor-pointer"
-                            >
-                                <span>{item.emoji}</span>
-                                <span>{item.age} {item.label}</span>
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* Desktop View: Clean Static 5-Column Grid (No moving line on PC) */}
-                    <div className="hidden md:grid md:grid-cols-5 gap-6 lg:gap-8 justify-items-center max-w-[1300px] mx-auto pt-1 pb-2">
-                        {ageMilestones.map((item, idx) => (
-                            <Link
-                                to={`/products?age=${encodeURIComponent(item.age + ' ' + item.label)}`}
-                                key={`age-desktop-${idx}`}
-                                className="group/ageCard flex flex-col items-center justify-start w-full transition-all duration-300 ease-out hover:-translate-y-2 cursor-pointer select-none"
-                            >
-                                {/* Organic Shape Container */}
-                                <div className="relative w-40 h-40 lg:w-44 lg:h-44 mb-4 flex items-center justify-center">
-                                    {/* 1st Small Icon (decoLeft) */}
-                                    {item.decoLeft && (
-                                        <div className={`absolute ${item.posLeft} pointer-events-none transition-transform duration-500 z-30`}>
-                                            <div
-                                                className="age-deco-left bg-white/95 backdrop-blur-md rounded-2xl w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center shadow-md border"
-                                                style={{ borderColor: `${item.border}50` }}
-                                            >
-                                                <span className="text-[17px] lg:text-[19px] select-none leading-none">{item.decoLeft}</span>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* 2nd Small Icon (decoRight) */}
-                                    {item.decoRight && (
-                                        <div className={`absolute ${item.posRight} pointer-events-none transition-transform duration-500 z-30`}>
-                                            <div
-                                                className="age-deco-right bg-white/95 backdrop-blur-md rounded-2xl w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center shadow-md border"
-                                                style={{ borderColor: `${item.border}50` }}
-                                            >
-                                                <span className="text-[17px] lg:text-[19px] select-none leading-none">{item.decoRight}</span>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Inner Shape with border and clipPath */}
-                                    <div className="absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover/ageCard:scale-105">
-                                        {/* Border Outline SVG */}
-                                        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-md">
-                                            <path d={item.path} fill="none" stroke={item.border} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-
-                                        {/* Masked Image */}
-                                        <div
-                                            className="absolute inset-0 w-full h-full bg-white z-10"
-                                            style={{ clipPath: `url(#global-age-clip-${idx})` }}
-                                        >
-                                            <img
-                                                src={item.img}
-                                                alt={item.title}
-                                                draggable="false"
-                                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/ageCard:scale-110 pointer-events-none"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Text Details */}
-                                <h3 className="font-extrabold text-[18px] lg:text-[20px] mb-1 flex items-center gap-1.5 text-center group-hover/ageCard:text-[#E51A22] transition-colors" style={{ color: item.textPrimary }}>
-                                    <span className="text-[19px] lg:text-[21px] transition-transform duration-300 group-hover/ageCard:scale-125 inline-block">{item.icon}</span>
-                                    {item.title}
-                                </h3>
-                                <p className="text-[13px] lg:text-[14px] font-bold tracking-wide text-amber-800 bg-amber-100/70 px-3 py-0.5 rounded-full">
-                                    {item.age} {item.label}
-                                </p>
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* Mobile View: Continuous Running Line ("Aekdhari Line" - Only on Mobile) */}
-                    <div
-                        className="block md:hidden relative w-full py-2 group/ageSlider"
-                        onMouseEnter={() => setIsAgeHovered(true)}
-                        onMouseLeave={() => setIsAgeHovered(false)}
-                    >
-                        {/* Left Navigation Chevron */}
-                        <button
-                            onClick={() => handleAgeManualScroll('left')}
-                            className="absolute left-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-amber-200/80 text-slate-800 opacity-90 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white flex items-center justify-center cursor-pointer"
-                            title="Scroll Left"
-                        >
-                            <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
-                        </button>
-
-                        {/* Right Navigation Chevron */}
-                        <button
-                            onClick={() => handleAgeManualScroll('right')}
-                            className="absolute right-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-amber-200/80 text-slate-800 opacity-90 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white flex items-center justify-center cursor-pointer"
-                            title="Scroll Right"
-                        >
-                            <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
-                        </button>
-
-                        <div
-                            ref={ageContainerRef}
-                            className={`flex overflow-x-auto hide-scrollbar pt-4 pb-4 px-3 gap-5 ${isAgeDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
-                            onMouseDown={handleAgeMouseDown}
-                            onMouseLeave={handleAgeMouseLeave}
-                            onMouseUp={handleAgeMouseUp}
-                            onMouseMove={handleAgeMouseMove}
-                            onTouchStart={handleAgeTouchStart}
-                            onTouchMove={handleAgeTouchMove}
-                            onTouchEnd={handleAgeTouchEnd}
-                        >
-                            {[...ageMilestones, ...ageMilestones, ...ageMilestones, ...ageMilestones].map((item, idx) => {
-                                const clipIndex = idx % 5;
-                                return (
-                                    <Link
-                                        to={`/products?age=${encodeURIComponent(item.age + ' ' + item.label)}`}
-                                        key={`age-mobile-${idx}`}
-                                        onClick={(e) => { if (ageDragDistance > 6) e.preventDefault(); }}
-                                        className="group flex flex-col items-center justify-start shrink-0 transition-transform duration-500 ease-out active:scale-95 cursor-pointer select-none"
-                                        style={{ width: '165px' }}
-                                    >
-                                        {/* Organic Shape Container */}
-                                        <div className="relative w-36 h-36 mb-3 flex items-center justify-center">
-                                            {/* 1st Small Icon (decoLeft) */}
-                                            {item.decoLeft && (
-                                                <div className={`absolute ${item.posLeft} pointer-events-none transition-transform duration-500 z-30`}>
-                                                    <div
-                                                        className="bg-white/95 backdrop-blur-md rounded-xl w-8 h-8 flex items-center justify-center rotate-[-10deg] shadow-md border"
-                                                        style={{ borderColor: `${item.border}50` }}
-                                                    >
-                                                        <span className="text-[14px] select-none leading-none">{item.decoLeft}</span>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* 2nd Small Icon (decoRight) */}
-                                            {item.decoRight && (
-                                                <div className={`absolute ${item.posRight} pointer-events-none transition-transform duration-500 z-30`}>
-                                                    <div
-                                                        className="bg-white/95 backdrop-blur-md rounded-xl w-8 h-8 flex items-center justify-center rotate-[10deg] shadow-md border"
-                                                        style={{ borderColor: `${item.border}50` }}
-                                                    >
-                                                        <span className="text-[14px] select-none leading-none">{item.decoRight}</span>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Inner Shape with border and clipPath */}
-                                            <div className="absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover:scale-105">
-                                                {/* Border Outline SVG */}
-                                                <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-md">
-                                                    <path d={item.path} fill="none" stroke={item.border} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-
-                                                {/* Masked Image */}
-                                                <div
-                                                    className="absolute inset-0 w-full h-full bg-white z-10"
-                                                    style={{ clipPath: `url(#global-age-clip-${clipIndex})` }}
-                                                >
-                                                    <img
-                                                        src={item.img}
-                                                        alt={item.title}
-                                                        draggable="false"
-                                                        className="w-full h-full object-cover pointer-events-none"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Text Details */}
-                                        <h3 className="font-extrabold text-[16px] mb-0.5 flex items-center gap-1.5 text-center text-[#224B9C]">
-                                            <span className="text-[17px]">{item.icon}</span>
-                                            {item.title}
-                                        </h3>
-                                        <p className="text-[12px] font-bold tracking-wide text-amber-800 bg-amber-100/70 px-2.5 py-0.5 rounded-full">
-                                            {item.age} {item.label}
-                                        </p>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-
             {/* Promo Media (Videos & Images) - Limited Edition Style */}
             {promoMedia && promoMedia.length > 0 && (
                 <div className="w-full bg-[#F4F7FC] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-indigo-200/70 relative">
                     <div className="w-full mx-auto px-4 md:px-8">
-                        <div className="mb-4 sm:mb-5 text-center md:text-left">
-                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-blue-200/80 shadow-2xs">
+                        <div className="flex flex-col items-center justify-center text-center mb-4 sm:mb-6">
+                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2 border border-blue-200/80 shadow-2xs">
                                 ✨ EXCLUSIVE DROPS
                             </span>
-                            <h2 className="text-[26px] md:text-[34px] font-black text-[#1A1A24] mb-1.5 font-sans">Limited-edition playtime drops</h2>
-                            <p className="text-[#555] text-[14px] md:text-[15px] max-w-2xl font-medium">Explore our limited-edition toy drops, crafted for unforgettable playtime moments and available only while exclusive stocks last.</p>
+                            <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-1.5">
+                                Limited-edition playtime drops
+                            </h2>
+                            <p className="text-[#555] text-[14px] md:text-[16px] max-w-2xl font-medium mx-auto">
+                                Explore our limited-edition toy drops, crafted for unforgettable playtime moments and available only while exclusive stocks last.
+                            </p>
                         </div>
 
                         <div className="w-full relative group/promo">
@@ -1325,177 +1412,6 @@ const Dashboard = () => {
                     </div>
                 </div>
             )}
-
-            {/* Explore Popular Toy Set */}
-            <div className="w-full bg-white pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-slate-200/90 relative">
-                <div className="w-full mx-auto px-4 md:px-6">
-                    <div className="flex flex-col items-center justify-center text-center mb-4 sm:mb-5">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-rose-200/80 shadow-2xs">
-                            🧸 FEATURED PLAYSETS
-                        </span>
-                        <h2 className="text-[28px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-1.5">
-                            Explore Popular Toy Set
-                        </h2>
-                        <p className="text-[#666] text-[14.5px] md:text-[16px] font-medium">Smart, Fun & Creative Toys for Every Little Adventure</p>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 sm:px-2 md:px-0">
-                        {[...allProducts]
-                            .filter(product => product.status !== 'Out of Stock')
-                            .sort((a, b) => {
-                                if (a.bestSeller && !b.bestSeller) return -1;
-                                if (!a.bestSeller && b.bestSeller) return 1;
-                                return (b.reviewCount || 0) - (a.reviewCount || 0);
-                            })
-                            .slice(0, visibleCount)
-                            .map((product) => (
-                                <div key={product._id} className="flex flex-col group cursor-pointer relative bg-white rounded-2xl sm:rounded-3xl border border-slate-100 hover:border-red-50 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden">
-                                    <div className="relative w-full aspect-square overflow-hidden bg-[#F8F9FA]">
-                                        {/* Discount Badge */}
-                                        {product.originalPrice > product.price && (
-                                            <div className="absolute top-2 left-2 z-30 pointer-events-none">
-                                                <span className="bg-[#E51A22] text-white px-1.5 sm:px-2 py-0.5 rounded-full text-[8.5px] sm:text-[9.5px] font-bold tracking-wider shadow-xs flex items-center gap-0.5">
-                                                    {`${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% Off`}
-                                                </span>
-                                            </div>
-                                        )}
-
-                                        {/* Waitlist Button - Top Right Header */}
-                                        <div className="absolute top-2.5 right-2.5 z-30 transition-all duration-200 opacity-100 scale-100">
-                                            <button
-                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                                                className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
-                                                title="Wishlist"
-                                            >
-                                                <HeartIcon
-                                                    className="w-4 h-4 transition-colors"
-                                                    fill={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "transparent"}
-                                                    stroke={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#64748b"}
-                                                    strokeWidth={2.2}
-                                                />
-                                            </button>
-                                        </div>
-
-
-
-                                        <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 ease-out">
-                                            <ProductCardImageCarousel
-                                                images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])}
-                                                productName={product.name}
-                                            />
-                                        </Link>
-                                    </div>
-
-                                    <div className="p-3 sm:p-5 flex flex-col flex-grow text-left bg-white relative">
-                                        {/* Ratings Display */}
-                                        <div className="flex items-center gap-1.5 mb-1.5">
-                                            <div className="flex items-center gap-0.5 text-[#F5A623]">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <svg key={i} className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${i < Math.round(product.averageRating || 5) ? 'fill-current' : 'text-gray-200 fill-current'}`} viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                ))}
-                                            </div>
-                                            <span className="text-[10px] sm:text-[11px] text-gray-400 font-bold tracking-wider">({product.reviewCount || 0})</span>
-                                        </div>
-
-                                        <Link to={`/product/${product._id}`} className="font-bold text-[#1A1A24] text-[13px] sm:text-[15px] md:text-[16px] mb-1 hover:text-[#E51A22] transition-colors leading-snug line-clamp-1">
-                                            {product.name}
-                                        </Link>
-
-                                        <div className="text-[12px] text-gray-500/90 mb-3 leading-relaxed">
-                                            <p className={expandedProductDescIds[product._id] ? "" : "line-clamp-2 overflow-hidden"}>
-                                                {getCleanCardDescription(product)}
-                                            </p>
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    toggleProductDesc(product._id);
-                                                }}
-                                                className="mt-1 inline-flex items-center gap-1 text-[11.5px] font-bold text-[#E51A22] hover:text-[#b81219] transition-colors cursor-pointer"
-                                            >
-                                                <span>{expandedProductDescIds[product._id] ? 'View Less' : 'View More'}</span>
-                                                <svg
-                                                    className={`w-3 h-3 transition-transform duration-200 ${expandedProductDescIds[product._id] ? 'rotate-180' : ''}`}
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                    strokeWidth={2.5}
-                                                >
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <div className="flex items-center justify-between gap-1 mt-auto pt-2 border-t border-slate-50">
-                                            {product.status === 'Out of Stock' ? (
-                                                <span className="font-bold text-gray-400 text-[12px]">Out of Stock</span>
-                                            ) : (
-                                                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
-                                                    <span className="font-extrabold text-[#1A1A24] text-[14.5px] sm:text-[17px] md:text-[19px]">
-                                                        ₹{`${(product.price || 0).toFixed(0)}`}
-                                                    </span>
-                                                    {product.originalPrice > (product.price || 0) && (
-                                                        <span className="text-[10.5px] sm:text-[12px] text-gray-400 line-through font-medium">
-                                                            ₹{`${(product.originalPrice || 0).toFixed(0)}`}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Dual Action Buttons: Add to Cart & Buy Now */}
-                                        <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1.5 sm:gap-2">
-                                            {product.status === 'Out of Stock' ? (
-                                                <button
-                                                    disabled
-                                                    className="w-full py-2 px-3 rounded-xl bg-slate-100 text-slate-400 text-[11px] sm:text-[12px] font-bold cursor-not-allowed text-center"
-                                                >
-                                                    Out of Stock
-                                                </button>
-                                            ) : (
-                                                <>
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            addToCart(product);
-                                                        }}
-                                                        className="flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl border border-slate-200 hover:border-[#E51A22] bg-white hover:bg-red-50/50 text-[#1A1A24] hover:text-[#E51A22] text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer shadow-2xs active:scale-95"
-                                                        title="Add to Cart"
-                                                    >
-                                                        <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
-                                                        <span className="truncate">Add to Cart</span>
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => handleBuyNow(e, product)}
-                                                        className="flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl bg-[#E51A22] hover:bg-[#c9141b] text-white text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:shadow-red-500/25 active:scale-95"
-                                                        title="Buy Now"
-                                                    >
-                                                        <Zap className="w-3.5 h-3.5 shrink-0 fill-current" />
-                                                        <span className="truncate">Buy Now</span>
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                    </div>
-
-                    {/* View All Products Button (Load More removed) */}
-                    <div className="flex justify-center items-center mt-5 sm:mt-6 px-4 md:px-0">
-                        <Link to="/products" className="group bg-[#e6a27a] text-white shadow-sm hover:shadow-md hover:bg-[#d58f66] px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm">
-                            View All Products
-                            <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
-                </div>
-            </div>
 
             {/* Brands Marquee - Premium Continuous Ticker */}
             {brands.length > 0 && (
@@ -1624,25 +1540,6 @@ const Dashboard = () => {
                         <p className="text-slate-600 text-[14px] sm:text-[15.5px] leading-relaxed max-w-xl mx-auto">
                             Honest feedback from parents who trust Little Joys for safe, screen-free, and heirloom-quality toys.
                         </p>
-
-                        {/* Unified Modern Trust Bar */}
-                        <div className="inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-4 px-5 py-2 rounded-2xl bg-white border border-slate-200/90 shadow-2xs text-xs sm:text-sm font-semibold text-slate-700">
-                            <div className="flex items-center gap-1.5">
-                                <span className="text-amber-500 font-bold">★★★★★</span>
-                                <span className="font-extrabold text-[#1A1A24]">4.9 / 5</span>
-                                <span className="text-slate-400 font-normal hidden sm:inline">(1,200+ Reviews)</span>
-                            </div>
-                            <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-300" />
-                            <div className="flex items-center gap-1.5 text-emerald-700">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                                <span>100% Verified Buyers</span>
-                            </div>
-                            <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-300" />
-                            <div className="flex items-center gap-1.5 text-[#E51A22]">
-                                <Shield className="w-4 h-4 text-[#E51A22]" />
-                                <span>BIS Safe & Non-Toxic</span>
-                            </div>
-                        </div>
                     </div>
 
                     {/* Review Slider with Hover-Only Navigation Arrows */}
@@ -1713,10 +1610,6 @@ const Dashboard = () => {
                                                             ))}
                                                             <span className="ml-1 text-xs font-bold text-slate-800">5.0</span>
                                                         </div>
-                                                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80 shadow-2xs">
-                                                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                                            {test.badge || 'Verified Buyer'}
-                                                        </span>
                                                     </div>
 
                                                     {/* Clean Review Headline */}
@@ -1766,30 +1659,49 @@ const Dashboard = () => {
                         )}
                     </div>
 
-                    {/* Bottom Action Strip: Real Feedback & Shop Callout */}
-                    <div className="mt-6 pt-5 border-t border-orange-100/90 max-w-2xl mx-auto text-center px-4">
-                        <p className="text-xs sm:text-sm font-bold text-[#1A1A24] mb-1">
-                            Have you shopped with Little Joys? We value your real experience!
-                        </p>
-                        <p className="text-xs text-slate-500 mb-3.5">
-                            Share your feedback with our family team on WhatsApp or explore our most loved toys.
-                        </p>
-                        <div className="flex flex-wrap items-center justify-center gap-3">
-                            <a
-                                href="https://wa.me/918347640423?text=Hello%20Little%20Joys,%20I%20would%20like%20to%20share%20my%20review/feedback!"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs sm:text-sm font-bold py-2.5 px-5 rounded-full shadow-xs transition-all cursor-pointer hover:scale-105"
-                            >
-                                <MessageCircle className="w-4 h-4" />
-                                Share Feedback on WhatsApp
-                            </a>
-                            <Link
-                                to="/products"
-                                className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs sm:text-sm font-semibold py-2.5 px-5 rounded-full shadow-2xs transition-all hover:scale-105"
-                            >
-                                Explore Best Sellers →
-                            </Link>
+                    {/* Modern Horizontal Feedback & Exploration Banner (Aadu / Horizontal Strip, Unique & Sleek) */}
+                    <div className="mt-2 sm:mt-3 max-w-5xl mx-auto px-2 sm:px-4">
+                        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-emerald-500/[0.06] via-white to-orange-500/[0.06] border border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.05)] p-4 sm:p-5 md:px-7 md:py-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
+
+                            {/* Subtle Ambient Decorative Glow */}
+                            <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none" />
+                            <div className="absolute -right-10 -top-10 w-40 h-40 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+
+                            {/* Left Side: Cute Floating Icon + Text Details */}
+                            <div className="flex items-center gap-3.5 sm:gap-4 text-center md:text-left relative z-10 w-full md:w-auto">
+                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-[#25D366] to-[#1EBE5D] text-white flex items-center justify-center shadow-[0_4px_14px_rgba(37,211,102,0.35)] shrink-0 mx-auto md:mx-0">
+                                    <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 fill-white/20" />
+                                </div>
+                                <div className="min-w-0">
+                                    <h3 className="text-[14px] sm:text-[15.5px] font-black text-[#1A1A24] leading-snug">
+                                        Have you shopped with Little Joys? We value your real experience!
+                                    </h3>
+                                    <p className="text-[12px] sm:text-[13px] text-slate-500 font-medium mt-0.5 leading-relaxed">
+                                        Share your feedback with our family team on WhatsApp or explore our most loved toys.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Right Side: Horizontal Action Buttons */}
+                            <div className="flex items-center justify-center sm:justify-end gap-2.5 sm:gap-3 shrink-0 w-full md:w-auto relative z-10">
+                                <a
+                                    href="https://wa.me/918347640423?text=Hello%20Little%20Joys,%20I%20would%20like%20to%20share%20my%20review/feedback!"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-[12px] sm:text-[13px] font-bold py-2.5 px-4 sm:px-5 rounded-full shadow-[0_4px_14px_rgba(37,211,102,0.3)] hover:shadow-[0_6px_20px_rgba(37,211,102,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer whitespace-nowrap"
+                                >
+                                    <MessageCircle className="w-4 h-4 fill-white/20" />
+                                    <span>Share Feedback on WhatsApp</span>
+                                </a>
+                                <Link
+                                    to="/products"
+                                    className="inline-flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-[#E51A22] border border-slate-300/90 text-[12px] sm:text-[13px] font-bold py-2.5 px-4 sm:px-5 rounded-full shadow-2xs hover:shadow-xs hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer whitespace-nowrap"
+                                >
+                                    <span>Explore Best Sellers</span>
+                                    <ChevronRight className="w-4 h-4" />
+                                </Link>
+                            </div>
+
                         </div>
                     </div>
 

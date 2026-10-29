@@ -77,6 +77,52 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ELIMINATE BLACK BOX / OUTLINE ON ALL NAV LINKS & BUTTONS (ONLY SHOW UNDERLINE) */
+a,
+a:focus,
+a:active,
+a:focus-visible,
+button,
+button:focus,
+button:active,
+button:focus-visible,
+[role="button"],
+[role="button"]:focus,
+[role="button"]:active,
+[role="button"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+nav a,
+nav a:focus,
+nav a:active,
+nav a:focus-visible,
+header a,
+header a:focus,
+header a:active,
+header a:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
+
+/* Ensure all checkboxes, radio buttons, labels, and interactive filter elements show hand pointer cursor */
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"],
+label,
+label *,
+.cursor-pointer,
+.cursor-pointer * {
+  cursor: pointer !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 /* Hide scrollbar for all browsers */
 * {
   -ms-overflow-style: none;

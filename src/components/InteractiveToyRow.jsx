@@ -28,7 +28,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 const TOY_SOUND_FILES = [
     '/sounds/teddy.ogg',    // 0: Teddy (Real Cute Baby Giggle & Laugh)
-    '/sounds/bunny.ogg',    // 1: Bunny (Real Cartoon Boing Spring Bounce)
+    '/sounds/bunny.wav',    // 1: Bunny (Real Authentic Rabbit Sound / સસલાનો અસલી અવાજ)
     '/sounds/robot.ogg',    // 2: Robot (Real Synth Filter & Futuristic Tone)
     '/sounds/car.wav',      // 3: Car (Clean Purring Motor Rev + Crisp Beep-Beep Horn)
     '/sounds/peacock.wav',  // 4: Royal Peacock / Mor (Real Majestic Indian Peacock Tahuko / ટહૂકો)
@@ -60,63 +60,33 @@ const InteractiveToyRow = () => {
     const [activeIdx, setActiveIdx] = useState(null);
     const activeIdxRef = useRef(null);
     const [animResetKey, setAnimResetKey] = useState(0);
-    const [needsInteraction, setNeedsInteraction] = useState(false);
     const sectionRef = useRef(null);
     const hoverTimerRef = useRef(null);
     const activeTimerRef = useRef(null);
     const currentAudioRef = useRef(null);
-    const preloadedAudiosRef = useRef([]);
-
-    // Preload HTML5 Audio objects for zero-latency response
+    // Preload audio files cleanly without micro-play race conditions
     useEffect(() => {
-        try {
-            preloadedAudiosRef.current = TOY_SOUND_FILES.map((src) => {
-                const audio = new Audio(src);
-                audio.preload = 'auto';
-                audio.volume = 0.95;
-                audio.load();
-                return audio;
-            });
-        } catch (e) {}
+        TOY_SOUND_FILES.forEach((src) => {
+            try {
+                const a = new Audio(src);
+                a.preload = 'auto';
+                a.load();
+            } catch (e) {}
+        });
 
-        // Global unlocker listener on any user interaction across the page
-        const unlockAudioOnGesture = () => {
+        // Resume AudioContext on any user gesture across the page
+        const unlockAudio = () => {
             const ctx = getAudioContext();
             if (ctx && ctx.state === 'suspended') {
                 ctx.resume().catch(() => {});
             }
-            setNeedsInteraction(false);
-            if (!isAudioUnlocked) {
-                isAudioUnlocked = true;
-                if (preloadedAudiosRef.current) {
-                    preloadedAudiosRef.current.forEach((a) => {
-                        try {
-                            if (a) {
-                                a.muted = true;
-                                const p = a.play();
-                                if (p) {
-                                    p.then(() => {
-                                        a.pause();
-                                        a.currentTime = 0;
-                                        a.muted = false;
-                                    }).catch(() => {
-                                        a.muted = false;
-                                    });
-                                }
-                            }
-                        } catch (err) {
-                            if (a) a.muted = false;
-                        }
-                    });
-                }
-            }
         };
 
         const events = ['click', 'touchstart', 'pointerdown', 'keydown', 'scroll', 'wheel'];
-        events.forEach((ev) => window.addEventListener(ev, unlockAudioOnGesture, { passive: true }));
+        events.forEach((ev) => window.addEventListener(ev, unlockAudio, { passive: true }));
 
         return () => {
-            events.forEach((ev) => window.removeEventListener(ev, unlockAudioOnGesture));
+            events.forEach((ev) => window.removeEventListener(ev, unlockAudio));
         };
     }, []);
 
@@ -155,29 +125,20 @@ const InteractiveToyRow = () => {
             ctx.resume().catch(() => {});
         }
 
-        // Preloaded HTML5 Audio for authentic real-world sound
+        // Fresh HTML5 Audio object for clean, uncorrupted playback
         try {
-            const audio = preloadedAudiosRef.current[index] || new Audio(TOY_SOUND_FILES[index]);
+            const audio = new Audio(TOY_SOUND_FILES[index]);
             audio.volume = 0.95;
             audio.currentTime = 0;
-            // CONTINUOUS LOOP: Keeps playing without stopping as long as toy is on screen
             audio.loop = true;
 
             currentAudioRef.current = audio;
 
             const playPromise = audio.play();
             if (playPromise !== undefined) {
-                playPromise
-                    .then(() => {
-                        // Playing successfully!
-                        setNeedsInteraction(false);
-                    })
-                    .catch((err) => {
-                        // If browser autoplay policy blocks sound before first gesture
-                        if (err && (err.name === 'NotAllowedError' || err.message?.includes('interact'))) {
-                            setNeedsInteraction(true);
-                        }
-                    });
+                playPromise.catch((err) => {
+                    console.log('Audio autoplay awaiting user gesture:', err);
+                });
             }
         } catch (e) {
             console.error('Audio play error:', e);
@@ -220,8 +181,8 @@ const InteractiveToyRow = () => {
     };
 
     // Click / Single Tap on toy (Mobile & Desktop):
-    // 1. Single tap on any toy immediately activates it (plays authentic music + starts 3D work)
-    // 2. Single tap on the active toy stops it cleanly (Toggle behavior - user clicks again, it stops!)
+    // 1. If audio is not playing (e.g. Chrome blocked hover autoplay on fresh page), CLICK plays it immediately!
+    // 2. If already playing, clicking again toggles it off!
     // 3. ZERO click sound / beep / pop - pure authentic toy music only!
     const handleToyClick = (e, index) => {
         if (e) {
@@ -241,16 +202,16 @@ const InteractiveToyRow = () => {
             ctx.resume().catch(() => {});
         }
 
-        // SINGLE TAP TOGGLE (Mobile & Desktop):
-        // If this toy is ALREADY active, clicking/tapping it again stops it immediately!
-        if (activeIdx === index) {
+        // Check if audio is currently actively playing for this toy
+        const isAudioActive = currentAudioRef.current && !currentAudioRef.current.paused && currentAudioRef.current.currentTime > 0;
+
+        // If this toy is already active AND audio is actually playing, click toggles it off!
+        if (activeIdx === index && isAudioActive) {
             stopCurrentToy();
             return;
         }
 
-        setNeedsInteraction(false);
-
-        // If clicking/tapping a new toy, activate it cleanly with the 30s timer
+        // Otherwise (first click, or if hover was visual-only and sound didn't play), start sound & action!
         activateToy(index);
     };
 
@@ -330,7 +291,7 @@ const InteractiveToyRow = () => {
     return (
         <section
             ref={sectionRef}
-            className="w-full bg-white select-none relative pt-10 sm:pt-14 pb-4 sm:pb-6 overflow-visible"
+            className="w-full bg-transparent select-none relative pt-6 sm:pt-8 pb-4 sm:pb-6 overflow-visible"
         >
             {/* CSS Keyframes for Realistic 3D Toy Actions & Mobile Continuous Wave */}
             <style>{`
@@ -562,8 +523,7 @@ const InteractiveToyRow = () => {
                 /* 6. ROCKING HORSE: REALISTIC 3D ROCKING MOTION (ZATKO-FREE SMOOTH ROCK) */
                 /* BY DEFAULT: GENTLE WOODEN ROCKING ON SHELF IN NATURAL SIZE (સ્મૂથ હળવા હિંચકા) */
                 .rocking-horse-body {
-                    transform-origin: 38px 72px;
-                    transform-box: view-box;
+                    transform-origin: 50% 92%;
                     animation: horseNaturalGentleRock 2.4s ease-in-out infinite alternate;
                 }
 
@@ -576,40 +536,44 @@ const InteractiveToyRow = () => {
 
                 @keyframes horseNaturalGentleRock {
                     0% {
-                        transform: rotate(-8deg);
+                        transform: rotate(-7deg);
                     }
                     100% {
-                        transform: rotate(8deg);
+                        transform: rotate(7deg);
                     }
                 }
 
                 @keyframes horseSmoothGallopRock {
                     0% {
-                        transform: rotate(-18deg);
+                        transform: rotate(-16deg);
                     }
                     100% {
-                        transform: rotate(18deg);
+                        transform: rotate(16deg);
                     }
                 }
             `}</style>
 
-            {/* If browser requires 1 user gesture to unlock audio after fresh reload */}
-            {needsInteraction && (
-                <div className="w-full flex justify-center px-4 mb-2">
-                    <button
-                        onClick={() => {
-                            setNeedsInteraction(false);
-                            const ctx = getAudioContext();
-                            if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
-                            if (activeIdx !== null) activateToy(activeIdx);
-                        }}
-                        className="px-4 py-1.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-black rounded-full shadow-md flex items-center gap-2 cursor-pointer animate-pulse z-50 pointer-events-auto transition-transform active:scale-95"
-                    >
-                        <span>🔊</span>
-                        <span>Click to Enable Audio (સાઉન્ડ ચાલુ કરવા અહીં ક્લિક કરો)</span>
-                    </button>
+
+
+            {/* Playful Header on Left Side */}
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 mb-3 sm:mb-4 flex items-center justify-start">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-[#E51A22] to-rose-400 text-white flex items-center justify-center shadow-md shadow-red-500/25 shrink-0 rotate-[-6deg]">
+                        <span className="text-[20px] sm:text-[22px] select-none leading-none">🧸</span>
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-50 text-[#E51A22] text-[10.5px] sm:text-[11px] font-black uppercase tracking-wider border border-red-200/80 shadow-2xs">
+                                ✨ INTERACTIVE PLAY ZONE
+                            </span>
+                        </div>
+                        <h3 className="text-[19px] sm:text-[23px] md:text-[25px] font-black text-[#1A1A24] tracking-tight flex items-center gap-2 mt-0.5">
+                            Let's Play Some Toys
+                            <span className="text-[19px] sm:text-[21px] animate-bounce inline-block">🎉</span>
+                        </h3>
+                    </div>
                 </div>
-            )}
+            </div>
 
             {/* 7 TOYS DISPLAY SHELF - FULL WIDTH EDGE TO EDGE, OVERFLOW VISIBLE */}
             <div className="w-full px-3 sm:px-8 md:px-12 lg:px-16 relative overflow-visible pointer-events-none">
@@ -796,12 +760,7 @@ const InteractiveToyRow = () => {
                         onMouseLeave={() => handleMouseLeave(3)}
                         onClick={(e) => handleToyClick(e, 3)}
                     >
-                        {/* Realistic 3D Asphalt Road Strip with Moving Highway Dashes */}
-                        {activeIdx === 3 && (
-                            <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-28 sm:w-32 h-3.5 bg-slate-900 rounded-full overflow-hidden flex items-center justify-center shadow-lg z-0 pointer-events-none border border-slate-700">
-                                <div className="w-full h-1 bg-[repeating-linear-gradient(90deg,#FBBF24_0,#FBBF24_8px,transparent_8px,transparent_16px)] animate-road-drive"></div>
-                            </div>
-                        )}
+
 
                         <svg viewBox="0 0 88 62" fill="none" className="w-[46px] h-[36px] xs:w-[56px] xs:h-[44px] sm:w-[70px] sm:h-[54px] md:w-[88px] md:h-[62px] filter drop-shadow-md relative z-10 overflow-visible">
                             <defs>
@@ -985,12 +944,7 @@ const InteractiveToyRow = () => {
                         onMouseLeave={() => handleMouseLeave(4)}
                         onClick={(e) => handleToyClick(e, 4)}
                     >
-                        {/* Royal Garden Lawn Walking Track with Moving Stepping Stones & Daisies */}
-                        {activeIdx === 4 && (
-                            <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-32 sm:w-36 h-3.5 bg-gradient-to-r from-emerald-700 via-green-600 to-emerald-700 rounded-full overflow-hidden flex items-center justify-center shadow-lg z-0 pointer-events-none border border-emerald-400">
-                                <div className="w-full h-1.5 bg-[repeating-linear-gradient(90deg,#FEF08A_0,#FEF08A_6px,#86EFAC_6px,#86EFAC_14px,transparent_14px,transparent_22px)] animate-garden-walk"></div>
-                            </div>
-                        )}
+
 
                         <svg viewBox="0 0 96 88" fill="none" className="w-[48px] h-[44px] xs:w-[58px] xs:h-[53px] sm:w-[72px] sm:h-[66px] md:w-[96px] md:h-[88px] filter drop-shadow-lg relative z-10 overflow-visible">
                             <defs>
@@ -1213,41 +1167,14 @@ const InteractiveToyRow = () => {
                         onMouseLeave={() => handleMouseLeave(6)}
                         onClick={(e) => handleToyClick(e, 6)}
                     >
-                        <svg viewBox="0 0 78 78" fill="none" className="w-[41px] h-[41px] xs:w-[50px] xs:h-[50px] sm:w-[63px] sm:h-[63px] md:w-[78px] md:h-[78px] filter drop-shadow-md overflow-visible">
-                            <g className="rocking-horse-body">
-                                {/* Horse Head & Ears */}
-                                <polygon points="56,19 60,12 53,16" fill="#10B981" stroke="#059669" strokeWidth="1.5" />
-                                
-                                {/* Horse Neck and Head Profile */}
-                                <path d="M42 36 L52 20 C54 18 64 21 66 26 C68 31 63 33 58 35 L52 42 Z" fill="#34D399" stroke="#059669" strokeWidth="2" />
-                                {/* Golden Mane */}
-                                <path d="M48 22 C46 25 45 29 47 34" stroke="#F59E0B" strokeWidth="3.5" strokeLinecap="round" />
-                                {/* Gentle Eye */}
-                                <circle cx="58" cy="24" r="2.2" fill="#0F172A" />
-                                <circle cx="57.5" cy="23.5" r="0.8" fill="#FFFFFF" />
-                                {/* Bridle & Reins */}
-                                <line x1="58" y1="28" x2="52" y2="35" stroke="#DC2626" strokeWidth="1.5" />
-                                <line x1="64" y1="29" x2="58" y2="28" stroke="#DC2626" strokeWidth="1.5" />
-
-                                {/* Horse Torso Body */}
-                                <ellipse cx="36" cy="45" rx="18" ry="11" fill="#34D399" stroke="#059669" strokeWidth="2" />
-                                
-                                {/* Red Leather Saddle with Gold Fringe */}
-                                <rect x="30" y="38" width="12" height="12" rx="3" fill="#EF4444" stroke="#B91C1C" strokeWidth="1.5" />
-                                <circle cx="36" cy="44" r="2" fill="#FDE047" />
-
-                                {/* Golden Yarn Tail */}
-                                <path d="M18 45 C14 48 12 55 16 58" stroke="#F59E0B" strokeWidth="3.5" strokeLinecap="round" />
-
-                                {/* Legs Extending to Rocker */}
-                                <line x1="25" y1="52" x2="18" y2="67" stroke="#059669" strokeWidth="3" strokeLinecap="round" />
-                                <line x1="47" y1="52" x2="58" y2="67" stroke="#059669" strokeWidth="3" strokeLinecap="round" />
-
-                                {/* Curved Wooden Rocking Skids (Natural 3D Rocker) */}
-                                <path d="M8 68 Q38 77 68 68" stroke="#B45309" strokeWidth="4.5" strokeLinecap="round" fill="none" />
-                                <path d="M12 69 Q38 77 64 69" stroke="#FDE68A" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-                            </g>
-                        </svg>
+                        <div className="rocking-horse-body w-[52px] h-[52px] xs:w-[64px] xs:h-[64px] sm:w-[82px] sm:h-[82px] md:w-[102px] md:h-[102px] flex items-center justify-center">
+                            <img
+                                src="/images/toy_rocking_horse.png"
+                                alt="Authentic Wooden Rocking Horse Toy"
+                                className="w-full h-full object-contain pointer-events-none select-none drop-shadow-md"
+                                loading="eager"
+                            />
+                        </div>
                     </div>
 
                 </div>

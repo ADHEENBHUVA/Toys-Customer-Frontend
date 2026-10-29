@@ -9,16 +9,38 @@ const LoginContent = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!email || !password) {
             toast.error("Please enter your email and password.");
             return;
         }
-        // Simulated local login
-        localStorage.setItem('token', 'mock_token_for_demo');
-        toast.success("Welcome back to Magic Toys! ✨");
-        navigate('/', { state: { showConfetti: true } });
+        setIsSubmitting(true);
+        const toastId = toast.loading("Signing in...");
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/auth/email-login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem('token', data.token);
+                if (data.user) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                }
+                toast.success(`Welcome back, ${data.user?.name || 'Customer'}! ✨`, { id: toastId });
+                navigate('/', { state: { showConfetti: true } });
+            } else {
+                toast.error(data.message || 'Login failed', { id: toastId });
+            }
+        } catch (err) {
+            console.error('Email login error:', err);
+            toast.error("Network error during login. Please try again.", { id: toastId });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const googleLogin = useGoogleLogin({
@@ -40,7 +62,7 @@ const LoginContent = () => {
                     if (data.user) {
                         localStorage.setItem('user', JSON.stringify(data.user));
                     }
-                    toast.success("Welcome to Magic Toys!", { id: toastId, icon: '✨' });
+                    toast.success(`Welcome to Magic Toys, ${data.user?.name || ''}!`, { id: toastId, icon: '✨' });
                     navigate('/', { state: { showConfetti: true } });
                 } else {
                     throw new Error(data.message || 'Authentication failed');
@@ -130,7 +152,7 @@ const LoginContent = () => {
                     {/* Mobile Logo */}
                     <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
                         <div className="w-12 h-12 bg-gradient-to-br from-[#e6a27a] to-[#d99268] rounded-full flex items-center justify-center shadow-md">
-                            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/></svg>
                         </div>
                         <span className="text-3xl font-serif font-bold text-[#3d3130] tracking-wide">Little Joys</span>
                     </div>
@@ -173,8 +195,12 @@ const LoginContent = () => {
                             <a href="#" onClick={(e) => { e.preventDefault(); toast.error("Password reset functionality coming soon."); }} className="font-bold text-[#e6a27a] text-sm hover:text-[#d99268] transition-colors">Forgot password?</a>
                         </div>
 
-                        <button type="submit" className="w-full mt-4 bg-gradient-to-r from-[#e6a27a] to-[#d99268] hover:from-[#d99268] hover:to-[#cc855a] text-white font-bold text-[15px] py-3.5 rounded-xl transition-all flex justify-center items-center gap-2 shadow-[0_8px_20px_rgba(230,162,122,0.3)] hover:shadow-[0_10px_25px_rgba(230,162,122,0.4)] hover:-translate-y-0.5">
-                            Sign In
+                        <button 
+                            type="submit" 
+                            disabled={isSubmitting}
+                            className="w-full mt-4 bg-gradient-to-r from-[#e6a27a] to-[#d99268] hover:from-[#d99268] hover:to-[#cc855a] text-white font-bold text-[15px] py-3.5 rounded-xl transition-all flex justify-center items-center gap-2 shadow-[0_8px_20px_rgba(230,162,122,0.3)] hover:shadow-[0_10px_25px_rgba(230,162,122,0.4)] hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            {isSubmitting ? 'Signing In...' : 'Sign In'}
                         </button>
                     </form>
 
@@ -187,7 +213,7 @@ const LoginContent = () => {
                         <button 
                             type="button" 
                             onClick={() => handleSocialLogin('Google')} 
-                            className="flex items-center justify-center gap-2 h-12 rounded-xl bg-white border border-[#f3eee7] text-[#5e504f] hover:border-[#e6a27a] hover:bg-[#fcfaf7] transition-all shadow-sm group"
+                            className="flex items-center justify-center gap-2 h-12 rounded-xl bg-white border border-[#f3eee7] text-[#5e504f] hover:border-[#e6a27a] hover:bg-[#fcfaf7] transition-all shadow-sm group cursor-pointer"
                         >
                             <svg className="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -201,7 +227,7 @@ const LoginContent = () => {
                         <button 
                             type="button" 
                             onClick={() => handleSocialLogin('Apple')} 
-                            className="flex items-center justify-center gap-2 h-12 rounded-xl bg-white border border-[#f3eee7] text-[#5e504f] hover:border-[#e6a27a] hover:bg-[#fcfaf7] transition-all shadow-sm group"
+                            className="flex items-center justify-center gap-2 h-12 rounded-xl bg-white border border-[#f3eee7] text-[#5e504f] hover:border-[#e6a27a] hover:bg-[#fcfaf7] transition-all shadow-sm group cursor-pointer"
                         >
                             <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.04 2.26-.82 3.59-.83 1.48-.05 2.76.65 3.53 1.83-3.11 1.76-2.58 5.75.52 7-1.12 1.63-2.14 3.3-2.72 4.17zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>

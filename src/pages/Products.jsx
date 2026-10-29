@@ -140,6 +140,19 @@ const Products = () => {
             result = result.filter(p => selectedCategories.includes(p.category));
         }
 
+        // Filter by collection
+        const colParam = searchParams.get('collection');
+        if (colParam) {
+            result = result.filter(p => {
+                if (!Array.isArray(p.collections)) return false;
+                return p.collections.some(c => {
+                    const cId = (typeof c === 'object' && c !== null) ? c._id?.toString() : String(c);
+                    const cName = (typeof c === 'object' && c !== null) ? c.name : null;
+                    return cId === colParam || (cName && cName.toLowerCase() === colParam.toLowerCase());
+                });
+            });
+        }
+
         // Filter by brand
         if (selectedBrands.length > 0) {
             result = result.filter(p => {

@@ -268,19 +268,18 @@ const Orders = () => {
                                                         
                                                         <div className="flex flex-col items-start md:items-end gap-3 shrink-0">
                                                             <p className="text-xl font-black text-[#1c274c]">₹{item.price * item.quantity}</p>
-                                                            {item.product && order.orderStatus === 'Delivered' && (
-                                                                item.hasReviewed ? (
-                                                                    <span className="text-[12px] font-bold text-green-700 bg-green-50 border border-green-200 px-4 py-1.5 rounded-lg flex items-center gap-1.5">
-                                                                        <CheckCircle2 className="w-3.5 h-3.5" /> Reviewed
-                                                                    </span>
-                                                                ) : (
-                                                                    <Link 
-                                                                        to={`/product/${item.product._id}#reviews`} 
-                                                                        className="text-[12px] font-bold text-[#E51A22] hover:text-white bg-white border-2 border-[#E51A22] hover:bg-[#E51A22] px-4 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shadow-sm hover:shadow-md"
-                                                                    >
-                                                                        <Star className="w-3.5 h-3.5 fill-current" /> Rate Product
-                                                                    </Link>
-                                                                )
+                                                            {item.product && item.hasReviewed === true && (
+                                                                <span className="text-[12px] font-bold text-green-700 bg-green-50 border border-green-200 px-4 py-1.5 rounded-lg flex items-center gap-1.5">
+                                                                    <CheckCircle2 className="w-3.5 h-3.5" /> Reviewed
+                                                                </span>
+                                                            )}
+                                                            {item.product && item.hasReviewed === false && (
+                                                                <Link 
+                                                                    to={`/product/${item.product._id}#reviews`} 
+                                                                    className="text-[12px] font-bold text-[#E51A22] hover:text-white bg-white border-2 border-[#E51A22] hover:bg-[#E51A22] px-4 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shadow-sm hover:shadow-md"
+                                                                >
+                                                                    <Star className="w-3.5 h-3.5 fill-current" /> Rate Product
+                                                                </Link>
                                                             )}
                                                         </div>
                                                     </div>

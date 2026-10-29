@@ -5,10 +5,10 @@ import { useCart } from '../context/CartContext';
 
 const MobileBottomNav = () => {
     const location = useLocation();
-    const { getCartCount, getWaitlistCount } = useCart();
+    const { getCartCount, getWaitlistCount, openCart } = useCart();
 
-    // On Product Details, Cart, and Checkout pages, let dedicated action bars or full-page checkout take focus
-    if (location.pathname.startsWith('/product/') || location.pathname === '/cart' || location.pathname === '/checkout') {
+    // On Product Details and Checkout pages, let dedicated action bars take focus
+    if (location.pathname.startsWith('/product/') || location.pathname === '/checkout') {
         return null;
     }
 
@@ -20,7 +20,7 @@ const MobileBottomNav = () => {
         { label: 'Categories', path: '/categories', icon: LayoutGrid },
         { label: 'Shop', path: '/products', icon: ShoppingBag },
         { label: 'Wishlist', path: '/waitlist', icon: Heart, badge: waitlistCount },
-        { label: 'Cart', path: '/cart', icon: ShoppingCart, badge: cartCount },
+        { label: 'Cart', path: '/cart', icon: ShoppingCart, badge: cartCount, isAction: true },
     ];
 
     return (
@@ -30,6 +30,29 @@ const MobileBottomNav = () => {
                 const isActive = item.path === '/' 
                     ? location.pathname === '/' 
                     : location.pathname.startsWith(item.path);
+
+                if (item.isAction) {
+                    return (
+                        <button
+                            key={item.label}
+                            type="button"
+                            onClick={openCart}
+                            className="flex flex-col items-center justify-center flex-1 py-1 relative transition-all duration-200 active:scale-95 text-slate-500 hover:text-slate-800 cursor-pointer"
+                        >
+                            <div className="relative">
+                                <Icon className="w-5 h-5 stroke-[1.8]" />
+                                {item.badge > 0 && (
+                                    <span className="absolute -top-1.5 -right-2.5 bg-[#E51A22] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs border border-white">
+                                        {item.badge > 9 ? '9+' : item.badge}
+                                    </span>
+                                )}
+                            </div>
+                            <span className="text-[10px] mt-1 font-bold tracking-tight text-slate-600">
+                                {item.label}
+                            </span>
+                        </button>
+                    );
+                }
 
                 return (
                     <Link

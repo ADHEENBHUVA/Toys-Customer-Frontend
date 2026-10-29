@@ -74,14 +74,14 @@ const Footer = () => {
     };
 
     return (
-        <footer className="w-full relative font-sans text-slate-800 bg-white overflow-hidden flex flex-col border-t border-slate-200">
+        <footer className="w-full relative font-sans text-slate-800 bg-[#FFF5F5] overflow-hidden flex flex-col border-t border-red-100">
             {/* Animated Toy Train & Road Transit Scene (Between Reviews & Footer) */}
             <ToyTransitScene />
 
             {/* Main Content Container */}
             <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-8 sm:pb-10 flex flex-col gap-8 sm:gap-10">
                 {/* 1. Newsletter Row */}
-                <div className="bg-gradient-to-br from-slate-50 via-white to-red-50/25 rounded-2xl p-5 sm:p-7 border border-slate-200/90 flex flex-col lg:flex-row items-center justify-between gap-5 sm:gap-6 shadow-xs">
+                <div className="bg-white/95 rounded-2xl p-5 sm:p-7 border border-red-100 flex flex-col lg:flex-row items-center justify-between gap-5 sm:gap-6 shadow-xs">
                     <div className="flex flex-col sm:flex-row items-center gap-3.5 sm:gap-4 text-center sm:text-left justify-center lg:justify-start">
                         <div className="w-12 h-12 sm:w-15 sm:h-15 bg-[#FFF2F2] rounded-2xl shadow-xs flex items-center justify-center text-[#E51A22] shrink-0 border border-red-100">
                             <svg className="w-6 h-6 sm:w-8 sm:h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
@@ -249,8 +249,8 @@ const Footer = () => {
             {/* 3. Interactive Bumping Toys Row (7 Toys Zigzag Row) */}
             <InteractiveToyRow />
 
-            {/* 4. Bottom Row - Clean Soft White Copyright Bar (At the Very Bottom of Footer) */}
-            <div className="relative z-10 w-full bg-white border-t border-slate-200">
+            {/* 4. Bottom Row - Clean Soft Pastel Red Copyright Bar (At the Very Bottom of Footer) */}
+            <div className="relative z-10 w-full bg-[#FFF0F0] border-t border-red-100/90">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4 flex flex-col sm:flex-row justify-center items-center gap-1.5 sm:gap-3 text-center text-[12.5px] sm:text-[14px] text-slate-600 font-bold">
                     <p>© 2026 Little Joys. All rights reserved.</p>
                     <span className="hidden sm:inline text-slate-300 font-normal">|</span>

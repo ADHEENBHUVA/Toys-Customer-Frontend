@@ -28,6 +28,10 @@ export const CartProvider = ({ children }) => {
     });
 
     const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [isCartOpen, setIsCartOpen] = useState(false);
+    const [orderNotes, setOrderNotes] = useState(() => {
+        return localStorage.getItem('magic_toys_order_notes') || '';
+    });
 
     const [websiteSettings, setWebsiteSettings] = useState({
         discountDisplayType: 'amount'
@@ -40,6 +44,14 @@ export const CartProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('magic_toys_waitlist', JSON.stringify(waitlistItems));
     }, [waitlistItems]);
+
+    useEffect(() => {
+        localStorage.setItem('magic_toys_order_notes', orderNotes);
+    }, [orderNotes]);
+
+    const openCart = () => setIsCartOpen(true);
+    const closeCart = () => setIsCartOpen(false);
+    const toggleCart = () => setIsCartOpen(prev => !prev);
 
     // Removed coupon localStorage persistence
 
@@ -109,6 +121,7 @@ export const CartProvider = ({ children }) => {
             toast.success(quantityToAdd > 1 ? `Added ${quantityToAdd} items to your magic cart!` : 'Added to your magic cart!');
             setCartItems(prev => [...prev, { ...product, quantity: quantityToAdd }]);
         }
+        setIsCartOpen(true);
     };
 
     const removeFromCart = (id) => {
@@ -206,7 +219,14 @@ export const CartProvider = ({ children }) => {
             websiteSettings,
             appliedCoupon,
             applyCoupon,
-            removeCoupon
+            removeCoupon,
+            isCartOpen,
+            setIsCartOpen,
+            openCart,
+            closeCart,
+            toggleCart,
+            orderNotes,
+            setOrderNotes
         }}>
             {children}
         </CartContext.Provider>
