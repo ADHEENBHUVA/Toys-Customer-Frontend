@@ -188,17 +188,17 @@ const LoginContent = () => {
     };
 
     return (
-        <div className="h-screen w-screen overflow-hidden flex flex-col md:flex-row font-sans bg-white m-0 p-0 select-none relative">
+        <div className="h-screen w-screen overflow-hidden flex flex-col md:flex-row font-sans bg-slate-50 m-0 p-0 select-none relative">
             
-            {/* INLINE CSS FOR HIGH-SPEED ROCKET & FLIGHT ANIMATIONS FLYING COMPLETELY OFF SCREEN */}
+            {/* CSS FOR SKY LAUNCH ANIMATIONS: ONLY ROCKET & FLIGHT SOAR OFF TOP OF SCREEN */}
             <style>{`
-                @keyframes rocketBlastOffTop {
+                @keyframes rocketFlyOutOfScreen {
                     0% {
                         transform: translateY(0) scale(1.1);
                         opacity: 1;
                     }
                     35% {
-                        transform: translateY(-35vh) scale(1.5) rotate(-5deg);
+                        transform: translateY(-40vh) scale(1.5) rotate(-5deg);
                         opacity: 1;
                     }
                     100% {
@@ -206,13 +206,13 @@ const LoginContent = () => {
                         opacity: 0;
                     }
                 }
-                @keyframes flightTakeoffTopRight {
+                @keyframes flightFlyOutOfScreen {
                     0% {
                         transform: translate(0, 0) scale(1.1) rotate(0deg);
                         opacity: 1;
                     }
                     35% {
-                        transform: translate(25vw, -35vh) scale(1.5) rotate(-22deg);
+                        transform: translate(25vw, -40vh) scale(1.5) rotate(-22deg);
                         opacity: 1;
                     }
                     100% {
@@ -220,11 +220,11 @@ const LoginContent = () => {
                         opacity: 0;
                     }
                 }
-                .animate-rocket-offscreen {
-                    animation: rocketBlastOffTop 0.85s cubic-bezier(0.12, 0.8, 0.2, 1) forwards;
+                .animate-rocket-skyward {
+                    animation: rocketFlyOutOfScreen 0.85s cubic-bezier(0.12, 0.8, 0.2, 1) forwards;
                 }
-                .animate-flight-offscreen {
-                    animation: flightTakeoffTopRight 0.85s cubic-bezier(0.12, 0.8, 0.2, 1) forwards;
+                .animate-flight-skyward {
+                    animation: flightFlyOutOfScreen 0.85s cubic-bezier(0.12, 0.8, 0.2, 1) forwards;
                 }
             `}</style>
 
@@ -235,7 +235,7 @@ const LoginContent = () => {
                     className="absolute inset-0 bg-cover bg-center transform hover:scale-105 transition-transform duration-700"
                     style={{ backgroundImage: `url('${TOYS_HERO_BG}')` }}
                 ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/65 to-slate-900/40"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/70 to-slate-900/40"></div>
 
                 {/* Top Row: ONLY 1 OFFICIAL LITTLE JOYS LOGO + RATING */}
                 <div className="relative z-10 flex items-center justify-between">
@@ -257,53 +257,39 @@ const LoginContent = () => {
                     </div>
                 </div>
 
-                {/* Middle: 4 Distinct Toy Vehicles Showcase */}
+                {/* Middle: 3 Unique Vehicles Showcase */}
                 <div className="relative z-10 my-auto py-2">
                     <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-500/30 backdrop-blur-md border border-rose-400/40 text-rose-200 text-xs font-black mb-2">
                         <Sparkles className="w-3.5 h-3.5 text-rose-300" />
-                        <span>Magical Toy Fleet Kingdom</span>
+                        <span>Handcrafted 3D Toy Vehicles Fleet</span>
                     </div>
 
                     <h2 className="text-2xl lg:text-3xl xl:text-4xl font-black text-white leading-tight mb-2">
-                        Zoom, Haul &amp; Chug Into Fun!
+                        Ride the Bus, Haul the Truck &amp; Board the Train!
                     </h2>
                     
                     <p className="text-xs text-white/90 leading-relaxed max-w-md mb-4">
-                        Handcrafted 3D Express Bus, Heavy Delivery Truck, and Steam Train designed to inspire imagination and playtime wonder.
+                        Discover 100% child-safe, imaginative toy vehicles engineered to inspire joy, creativity, and active playtime fun.
                     </p>
 
-                    {/* 3D Vehicles Showcase Grid */}
-                    <div className="grid grid-cols-2 gap-2.5 max-w-lg">
-                        <div className="bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl p-2.5 flex items-center gap-3 hover:bg-white/25 transition-all shadow-sm group">
-                            <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">🚌</span>
-                            <div>
-                                <p className="text-xs font-extrabold text-white leading-tight">3D Express Bus</p>
-                                <p className="text-[10px] text-amber-200 font-medium">Toy passenger line</p>
-                            </div>
+                    {/* 3 Vehicles Cards */}
+                    <div className="grid grid-cols-3 gap-2.5 max-w-lg">
+                        <div className="bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl p-2.5 flex flex-col items-center text-center hover:bg-white/25 transition-all shadow-sm group">
+                            <span className="text-3xl mb-1 group-hover:scale-110 transition-transform">🚌</span>
+                            <p className="text-xs font-extrabold text-white leading-tight">3D Express Bus</p>
+                            <p className="text-[10px] text-amber-200 font-medium">Passenger line</p>
                         </div>
 
-                        <div className="bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl p-2.5 flex items-center gap-3 hover:bg-white/25 transition-all shadow-sm group">
-                            <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">🚚</span>
-                            <div>
-                                <p className="text-xs font-extrabold text-white leading-tight">3D Heavy Cargo Truck</p>
-                                <p className="text-[10px] text-blue-200 font-medium">Corrugated cargo vault</p>
-                            </div>
+                        <div className="bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl p-2.5 flex flex-col items-center text-center hover:bg-white/25 transition-all shadow-sm group">
+                            <span className="text-3xl mb-1 group-hover:scale-110 transition-transform">🚚</span>
+                            <p className="text-xs font-extrabold text-white leading-tight">3D Cargo Truck</p>
+                            <p className="text-[10px] text-blue-200 font-medium">Heavy freight vault</p>
                         </div>
 
-                        <div className="bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl p-2.5 flex items-center gap-3 hover:bg-white/25 transition-all shadow-sm group">
-                            <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">🚂</span>
-                            <div>
-                                <p className="text-xs font-extrabold text-white leading-tight">3D Steam Train Express</p>
-                                <p className="text-[10px] text-rose-200 font-medium">Chugs on railway tracks</p>
-                            </div>
-                        </div>
-
-                        <div className="bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl p-2.5 flex items-center gap-3 hover:bg-white/25 transition-all shadow-sm group">
-                            <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">🚀</span>
-                            <div>
-                                <p className="text-xs font-extrabold text-white leading-tight">Cosmic Rocket &amp; Jet</p>
-                                <p className="text-[10px] text-emerald-200 font-medium">Sky-high authentic launches</p>
-                            </div>
+                        <div className="bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl p-2.5 flex flex-col items-center text-center hover:bg-white/25 transition-all shadow-sm group">
+                            <span className="text-3xl mb-1 group-hover:scale-110 transition-transform">🚂</span>
+                            <p className="text-xs font-extrabold text-white leading-tight">3D Steam Train</p>
+                            <p className="text-[10px] text-rose-200 font-medium">Railway express</p>
                         </div>
                     </div>
                 </div>
@@ -321,7 +307,7 @@ const LoginContent = () => {
                 </div>
             </div>
 
-            {/* RIGHT 50% PANEL: 3 COMPLETELY DISTINCT 3D VEHICLES (1 BUS, 2 TRUCK, 3 TRAIN) */}
+            {/* RIGHT 50% PANEL: 3 TRULY UNIQUE 3D VEHICLES (1 BUS, 2 TRUCK, 3 TRAIN) */}
             <div className="w-full md:w-1/2 h-full flex flex-col justify-between p-3 sm:p-5 lg:p-6 xl:p-8 bg-white overflow-hidden relative">
                 
                 {/* Top Row: Back to Store + Official Trust Pill */}
@@ -363,41 +349,38 @@ const LoginContent = () => {
                         </p>
                     </div>
 
-                    <form onSubmit={handleAuthSubmit} className="space-y-2.5">
+                    <form onSubmit={handleAuthSubmit} className="space-y-3">
                         
                         {/* DRIVER NAME FIELD (ONLY FOR SIGN UP) */}
                         {isSignUp && (
-                            <div className="relative group pt-1">
-                                <div className="flex items-center justify-between px-2 mb-0.5">
-                                    <div className="flex items-center gap-1.5 text-[11px] font-black uppercase text-amber-600">
-                                        <span className="text-sm">🪪</span>
+                            <div>
+                                <div className="flex items-center justify-between px-1 mb-1">
+                                    <span className="text-[11px] font-black text-amber-700 uppercase flex items-center gap-1">
+                                        <span>🪪</span>
                                         <span>Driver License Name</span>
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-400">Your Full Name</span>
+                                    </span>
                                 </div>
-                                <div className="relative bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 rounded-2xl p-2 shadow-sm border border-amber-600">
-                                    <div className="bg-white/95 rounded-xl px-3 py-1.5 border border-amber-200 flex items-center gap-2">
-                                        <UserIcon className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                                        <input 
-                                            type="text" 
-                                            value={name} 
-                                            onChange={(e) => setName(e.target.value)} 
-                                            placeholder="Enter your name (e.g. Adheen Bhuva)..."
-                                            className="w-full bg-transparent text-xs sm:text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none"
-                                        />
-                                    </div>
+                                <div className="bg-amber-50 border-2 border-amber-300 rounded-xl px-3 py-1.5 flex items-center gap-2">
+                                    <UserIcon className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                                    <input 
+                                        type="text" 
+                                        value={name} 
+                                        onChange={(e) => setName(e.target.value)} 
+                                        placeholder="Enter your name (e.g. Adheen Bhuva)..."
+                                        className="w-full bg-transparent text-xs sm:text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none"
+                                    />
                                 </div>
                             </div>
                         )}
 
                         {/* ========================================================= */}
-                        {/* 🚌 VEHICLE 1: 3D LITTLE JOYS EXPRESS BUS (EMAIL INPUT) */}
+                        {/* 🚌 VEHICLE 1: 3D EXPRESS TOY BUS (EMAIL INPUT) */}
                         {/* ========================================================= */}
-                        <div className="relative group pt-2">
-                            {/* Bus Identification Strip */}
-                            <div className="flex items-center justify-between px-2 mb-0.5">
-                                <div className="flex items-center gap-1.5 text-[11px] font-black uppercase text-red-600">
-                                    <span className="text-sm">🚌</span>
+                        <div>
+                            {/* Bus Label Header with Clean Margins (No Overlap) */}
+                            <div className="flex items-center justify-between px-1 mb-1">
+                                <div className="flex items-center gap-1.5 text-xs font-black uppercase text-red-600">
+                                    <span className="text-base">🚌</span>
                                     <span>Vehicle 1: 3D Express Bus</span>
                                     <span className="bg-red-600 text-white text-[9px] px-1.5 py-0.2 rounded font-black tracking-wider">
                                         ROUTE #01
@@ -406,40 +389,26 @@ const LoginContent = () => {
                                 <span className="text-[10px] font-bold text-slate-400">Driver Email</span>
                             </div>
 
-                            {/* 3D BUS CHASSIS: Rounded Aerodynamic Roof, Passenger Windows & Front Windshield */}
-                            <div className="relative bg-gradient-to-r from-red-600 via-rose-600 to-red-500 rounded-2xl p-2 pb-3.5 pt-2 shadow-md border-2 border-red-700 transition-all focus-within:shadow-xl focus-within:border-red-800">
+                            {/* 3D Bus Body Container */}
+                            <div className="relative bg-gradient-to-r from-red-600 via-rose-600 to-red-500 rounded-2xl p-2.5 pb-4 shadow-md border-2 border-red-700 transition-all focus-within:shadow-xl focus-within:border-red-800">
                                 
-                                {/* 🚌 Bus Roof Destination Board with Passengers */}
-                                <div className="absolute -top-3 left-6 flex items-center gap-1.5 z-10">
-                                    <div className="bg-slate-900 text-white border border-red-400 px-2 py-0.5 rounded-t-lg text-[9px] font-black flex items-center gap-1 shadow-2xs">
-                                        <span>🧸</span>
-                                        <span>🤖</span>
-                                        <span>🐥</span>
-                                        <span className="text-yellow-300 ml-1">LITTLE JOYS EXPRESS BUS</span>
+                                {/* Bus Top Windows Row with Smiling Passengers */}
+                                <div className="flex items-center justify-between px-2 mb-1.5 text-[10px] text-white/90">
+                                    <div className="flex items-center gap-2">
+                                        <span className="bg-black/30 px-1.5 py-0.2 rounded text-[9px] font-bold flex items-center gap-1">
+                                            <span>🧸</span>
+                                            <span>🤖</span>
+                                            <span>🐥</span>
+                                            <span className="text-yellow-300 ml-1">PASSENGERS</span>
+                                        </span>
                                     </div>
+                                    <span className="text-[9px] font-black text-yellow-300 uppercase tracking-wider">
+                                        TOY BUS CABIN
+                                    </span>
                                 </div>
 
-                                {/* 💡 Front Bus Headlight with Radiant Light Beam (Facing Right) */}
-                                <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center">
-                                    {/* Light Bulb */}
-                                    <div className={`w-3.5 h-3.5 rounded-full border-2 border-white transition-all duration-300 ${
-                                        rememberMe ? 'bg-yellow-300 shadow-[0_0_15px_#FACC15]' : 'bg-slate-400'
-                                    }`}></div>
-
-                                    {/* Radiant Golden Headlight Beam Cone */}
-                                    <div 
-                                        className={`absolute -right-16 top-1/2 -translate-y-1/2 w-16 h-10 pointer-events-none transition-all duration-300 ${
-                                            rememberMe ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-                                        }`}
-                                        style={{
-                                            background: 'linear-gradient(to right, rgba(254, 240, 138, 0.95), rgba(250, 204, 21, 0.4), transparent)',
-                                            clipPath: 'polygon(0% 40%, 100% 0%, 100% 100%, 0% 60%)'
-                                        }}
-                                    />
-                                </div>
-
-                                {/* Main Bus Body: Inset for Driver Email Input */}
-                                <div className="ml-1 mr-7 bg-white/95 backdrop-blur-xs rounded-xl px-3 py-1.5 border border-red-200 shadow-inner flex items-center gap-2">
+                                {/* Bus Cabin Inset: Email Typing Box */}
+                                <div className="bg-white rounded-xl px-3 py-1.5 border border-red-200 shadow-inner flex items-center gap-2 relative z-10">
                                     <div className="w-6 h-6 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
                                         <Mail className="w-3.5 h-3.5 text-red-600" />
                                     </div>
@@ -449,17 +418,32 @@ const LoginContent = () => {
                                             value={email} 
                                             onChange={(e) => setEmail(e.target.value)} 
                                             required
-                                            placeholder="Write email inside this 3D bus..."
+                                            placeholder="Write email on this 3D bus..."
                                             className="w-full bg-transparent text-xs sm:text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none"
+                                        />
+                                    </div>
+
+                                    {/* Front Bus Headlight Bulb + Soft Luminous Glow Halo */}
+                                    <div className="relative flex items-center shrink-0">
+                                        <div className={`w-4 h-4 rounded-full border-2 border-white transition-all duration-300 ${
+                                            rememberMe 
+                                                ? 'bg-yellow-300 shadow-[0_0_15px_#FACC15]' 
+                                                : 'bg-slate-300'
+                                        }`}></div>
+                                        {/* Soft Radial Headlight Glow Halo */}
+                                        <div 
+                                            className={`absolute -right-10 top-1/2 -translate-y-1/2 w-14 h-10 pointer-events-none rounded-full blur-md transition-all duration-300 ${
+                                                rememberMe ? 'opacity-80 scale-100 bg-yellow-300' : 'opacity-0 scale-75'
+                                            }`}
                                         />
                                     </div>
                                 </div>
 
-                                {/* Bus Wheels at Bottom */}
-                                <div className="absolute -bottom-2.5 left-10 w-6 h-6 rounded-full bg-slate-950 border-2 border-slate-700 shadow-md flex items-center justify-center z-10">
+                                {/* 2 3D Bus Wheels with Wheel Wells */}
+                                <div className="absolute -bottom-2.5 left-8 w-6 h-6 rounded-full bg-slate-950 border-2 border-slate-700 shadow-md flex items-center justify-center z-10">
                                     <div className="w-2.5 h-2.5 rounded-full bg-slate-300 border border-slate-500"></div>
                                 </div>
-                                <div className="absolute -bottom-2.5 right-12 w-6 h-6 rounded-full bg-slate-950 border-2 border-slate-700 shadow-md flex items-center justify-center z-10">
+                                <div className="absolute -bottom-2.5 right-10 w-6 h-6 rounded-full bg-slate-950 border-2 border-slate-700 shadow-md flex items-center justify-center z-10">
                                     <div className="w-2.5 h-2.5 rounded-full bg-slate-300 border border-slate-500"></div>
                                 </div>
                             </div>
@@ -468,11 +452,11 @@ const LoginContent = () => {
                         {/* ========================================================= */}
                         {/* 🚚 VEHICLE 2: 3D HEAVY CARGO TRUCK (PASSWORD VAULT) */}
                         {/* ========================================================= */}
-                        <div className="relative group pt-2">
-                            {/* Truck Identification Strip */}
-                            <div className="flex items-center justify-between px-2 mb-0.5">
-                                <div className="flex items-center gap-1.5 text-[11px] font-black uppercase text-blue-600">
-                                    <span className="text-sm">🚚</span>
+                        <div>
+                            {/* Truck Label Header with Clean Margins */}
+                            <div className="flex items-center justify-between px-1 mb-1">
+                                <div className="flex items-center gap-1.5 text-xs font-black uppercase text-blue-600">
+                                    <span className="text-base">🚚</span>
                                     <span>Vehicle 2: 3D Cargo Delivery Truck</span>
                                     <span className="bg-blue-600 text-white text-[9px] px-1.5 py-0.2 rounded font-black tracking-wider">
                                         #02 FREIGHT
@@ -492,44 +476,24 @@ const LoginContent = () => {
                                 )}
                             </div>
 
-                            {/* 3D TRUCK CHASSIS: Corrugated Cargo Container (Left) + Raised Driver Cab (Right) */}
-                            <div className="relative bg-gradient-to-r from-blue-800 via-blue-700 to-sky-700 rounded-2xl p-2 pb-3.5 pt-2 shadow-md border-2 border-blue-900 transition-all focus-within:shadow-xl focus-within:border-blue-950">
+                            {/* 3D Heavy Truck Body: Corrugated Container + Driver Cab */}
+                            <div className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-sky-800 rounded-2xl p-2.5 pb-4 shadow-md border-2 border-blue-950 transition-all focus-within:shadow-xl focus-within:border-blue-950">
                                 
-                                {/* 🚚 Tall Vertical Chrome Smokestack on Truck Cab (Right) */}
-                                <div className="absolute -top-3.5 right-16 flex flex-col items-center z-10">
-                                    <div className="w-2 h-3.5 bg-slate-700 rounded-t-sm border border-slate-400"></div>
-                                    <div className="w-3.5 h-1 bg-slate-800 rounded-sm"></div>
-                                </div>
-
-                                {/* 📦 Corrugated Cargo Container Badge (Left) */}
-                                <div className="absolute -top-3 left-6 flex items-center gap-1.5 z-10">
-                                    <div className="bg-blue-950 text-white border border-blue-400 px-2 py-0.5 rounded-t-lg text-[9px] font-black flex items-center gap-1 shadow-2xs">
-                                        <span>📦</span>
-                                        <span className="text-sky-300">CARGO CONTAINER VAULT</span>
+                                {/* Truck Header Row: Corrugated Container Ribs & Top Chrome Chimney */}
+                                <div className="flex items-center justify-between px-2 mb-1.5 text-[10px] text-white/90">
+                                    <div className="flex items-center gap-2">
+                                        <span className="bg-black/30 px-1.5 py-0.2 rounded text-[9px] font-bold text-sky-200">
+                                            📦 STEEL CARGO VAULT
+                                        </span>
                                     </div>
+                                    <span className="text-[9px] font-black text-amber-300 uppercase tracking-wider flex items-center gap-1">
+                                        <span>CAB CHIMNEY</span>
+                                        <span className="text-slate-300">💨</span>
+                                    </span>
                                 </div>
 
-                                {/* 💡 Front Headlight with Light Beam (Facing Right on Truck Cab) */}
-                                <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center">
-                                    {/* Light Bulb */}
-                                    <div className={`w-3.5 h-3.5 rounded-full border-2 border-white transition-all duration-300 ${
-                                        rememberMe ? 'bg-yellow-300 shadow-[0_0_15px_#FACC15]' : 'bg-slate-400'
-                                    }`}></div>
-
-                                    {/* Radiant Golden Headlight Beam Cone */}
-                                    <div 
-                                        className={`absolute -right-16 top-1/2 -translate-y-1/2 w-16 h-10 pointer-events-none transition-all duration-300 ${
-                                            rememberMe ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-                                        }`}
-                                        style={{
-                                            background: 'linear-gradient(to right, rgba(254, 240, 138, 0.95), rgba(250, 204, 21, 0.4), transparent)',
-                                            clipPath: 'polygon(0% 40%, 100% 0%, 100% 100%, 0% 60%)'
-                                        }}
-                                    />
-                                </div>
-
-                                {/* Main Truck Body: Inset inside Corrugated Cargo Container */}
-                                <div className="ml-1 mr-7 bg-white/95 backdrop-blur-xs rounded-xl px-3 py-1.5 border border-blue-200 shadow-inner flex items-center gap-2">
+                                {/* Truck Vault Inset: Password Typing Box */}
+                                <div className="bg-white rounded-xl px-3 py-1.5 border border-blue-200 shadow-inner flex items-center gap-2 relative z-10">
                                     <div className="w-6 h-6 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
                                         <Lock className="w-3.5 h-3.5 text-blue-600" />
                                     </div>
@@ -553,16 +517,31 @@ const LoginContent = () => {
                                     >
                                         {showPassword ? <EyeOff className="w-4 h-4 text-blue-600" /> : <Eye className="w-4 h-4" />}
                                     </button>
+
+                                    {/* Front Truck Headlight Bulb + Soft Halo */}
+                                    <div className="relative flex items-center shrink-0 ml-1">
+                                        <div className={`w-4 h-4 rounded-full border-2 border-white transition-all duration-300 ${
+                                            rememberMe 
+                                                ? 'bg-yellow-300 shadow-[0_0_15px_#FACC15]' 
+                                                : 'bg-slate-300'
+                                        }`}></div>
+                                        {/* Soft Radial Headlight Glow Halo */}
+                                        <div 
+                                            className={`absolute -right-10 top-1/2 -translate-y-1/2 w-14 h-10 pointer-events-none rounded-full blur-md transition-all duration-300 ${
+                                                rememberMe ? 'opacity-80 scale-100 bg-yellow-300' : 'opacity-0 scale-75'
+                                            }`}
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* Heavy Truck Dual Tandem Rear Wheels (Left) + Steer Wheel (Right) */}
+                                {/* Heavy Truck Wheels: Tandem Dual Rear Wheels (Left) + Front Steer Wheel (Right) */}
                                 <div className="absolute -bottom-2.5 left-7 w-6 h-6 rounded-full bg-slate-950 border-2 border-slate-700 shadow-md flex items-center justify-center z-10">
                                     <div className="w-2.5 h-2.5 rounded-full bg-amber-400 border border-slate-600"></div>
                                 </div>
                                 <div className="absolute -bottom-2.5 left-14 w-6 h-6 rounded-full bg-slate-950 border-2 border-slate-700 shadow-md flex items-center justify-center z-10">
                                     <div className="w-2.5 h-2.5 rounded-full bg-amber-400 border border-slate-600"></div>
                                 </div>
-                                <div className="absolute -bottom-2.5 right-12 w-6 h-6 rounded-full bg-slate-950 border-2 border-slate-700 shadow-md flex items-center justify-center z-10">
+                                <div className="absolute -bottom-2.5 right-10 w-6 h-6 rounded-full bg-slate-950 border-2 border-slate-700 shadow-md flex items-center justify-center z-10">
                                     <div className="w-2.5 h-2.5 rounded-full bg-amber-400 border border-slate-600"></div>
                                 </div>
                             </div>
@@ -571,8 +550,8 @@ const LoginContent = () => {
                         {/* ========================================================= */}
                         {/* 💡 VEHICLE HEADLIGHT IGNITION SWITCH (REMEMBER ME) */}
                         {/* ========================================================= */}
-                        <div className="pt-0.5">
-                            <label className="flex items-center justify-between p-2 rounded-2xl bg-amber-50/70 border border-amber-200 cursor-pointer select-none hover:bg-amber-50 transition-colors">
+                        <div>
+                            <label className="flex items-center justify-between p-2 rounded-xl bg-amber-50/70 border border-amber-200 cursor-pointer select-none hover:bg-amber-50 transition-colors">
                                 <div className="flex items-center gap-2">
                                     <div className={`w-4 h-4 rounded-md flex items-center justify-center border-2 transition-all ${
                                         rememberMe ? 'bg-amber-500 border-amber-500 text-white shadow-xs' : 'border-slate-300 bg-white'
@@ -601,105 +580,99 @@ const LoginContent = () => {
                         {/* ========================================================= */}
                         {/* 🚂 VEHICLE 3: 3D STEAM EXPRESS TRAIN (SUBMIT BUTTON) */}
                         {/* ========================================================= */}
-                        <div className="pt-1.5 relative">
-                            {/* Realistic Railway Tracks with Silver Rails & Wooden Sleepers */}
-                            <div className="w-full h-2.5 bg-slate-800 rounded-sm mb-1 relative overflow-hidden flex items-center justify-between px-1 border-t-2 border-b-2 border-slate-400 shadow-xs">
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
-                                <span className="w-1.5 h-full bg-amber-700/80"></span>
+                        <div>
+                            {/* Train Label Header */}
+                            <div className="flex items-center justify-between px-1 mb-1">
+                                <div className="flex items-center gap-1.5 text-xs font-black uppercase text-amber-700">
+                                    <span className="text-base">🚂</span>
+                                    <span>Vehicle 3: 3D Steam Train</span>
+                                    <span className="bg-amber-600 text-white text-[9px] px-1.5 py-0.2 rounded font-black tracking-wider">
+                                        #03 LOCOMOTIVE
+                                    </span>
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-400">Railway Boarding</span>
                             </div>
 
-                            {/* THE 3D STEAM TRAIN BUTTON: CHUGS FORWARD ON TRACKS WHEN CLICKED */}
-                            <button 
-                                type="submit" 
-                                disabled={isSubmitting}
-                                className={`w-full relative py-3 px-3.5 rounded-2xl bg-gradient-to-r from-red-700 via-rose-700 to-amber-700 text-white font-black text-xs sm:text-sm shadow-[0_8px_25px_rgba(185,28,28,0.4)] hover:shadow-[0_10px_30px_rgba(185,28,28,0.5)] active:scale-95 transition-all duration-700 cursor-pointer overflow-visible flex items-center justify-between border-2 border-red-800 ${
-                                    isTrainChugging ? 'translate-x-[140%] opacity-0 scale-95' : 'translate-x-0 opacity-100'
-                                }`}
-                            >
-                                {/* 🚂 Steam Locomotive Chimney (Funnel) with Puffy Smoke + Steam Dome */}
-                                <div className="absolute -top-3.5 right-18 flex flex-col items-center z-10">
-                                    <div className="w-3.5 h-3.5 bg-slate-900 rounded-t-sm border border-amber-400"></div>
-                                    <div className="w-4 h-1 bg-amber-500 rounded-sm"></div>
-                                    {/* Smoke puff */}
-                                    <span className="absolute -top-4 text-xs animate-bounce">💨</span>
-                                </div>
-
-                                {/* 🚂 Engineer's Train Cab Roof Overhang (Left Side) */}
-                                <div className="absolute -top-3 left-6 flex items-center gap-1 z-10">
-                                    <div className="bg-slate-950 text-white border border-amber-400 px-2 py-0.5 rounded-t-lg text-[9px] font-black flex items-center gap-1 shadow-2xs">
-                                        <span>🚂</span>
-                                        <span className="text-yellow-300">STEAM LOCOMOTIVE #03</span>
+                            {/* THE 3D STEAM LOCOMOTIVE BUTTON: CHUGS ON TRACKS */}
+                            <div className="relative">
+                                <button 
+                                    type="submit" 
+                                    disabled={isSubmitting}
+                                    className={`w-full relative py-3 px-4 rounded-2xl bg-gradient-to-r from-red-700 via-rose-700 to-amber-700 text-white font-black text-xs sm:text-sm shadow-[0_8px_25px_rgba(185,28,28,0.4)] hover:shadow-[0_10px_30px_rgba(185,28,28,0.5)] active:scale-95 transition-all duration-700 cursor-pointer overflow-visible flex items-center justify-between border-2 border-red-800 ${
+                                        isTrainChugging ? 'translate-x-[140%] opacity-0 scale-95' : 'translate-x-0 opacity-100'
+                                    }`}
+                                >
+                                    {/* Train Details & Icon */}
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-xl bg-amber-500/20 backdrop-blur-xs flex items-center justify-center text-xl shrink-0 border border-amber-400/40">
+                                            🚂
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="text-white font-black text-xs sm:text-sm uppercase tracking-wider leading-tight">
+                                                {isTrainChugging 
+                                                    ? (isSignUp ? 'Train Boarding: Creating Account... 🚂💨' : 'Steam Train Chugging to Account... 🚂💨')
+                                                    : (isSignUp ? 'Vehicle 3: Board Train & Register' : 'Vehicle 3: Steam Express Train')}
+                                            </p>
+                                            <p className="text-[10px] text-yellow-300 font-bold">
+                                                {isTrainChugging 
+                                                    ? 'Chugging down the railway track...' 
+                                                    : (isSignUp ? 'Click to Board Train & Register ➔' : 'All Aboard! Click to Drive & Sign In ➔')}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
 
-                                {/* Train Front Cab & Details */}
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 backdrop-blur-xs flex items-center justify-center text-xl shrink-0 border border-amber-400/40">
-                                        🚂
+                                    {/* Front Train Lantern with Spotlight Beam on Tracks */}
+                                    <div className="relative flex items-center shrink-0 pl-3">
+                                        {/* Lantern Bulb */}
+                                        <div className={`w-4 h-4 rounded-full border-2 border-white transition-all duration-300 ${
+                                            rememberMe ? 'bg-yellow-300 shadow-[0_0_15px_#FACC15]' : 'bg-slate-400'
+                                        }`}></div>
+
+                                        {/* Soft Luminous Spotlight Halo */}
+                                        <div 
+                                            className={`absolute -right-10 top-1/2 -translate-y-1/2 w-14 h-10 pointer-events-none rounded-full blur-md transition-all duration-300 ${
+                                                rememberMe ? 'opacity-80 scale-100 bg-yellow-300' : 'opacity-0 scale-75'
+                                            }`}
+                                        />
+                                        
+                                        <ArrowRight className="w-4 h-4 ml-2 text-white group-hover:translate-x-1 transition-transform" />
                                     </div>
-                                    <div className="text-left">
-                                        <p className="text-white font-black text-xs sm:text-sm uppercase tracking-wider leading-tight">
-                                            {isTrainChugging 
-                                                ? (isSignUp ? 'Train Boarding: Creating Account... 🚂💨' : 'Steam Train Chugging to Account... 🚂💨')
-                                                : (isSignUp ? 'Vehicle 3: Board Train & Register' : 'Vehicle 3: Steam Express Train')}
-                                        </p>
-                                        <p className="text-[10px] text-yellow-300 font-bold">
-                                            {isTrainChugging 
-                                                ? 'Chugging down the railway track...' 
-                                                : (isSignUp ? 'Click to Board Train & Register ➔' : 'All Aboard! Click to Drive & Sign In ➔')}
-                                        </p>
+
+                                    {/* Train Wheels (3 Big Spoked Locomotive Driving Wheels + Connecting Rod) */}
+                                    <div className="absolute -bottom-2.5 left-8 w-5 h-5 rounded-full bg-slate-950 border-2 border-amber-400 shadow-md flex items-center justify-center">
+                                        <span className={`w-2 h-2 rounded-full bg-red-500 ${isTrainChugging ? 'animate-spin' : ''}`}></span>
                                     </div>
-                                </div>
+                                    <div className="absolute -bottom-2.5 left-18 w-5 h-5 rounded-full bg-slate-950 border-2 border-amber-400 shadow-md flex items-center justify-center">
+                                        <span className={`w-2 h-2 rounded-full bg-red-500 ${isTrainChugging ? 'animate-spin' : ''}`}></span>
+                                    </div>
+                                    <div className="absolute -bottom-2.5 right-12 w-5 h-5 rounded-full bg-slate-950 border-2 border-amber-400 shadow-md flex items-center justify-center">
+                                        <span className={`w-2 h-2 rounded-full bg-red-500 ${isTrainChugging ? 'animate-spin' : ''}`}></span>
+                                    </div>
+                                    {/* Train Wheels Connecting Rod */}
+                                    <div className="absolute -bottom-1 left-9 w-24 h-0.5 bg-slate-300 shadow-xs pointer-events-none"></div>
 
-                                {/* Front Train Lantern with Spotlight Beam on Tracks */}
-                                <div className="relative flex items-center shrink-0 pl-3">
-                                    {/* Lantern Bulb */}
-                                    <div className={`w-4 h-4 rounded-full border-2 border-white transition-all duration-300 ${
-                                        rememberMe ? 'bg-yellow-300 shadow-[0_0_18px_#FACC15]' : 'bg-slate-400'
-                                    }`}></div>
+                                    {/* Smoke puffs behind the locomotive */}
+                                    {isTrainChugging && (
+                                        <span className="absolute -left-6 top-1/2 -translate-y-1/2 text-xl animate-ping">💨</span>
+                                    )}
+                                </button>
 
-                                    {/* Shining Light Beam Cone down the track */}
-                                    <div 
-                                        className={`absolute -right-20 top-1/2 -translate-y-1/2 w-20 h-12 pointer-events-none transition-all duration-300 ${
-                                            rememberMe ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-                                        }`}
-                                        style={{
-                                            background: 'linear-gradient(to right, rgba(254, 240, 138, 0.95), rgba(250, 204, 21, 0.45), transparent)',
-                                            clipPath: 'polygon(0% 40%, 100% 0%, 100% 100%, 0% 60%)'
-                                        }}
-                                    />
-                                    
-                                    <ArrowRight className="w-4 h-4 ml-2 text-white group-hover:translate-x-1 transition-transform" />
+                                {/* Realistic Railway Track beneath the train button */}
+                                <div className="w-full h-2 bg-slate-800 rounded-sm mt-1.5 relative overflow-hidden flex items-center justify-between px-1 border-t border-b border-slate-500 shadow-xs">
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
+                                    <span className="w-1.5 h-full bg-amber-700/90"></span>
                                 </div>
-
-                                {/* Train Wheels (3 Big Locomotive Driving Wheels with Connecting Rod) */}
-                                <div className="absolute -bottom-2.5 left-8 w-5 h-5 rounded-full bg-slate-950 border-2 border-amber-400 shadow-md flex items-center justify-center">
-                                    <span className={`w-2 h-2 rounded-full bg-red-500 ${isTrainChugging ? 'animate-spin' : ''}`}></span>
-                                </div>
-                                <div className="absolute -bottom-2.5 left-18 w-5 h-5 rounded-full bg-slate-950 border-2 border-amber-400 shadow-md flex items-center justify-center">
-                                    <span className={`w-2 h-2 rounded-full bg-red-500 ${isTrainChugging ? 'animate-spin' : ''}`}></span>
-                                </div>
-                                <div className="absolute -bottom-2.5 right-12 w-5 h-5 rounded-full bg-slate-950 border-2 border-amber-400 shadow-md flex items-center justify-center">
-                                    <span className={`w-2 h-2 rounded-full bg-red-500 ${isTrainChugging ? 'animate-spin' : ''}`}></span>
-                                </div>
-                                {/* Train Wheels Connecting Rod */}
-                                <div className="absolute -bottom-1 left-9 w-24 h-0.5 bg-slate-300 shadow-xs pointer-events-none"></div>
-
-                                {/* Smoke puffs behind the locomotive */}
-                                {isTrainChugging && (
-                                    <span className="absolute -left-6 top-1/2 -translate-y-1/2 text-xl animate-ping">💨</span>
-                                )}
-                            </button>
+                            </div>
                         </div>
                     </form>
 
@@ -726,7 +699,7 @@ const LoginContent = () => {
                             {/* THE ROCKET ITSELF: WHEN CLICKED, SHOOTS STRAIGHT UP AND COMPLETELY OUT OF THE SCREEN */}
                             <div className={`transition-all ${
                                 isRocketLaunching 
-                                    ? 'fixed z-[9999] pointer-events-none animate-rocket-offscreen' 
+                                    ? 'fixed z-[9999] pointer-events-none animate-rocket-skyward' 
                                     : 'relative'
                             }`}
                             style={isRocketLaunching ? {
@@ -754,7 +727,7 @@ const LoginContent = () => {
                             {/* THE JET ITSELF: WHEN CLICKED, FLIES DIAGONALLY UP AND COMPLETELY OUT OF THE SCREEN */}
                             <div className={`transition-all ${
                                 isFlightTakingOff 
-                                    ? 'fixed z-[9999] pointer-events-none animate-flight-offscreen' 
+                                    ? 'fixed z-[9999] pointer-events-none animate-flight-skyward' 
                                     : 'relative'
                             }`}
                             style={isFlightTakingOff ? {
