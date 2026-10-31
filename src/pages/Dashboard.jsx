@@ -194,8 +194,17 @@ const Dashboard = () => {
     };
 
 
-    // Brands
+    // Brands Continuous Smooth Track & Navigation
     const [brands, setBrands] = useState([]);
+    const brandContainerRef = useRef(null);
+    const brandAnimRef = useRef(null);
+    const [isBrandHovered, setIsBrandHovered] = useState(false);
+    const [isBrandDragging, setIsBrandDragging] = useState(false);
+    const [brandStartX, setBrandStartX] = useState(0);
+    const [brandScrollLeftPos, setBrandScrollLeftPos] = useState(0);
+    const [brandDragDistance, setBrandDragDistance] = useState(0);
+    const isBrandManualScrollingRef = useRef(false);
+    const brandManualScrollTimeoutRef = useRef(null);
 
     // Testimonials
     const [testimonials, setTestimonials] = useState([]);
@@ -668,6 +677,113 @@ const Dashboard = () => {
         setIsAgeDragging(false);
     };
 
+    // Brands duplicated slides for seamless infinite loop
+    const brandSlides = React.useMemo(() => {
+        if (!brands || brands.length === 0) return [];
+        let items = [...brands];
+        while (items.length < 12) {
+            items = [...items, ...brands];
+        }
+        return [...items, ...items];
+    }, [brands]);
+
+    // Brands Continuous 60fps smooth auto-scroll with ZERO lag & pause on hover
+    useEffect(() => {
+        if (!brands || brands.length === 0) return;
+        const animate = () => {
+            const container = brandContainerRef.current;
+            if (container && container.offsetParent !== null && !isBrandHovered && !isBrandDragging && !isBrandManualScrollingRef.current) {
+                container.scrollLeft += 0.85; // 60fps smooth continuous glide
+                const half = container.scrollWidth / 2;
+                if (container.scrollLeft >= half) {
+                    container.scrollLeft -= half;
+                }
+            }
+            brandAnimRef.current = requestAnimationFrame(animate);
+        };
+
+        brandAnimRef.current = requestAnimationFrame(animate);
+        return () => {
+            if (brandAnimRef.current) cancelAnimationFrame(brandAnimRef.current);
+        };
+    }, [brands, isBrandHovered, isBrandDragging]);
+
+    const handleBrandManualScroll = (direction) => {
+        const container = brandContainerRef.current;
+        if (!container) return;
+
+        // Lock auto-glide during manual arrow scrolling so smooth scroll can finish without interruption
+        isBrandManualScrollingRef.current = true;
+        if (brandManualScrollTimeoutRef.current) clearTimeout(brandManualScrollTimeoutRef.current);
+        brandManualScrollTimeoutRef.current = setTimeout(() => {
+            isBrandManualScrollingRef.current = false;
+        }, 900);
+
+        const cardEl = container.querySelector('.brand-pod-card');
+        const stride = cardEl ? cardEl.offsetWidth + 24 : 220;
+        const current = container.scrollLeft;
+        let target = direction === 'left' ? current - stride : current + stride;
+
+        const half = container.scrollWidth / 2;
+        if (target < 0) {
+            container.scrollLeft += half;
+            target += half;
+        } else if (target >= half) {
+            container.scrollLeft -= half;
+            target -= half;
+        }
+
+        container.scrollTo({ left: target, behavior: 'smooth' });
+    };
+
+    const handleBrandMouseDown = (e) => {
+        setIsBrandDragging(true);
+        setBrandDragDistance(0);
+        setBrandStartX(e.pageX - brandContainerRef.current.offsetLeft);
+        setBrandScrollLeftPos(brandContainerRef.current.scrollLeft);
+    };
+
+    const handleBrandMouseLeave = () => {
+        setIsBrandDragging(false);
+        setIsBrandHovered(false);
+    };
+
+    const handleBrandMouseEnter = () => {
+        setIsBrandHovered(true);
+    };
+
+    const handleBrandMouseUp = () => {
+        setIsBrandDragging(false);
+    };
+
+    const handleBrandMouseMove = (e) => {
+        if (!isBrandDragging) return;
+        e.preventDefault();
+        const x = e.pageX - brandContainerRef.current.offsetLeft;
+        const walk = (x - brandStartX) * 1.5;
+        setBrandDragDistance(Math.abs(walk));
+        brandContainerRef.current.scrollLeft = brandScrollLeftPos - walk;
+    };
+
+    const handleBrandTouchStart = (e) => {
+        setIsBrandDragging(true);
+        setBrandDragDistance(0);
+        setBrandStartX(e.touches[0].pageX - brandContainerRef.current.offsetLeft);
+        setBrandScrollLeftPos(brandContainerRef.current.scrollLeft);
+    };
+
+    const handleBrandTouchMove = (e) => {
+        if (!isBrandDragging) return;
+        const x = e.touches[0].pageX - brandContainerRef.current.offsetLeft;
+        const walk = (x - brandStartX) * 1.3;
+        setBrandDragDistance(Math.abs(walk));
+        brandContainerRef.current.scrollLeft = brandScrollLeftPos - walk;
+    };
+
+    const handleBrandTouchEnd = () => {
+        setIsBrandDragging(false);
+    };
+
     const StarRating = ({ rating = 5, count }) => (
         <div className="flex items-center gap-1.5 mt-1">
             <div className="flex text-[#e8b960] text-[12px]">
@@ -817,7 +933,7 @@ const Dashboard = () => {
                     <p className="text-[#666] text-[13.5px] md:text-[15px] font-semibold uppercase tracking-wider">Everything your little one needs to learn, imagine & play</p>
                 </div>
 
-                <div className="relative w-full px-2 sm:px-4 md:px-6 lg:px-8">
+                <div className="relative w-full px-0">
                     {/* Left Navigation Arrow - Shown ONLY on hover, hidden on mobile */}
                     <button
                         type="button"
@@ -827,7 +943,7 @@ const Dashboard = () => {
                             handleCatManualScroll('left');
                         }}
                         onMouseEnter={() => setIsCatHovered(true)}
-                        className="cat-slider-prev absolute left-1 sm:left-2 md:left-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.16)] border border-slate-200 text-slate-800 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] hidden md:flex items-center justify-center cursor-pointer opacity-0 group-hover/categories:opacity-100"
+                        className="cat-slider-prev absolute left-2 sm:left-3 md:left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.16)] border border-slate-200 text-slate-800 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] hidden md:flex items-center justify-center cursor-pointer opacity-0 group-hover/categories:opacity-100"
                         title="Previous Category"
                     >
                         <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" strokeWidth={2.5} />
@@ -842,13 +958,13 @@ const Dashboard = () => {
                             handleCatManualScroll('right');
                         }}
                         onMouseEnter={() => setIsCatHovered(true)}
-                        className="cat-slider-next absolute right-1 sm:right-2 md:right-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.16)] border border-slate-200 text-slate-800 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] hidden md:flex items-center justify-center cursor-pointer opacity-0 group-hover/categories:opacity-100"
+                        className="cat-slider-next absolute right-2 sm:right-3 md:right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.16)] border border-slate-200 text-slate-800 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] hidden md:flex items-center justify-center cursor-pointer opacity-0 group-hover/categories:opacity-100"
                         title="Next Category"
                     >
                         <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" strokeWidth={2.5} />
                     </button>
 
-                    {/* Continuous 60fps Smooth Container - ZERO LAG, pure GPU scroll */}
+                    {/* Continuous 60fps Smooth Container - Edge-to-Edge touching both screen sides */}
                     <div
                         ref={catContainerRef}
                         onMouseEnter={handleCatMouseEnter}
@@ -859,7 +975,7 @@ const Dashboard = () => {
                         onTouchStart={handleCatTouchStart}
                         onTouchMove={handleCatTouchMove}
                         onTouchEnd={handleCatTouchEnd}
-                        className="flex items-start gap-3 sm:gap-3.5 md:gap-4 overflow-x-auto py-3 cursor-grab active:cursor-grabbing select-none scrollbar-none"
+                        className="flex items-start gap-3 sm:gap-3.5 md:gap-4 overflow-x-auto py-3 cursor-grab active:cursor-grabbing select-none scrollbar-none w-full"
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                         {categorySlides.map((cat, idx) => {
@@ -870,7 +986,7 @@ const Dashboard = () => {
                                 <div
                                     key={idx}
                                     onClick={(e) => handleCatBoxClick(e, cat.name)}
-                                    className="cat-pod-card flex-none w-[calc((100%-1*14px)/2)] sm:w-[calc((100%-2*16px)/3)] md:w-[calc((100%-3*18px)/4)] lg:w-[calc((100%-5*20px)/6)] xl:w-[calc((100%-7*20px)/8)] cursor-pointer group flex flex-col items-center select-none transition-all duration-300 hover:-translate-y-2 py-2"
+                                    className="cat-pod-card flex-none w-[calc((100%-1*12px)/2)] sm:w-[calc((100%-2*14px)/3)] md:w-[calc((100%-3*16px)/4)] lg:w-[calc((100%-5*16px)/6)] xl:w-[calc((100%-7*16px)/8)] cursor-pointer group flex flex-col items-center select-none transition-all duration-300 hover:-translate-y-2 py-2"
                                     title={`Explore ${cat.name}`}
                                 >
                                     {/* Floating Pedestal Circle Container */}
@@ -894,15 +1010,187 @@ const Dashboard = () => {
                                         </span>
                                     </div>
 
-                                    {/* Stylish Capsule Title */}
-                                    <div className="w-full text-center px-1">
-                                        <span className={`inline-block px-3.5 py-1 rounded-full ${theme.pillBg} text-xs sm:text-[13px] font-black uppercase tracking-wider ${theme.pillHover} transition-all duration-300 shadow-2xs line-clamp-1`}>
-                                            {cat.name}
-                                        </span>
+                                    {/* Stylish Capsule Title - Uniform 2-Line Height with Perfect Vertical Centering for 1-Line Titles */}
+                                    <div className="w-full text-center px-1 flex items-center justify-center">
+                                        <div
+                                            className={`w-full max-w-[130px] sm:max-w-[145px] md:max-w-[155px] min-h-[42px] sm:min-h-[46px] h-[42px] sm:h-[46px] px-2.5 sm:px-3 py-1 rounded-2xl ${theme.pillBg} border ${theme.pillHover} flex items-center justify-center transition-all duration-300 shadow-2xs`}
+                                        >
+                                            <span className="text-[11px] sm:text-[12px] md:text-[12.5px] font-black uppercase tracking-wider leading-[1.22] text-center line-clamp-2 select-none">
+                                                {cat.name}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             );
                         })}
+                    </div>
+                </div>
+            </div>
+
+            {/* Best Selling Picks - Ranked with Most Selling First */}
+            <div className="w-full bg-[#F8FAFC] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-slate-200/90 relative">
+                <div className="w-full mx-auto px-4 md:px-6">
+                    <div className="flex flex-col items-center justify-center text-center mb-4 sm:mb-5">
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-amber-200/80 shadow-2xs">
+                            🏆 TOP-RANKED FAVORITES
+                        </span>
+                        <h2 className="text-[28px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-1.5">
+                            Best Selling Picks
+                        </h2>
+                        <p className="text-[#666] text-[14.5px] md:text-[16px] font-medium">Top-rated toys loved by parents and kids alike</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 sm:px-2 md:px-0">
+                        {((trendingProducts && trendingProducts.length > 0)
+                            ? [...trendingProducts]
+                            : [...allProducts].sort((a, b) => (b.totalSold || 0) - (a.totalSold || 0) || (b.reviewCount || 0) - (a.reviewCount || 0))
+                        )
+                            .filter(product => product.status !== 'Out of Stock')
+                            .slice(0, 8)
+                            .map((product, idx) => (
+                                <div key={product._id} className="flex flex-col group cursor-pointer relative bg-white rounded-2xl sm:rounded-3xl border border-slate-100 hover:border-red-50 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden">
+                                    <div className="relative w-full aspect-square overflow-hidden bg-[#F8F9FA]">
+                                        {/* Discount Badge */}
+                                        <div className="absolute top-2 left-2 z-30 pointer-events-none flex flex-col gap-1 items-start">
+                                            {product.originalPrice > product.price && (
+                                                <span className="bg-[#E51A22] text-white px-1.5 py-0.5 rounded-full text-[8.5px] sm:text-[9.5px] font-bold tracking-wider shadow-xs flex items-center">
+                                                    {`${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% Off`}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Waitlist Button - Top Right Header */}
+                                        <div className="absolute top-2.5 right-2.5 z-30 transition-all duration-200 opacity-100 scale-100">
+                                            <button
+                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
+                                                className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
+                                                title="Wishlist"
+                                            >
+                                                <HeartIcon
+                                                    className="w-4 h-4 transition-colors"
+                                                    fill={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "transparent"}
+                                                    stroke={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#64748b"}
+                                                    strokeWidth={2.2}
+                                                />
+                                            </button>
+                                        </div>
+
+
+
+                                        <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 ease-out">
+                                            <ProductCardImageCarousel
+                                                images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])}
+                                                productName={product.name}
+                                            />
+                                        </Link>
+                                    </div>
+
+                                    <div className="p-3 sm:p-5 flex flex-col flex-grow text-left bg-white relative">
+                                        {/* Ratings Display */}
+                                        <div className="flex items-center gap-1.5 mb-1.5">
+                                            <div className="flex items-center gap-0.5 text-[#F5A623]">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <svg key={i} className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${i < Math.round(product.averageRating || 5) ? 'fill-current' : 'text-gray-200 fill-current'}`} viewBox="0 0 20 20">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                ))}
+                                            </div>
+                                            <span className="text-[10px] sm:text-[11px] text-gray-400 font-bold tracking-wider">({product.reviewCount || 0})</span>
+                                        </div>
+
+                                        <Link to={`/product/${product._id}`} className="font-bold text-[#1A1A24] text-[13px] sm:text-[15px] md:text-[16px] mb-1 hover:text-[#E51A22] transition-colors leading-snug line-clamp-1">
+                                            {product.name}
+                                        </Link>
+
+                                        <div className="text-[12px] text-gray-500/90 mb-3 leading-relaxed">
+                                            <p className={expandedProductDescIds[product._id] ? "" : "line-clamp-2 overflow-hidden"}>
+                                                {getCleanCardDescription(product)}
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    toggleProductDesc(product._id);
+                                                }}
+                                                className="mt-1 inline-flex items-center gap-1 text-[11.5px] font-bold text-[#E51A22] hover:text-[#b81219] transition-colors cursor-pointer"
+                                            >
+                                                <span>{expandedProductDescIds[product._id] ? 'View Less' : 'View More'}</span>
+                                                <svg
+                                                    className={`w-3 h-3 transition-transform duration-200 ${expandedProductDescIds[product._id] ? 'rotate-180' : ''}`}
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    strokeWidth={2.5}
+                                                >
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div className="flex items-center justify-between gap-1 mt-auto pt-2 border-t border-slate-50">
+                                            {product.status === 'Out of Stock' ? (
+                                                <span className="font-bold text-gray-400 text-[12px]">Out of Stock</span>
+                                            ) : (
+                                                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
+                                                    <span className="font-extrabold text-[#1A1A24] text-[14.5px] sm:text-[17px] md:text-[19px]">
+                                                        ₹{`${(product.price || 0).toFixed(0)}`}
+                                                    </span>
+                                                    {product.originalPrice > (product.price || 0) && (
+                                                        <span className="text-[10.5px] sm:text-[12px] text-gray-400 line-through font-medium">
+                                                            ₹{`${(product.originalPrice || 0).toFixed(0)}`}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Dual Action Buttons: Add to Cart & Buy Now */}
+                                        <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1.5 sm:gap-2">
+                                            {product.status === 'Out of Stock' ? (
+                                                <button
+                                                    disabled
+                                                    className="w-full py-2 px-3 rounded-xl bg-slate-100 text-slate-400 text-[11px] sm:text-[12px] font-bold cursor-not-allowed text-center"
+                                                >
+                                                    Out of Stock
+                                                </button>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            addToCart(product);
+                                                        }}
+                                                        className="flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl border border-slate-200 hover:border-[#E51A22] bg-white hover:bg-red-50/50 text-[#1A1A24] hover:text-[#E51A22] text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer shadow-2xs active:scale-95"
+                                                        title="Add to Cart"
+                                                    >
+                                                        <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
+                                                        <span className="truncate">Add to Cart</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => handleBuyNow(e, product)}
+                                                        className="flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl bg-[#E51A22] hover:bg-[#c9141b] text-white text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:shadow-red-500/25 active:scale-95"
+                                                        title="Buy Now"
+                                                    >
+                                                        <Zap className="w-3.5 h-3.5 shrink-0 fill-current" />
+                                                        <span className="truncate">Buy Now</span>
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+
+                    <div className="flex justify-center items-center mt-5 sm:mt-6 px-4 md:px-0">
+                        <Link to="/products?sort=bestseller" className="group bg-[#E51A22] text-white shadow-[0_4px_16px_rgba(229,26,34,0.25)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.35)] hover:bg-[#c9141b] active:scale-95 px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm cursor-pointer">
+                            View All Best Sellers
+                            <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -1155,174 +1443,6 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Best Selling Picks - Ranked with Most Selling First */}
-            <div className="w-full bg-[#F8FAFC] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-slate-200/90 relative">
-                <div className="w-full mx-auto px-4 md:px-6">
-                    <div className="flex flex-col items-center justify-center text-center mb-4 sm:mb-5">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-amber-200/80 shadow-2xs">
-                            🏆 TOP-RANKED FAVORITES
-                        </span>
-                        <h2 className="text-[28px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-1.5">
-                            Best Selling Picks
-                        </h2>
-                        <p className="text-[#666] text-[14.5px] md:text-[16px] font-medium">Top-rated toys loved by parents and kids alike</p>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 sm:px-2 md:px-0">
-                        {((trendingProducts && trendingProducts.length > 0)
-                            ? [...trendingProducts]
-                            : [...allProducts].sort((a, b) => (b.totalSold || 0) - (a.totalSold || 0) || (b.reviewCount || 0) - (a.reviewCount || 0))
-                        )
-                            .filter(product => product.status !== 'Out of Stock')
-                            .slice(0, 8)
-                            .map((product, idx) => (
-                                <div key={product._id} className="flex flex-col group cursor-pointer relative bg-white rounded-2xl sm:rounded-3xl border border-slate-100 hover:border-red-50 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden">
-                                    <div className="relative w-full aspect-square overflow-hidden bg-[#F8F9FA]">
-                                        {/* Discount Badge */}
-                                        <div className="absolute top-2 left-2 z-30 pointer-events-none flex flex-col gap-1 items-start">
-                                            {product.originalPrice > product.price && (
-                                                <span className="bg-[#E51A22] text-white px-1.5 py-0.5 rounded-full text-[8.5px] sm:text-[9.5px] font-bold tracking-wider shadow-xs flex items-center">
-                                                    {`${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% Off`}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        {/* Waitlist Button - Top Right Header */}
-                                        <div className="absolute top-2.5 right-2.5 z-30 transition-all duration-200 opacity-100 scale-100">
-                                            <button
-                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWaitlist(product); }}
-                                                className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-red-50 hover:scale-110 active:scale-95 border border-slate-200/80 transition-all duration-200 cursor-pointer"
-                                                title="Wishlist"
-                                            >
-                                                <HeartIcon
-                                                    className="w-4 h-4 transition-colors"
-                                                    fill={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "transparent"}
-                                                    stroke={Array.isArray(waitlistItems) && waitlistItems.some(item => item._id === product._id) ? "#E51A22" : "#64748b"}
-                                                    strokeWidth={2.2}
-                                                />
-                                            </button>
-                                        </div>
-
-
-
-                                        <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 ease-out">
-                                            <ProductCardImageCarousel
-                                                images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])}
-                                                productName={product.name}
-                                            />
-                                        </Link>
-                                    </div>
-
-                                    <div className="p-3 sm:p-5 flex flex-col flex-grow text-left bg-white relative">
-                                        {/* Ratings Display */}
-                                        <div className="flex items-center gap-1.5 mb-1.5">
-                                            <div className="flex items-center gap-0.5 text-[#F5A623]">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <svg key={i} className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${i < Math.round(product.averageRating || 5) ? 'fill-current' : 'text-gray-200 fill-current'}`} viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                ))}
-                                            </div>
-                                            <span className="text-[10px] sm:text-[11px] text-gray-400 font-bold tracking-wider">({product.reviewCount || 0})</span>
-                                        </div>
-
-                                        <Link to={`/product/${product._id}`} className="font-bold text-[#1A1A24] text-[13px] sm:text-[15px] md:text-[16px] mb-1 hover:text-[#E51A22] transition-colors leading-snug line-clamp-1">
-                                            {product.name}
-                                        </Link>
-
-                                        <div className="text-[12px] text-gray-500/90 mb-3 leading-relaxed">
-                                            <p className={expandedProductDescIds[product._id] ? "" : "line-clamp-2 overflow-hidden"}>
-                                                {getCleanCardDescription(product)}
-                                            </p>
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    toggleProductDesc(product._id);
-                                                }}
-                                                className="mt-1 inline-flex items-center gap-1 text-[11.5px] font-bold text-[#E51A22] hover:text-[#b81219] transition-colors cursor-pointer"
-                                            >
-                                                <span>{expandedProductDescIds[product._id] ? 'View Less' : 'View More'}</span>
-                                                <svg
-                                                    className={`w-3 h-3 transition-transform duration-200 ${expandedProductDescIds[product._id] ? 'rotate-180' : ''}`}
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                    strokeWidth={2.5}
-                                                >
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <div className="flex items-center justify-between gap-1 mt-auto pt-2 border-t border-slate-50">
-                                            {product.status === 'Out of Stock' ? (
-                                                <span className="font-bold text-gray-400 text-[12px]">Out of Stock</span>
-                                            ) : (
-                                                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
-                                                    <span className="font-extrabold text-[#1A1A24] text-[14.5px] sm:text-[17px] md:text-[19px]">
-                                                        ₹{`${(product.price || 0).toFixed(0)}`}
-                                                    </span>
-                                                    {product.originalPrice > (product.price || 0) && (
-                                                        <span className="text-[10.5px] sm:text-[12px] text-gray-400 line-through font-medium">
-                                                            ₹{`${(product.originalPrice || 0).toFixed(0)}`}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Dual Action Buttons: Add to Cart & Buy Now */}
-                                        <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1.5 sm:gap-2">
-                                            {product.status === 'Out of Stock' ? (
-                                                <button
-                                                    disabled
-                                                    className="w-full py-2 px-3 rounded-xl bg-slate-100 text-slate-400 text-[11px] sm:text-[12px] font-bold cursor-not-allowed text-center"
-                                                >
-                                                    Out of Stock
-                                                </button>
-                                            ) : (
-                                                <>
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            addToCart(product);
-                                                        }}
-                                                        className="flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl border border-slate-200 hover:border-[#E51A22] bg-white hover:bg-red-50/50 text-[#1A1A24] hover:text-[#E51A22] text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer shadow-2xs active:scale-95"
-                                                        title="Add to Cart"
-                                                    >
-                                                        <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
-                                                        <span className="truncate">Add to Cart</span>
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => handleBuyNow(e, product)}
-                                                        className="flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-xl bg-[#E51A22] hover:bg-[#c9141b] text-white text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:shadow-red-500/25 active:scale-95"
-                                                        title="Buy Now"
-                                                    >
-                                                        <Zap className="w-3.5 h-3.5 shrink-0 fill-current" />
-                                                        <span className="truncate">Buy Now</span>
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                    </div>
-
-                    <div className="flex justify-center items-center mt-5 sm:mt-6 px-4 md:px-0">
-                        <Link to="/products?sort=bestseller" className="group bg-[#E51A22] text-white shadow-[0_4px_16px_rgba(229,26,34,0.25)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.35)] hover:bg-[#c9141b] active:scale-95 px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm cursor-pointer">
-                            View All Best Sellers
-                            <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
-                </div>
-            </div>
-
             {/* Promo Media (Videos & Images) - Limited Edition Style */}
             {promoMedia && promoMedia.length > 0 && (
                 <div className="w-full bg-[#F4F7FC] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-indigo-200/70 relative">
@@ -1413,10 +1533,14 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Brands Marquee - Premium Continuous Ticker */}
+            {/* Brands Marquee - Premium Continuous Ticker with Hover Navigation Arrows */}
             {brands.length > 0 && (
-                <div className="w-full pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 overflow-hidden bg-[#FFFDF9] font-sans border-b border-slate-200/90 relative">
-                    <div className="text-center mb-3 sm:mb-4 px-4 relative">
+                <div 
+                    onMouseEnter={() => setIsBrandHovered(true)}
+                    onMouseLeave={() => setIsBrandHovered(false)}
+                    className="w-full pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 overflow-hidden bg-[#FFFDF9] font-sans border-b border-slate-200/90 relative group/brandSection"
+                >
+                    <div className="text-center mb-3 sm:mb-4 px-4 relative z-10">
                         <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-300 to-transparent -z-10"></div>
                         <div className="inline-block bg-[#FFFDF9] px-6">
                             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-50 text-purple-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2 border border-purple-200/80 shadow-2xs">
@@ -1426,34 +1550,52 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    <style>
-                        {`
-                        @keyframes marquee-scroll {
-                            0% { transform: translateX(0); }
-                            100% { transform: translateX(-50%); }
-                        }
-                        .animate-marquee-scroll {
-                            animation: marquee-scroll 25s linear infinite;
-                        }
-                        .animate-marquee-scroll:hover {
-                            animation-play-state: paused;
-                        }
-                        
-                        /* Mask for smooth fade at edges */
-                        .marquee-container {
-                            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-                            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-                        }
-                        `}
-                    </style>
+                    <div className="relative w-full max-w-[1600px] mx-auto px-2 sm:px-4">
+                        {/* Left Navigation Arrow (<) - Shown ONLY when hovering on Brand Section */}
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleBrandManualScroll('left');
+                            }}
+                            onMouseEnter={() => setIsBrandHovered(true)}
+                            className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.18)] border border-slate-200 text-slate-800 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] flex items-center justify-center cursor-pointer opacity-0 pointer-events-none group-hover/brandSection:opacity-100 group-hover/brandSection:pointer-events-auto"
+                            title="Previous Brand"
+                        >
+                            <ChevronLeft className="w-6 h-6 pointer-events-none" strokeWidth={2.5} />
+                        </button>
 
-                    <div className="w-full relative overflow-hidden marquee-container max-w-[1600px] mx-auto py-10">
-                        {/* 
-                            We duplicate the brands array 4 times to ensure enough content 
-                            for seamless infinite scroll across all screen sizes 
-                        */}
-                        <div className="flex animate-marquee-scroll w-max hover:pause items-center">
-                            {[...brands, ...brands, ...brands, ...brands].map((brand, idx) => {
+                        {/* Right Navigation Arrow (>) - Shown ONLY when hovering on Brand Section */}
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleBrandManualScroll('right');
+                            }}
+                            onMouseEnter={() => setIsBrandHovered(true)}
+                            className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.18)] border border-slate-200 text-slate-800 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] flex items-center justify-center cursor-pointer opacity-0 pointer-events-none group-hover/brandSection:opacity-100 group-hover/brandSection:pointer-events-auto"
+                            title="Next Brand"
+                        >
+                            <ChevronRight className="w-6 h-6 pointer-events-none" strokeWidth={2.5} />
+                        </button>
+
+                        {/* Continuous 60fps Smooth Container - ZERO LAG, pure GPU scroll with drag & touch */}
+                        <div
+                            ref={brandContainerRef}
+                            onMouseEnter={handleBrandMouseEnter}
+                            onMouseLeave={handleBrandMouseLeave}
+                            onMouseDown={handleBrandMouseDown}
+                            onMouseUp={handleBrandMouseUp}
+                            onMouseMove={handleBrandMouseMove}
+                            onTouchStart={handleBrandTouchStart}
+                            onTouchMove={handleBrandTouchMove}
+                            onTouchEnd={handleBrandTouchEnd}
+                            className="flex items-center overflow-x-auto py-6 sm:py-8 cursor-grab active:cursor-grabbing select-none scrollbar-none w-full"
+                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                        >
+                            {brandSlides.map((brand, idx) => {
                                 const brandShapesMap = {
                                     squircle: { path: "M 20 6 L 80 6 C 92 6 95 12 95 24 L 95 76 C 95 88 92 94 80 94 L 20 94 C 8 94 5 88 5 76 L 5 24 C 5 12 8 6 20 6 Z", bg: '#FFF0F5', border: '#FFB6C1', emoji1: '🧸', emoji2: '🎈', pos1: '-top-3 -left-2', pos2: '-bottom-3 -right-2' },
                                     circle: { path: "M 50 6 A 44 44 0 1 1 49.99 6 Z", bg: '#F0FFFF', border: '#87CEFA', emoji1: '🚀', emoji2: '⭐', pos1: '-top-3 -right-2', pos2: '-bottom-3 -left-2' },
@@ -1474,9 +1616,14 @@ const Dashboard = () => {
                                 const finalBorder = brand.borderColor || style.border;
 
                                 return (
-                                    <div key={`brand-${idx}-${brand._id}`} className="flex items-center justify-center px-4 md:px-6 py-6">
+                                    <div key={`brand-${idx}-${brand._id}`} className="brand-pod-card flex-none flex items-center justify-center px-4 md:px-6 py-4">
                                         <Link
                                             to={`/products?brand=${encodeURIComponent(brand.name)}`}
+                                            onClick={(e) => {
+                                                if (brandDragDistance > 6) {
+                                                    e.preventDefault();
+                                                }
+                                            }}
                                             title={`Shop ${brand.name} toys`}
                                             className="relative w-[150px] h-[150px] md:w-[170px] md:h-[170px] flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-2 cursor-pointer group select-none block"
                                         >

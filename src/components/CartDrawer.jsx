@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { X, Trash2, Plus, Minus, Tag, ShoppingBag, ArrowRight, ShieldCheck, Sparkles, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
@@ -254,8 +254,13 @@ const CartDrawer = () => {
                                             key={item._id} 
                                             className="bg-[#FAFBFD] hover:bg-white rounded-2xl p-3.5 border border-slate-100 hover:border-slate-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.04)] transition-all duration-200 flex gap-3.5 items-start group"
                                         >
-                                            {/* Thumbnail */}
-                                            <div className="w-20 h-20 rounded-xl bg-white border border-slate-200/80 p-1 overflow-hidden shrink-0 shadow-2xs">
+                                            {/* Thumbnail (Click to open product page) */}
+                                            <Link 
+                                                to={`/product/${item._id || item.productId}`} 
+                                                onClick={closeCart}
+                                                className="w-20 h-20 rounded-xl bg-white border border-slate-200/80 p-1 overflow-hidden shrink-0 shadow-2xs block cursor-pointer"
+                                                title={`View ${item.name}`}
+                                            >
                                                 <img 
                                                     src={getImageUrl(item)} 
                                                     alt={item.name}
@@ -264,14 +269,19 @@ const CartDrawer = () => {
                                                         e.target.src = 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=300&q=80';
                                                     }}
                                                 />
-                                            </div>
+                                            </Link>
 
                                             {/* Product Details */}
                                             <div className="flex-1 min-w-0 flex flex-col">
                                                 <div className="flex justify-between items-start gap-2">
-                                                    <h4 className="text-[14px] font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#E51A22] transition-colors">
+                                                    <Link 
+                                                        to={`/product/${item._id || item.productId}`} 
+                                                        onClick={closeCart}
+                                                        className="text-[14px] font-bold text-slate-900 leading-snug line-clamp-2 hover:text-[#E51A22] transition-colors cursor-pointer"
+                                                        title={`View ${item.name}`}
+                                                    >
                                                         {item.name}
-                                                    </h4>
+                                                    </Link>
                                                     <span className="text-[14.5px] font-black text-slate-900 whitespace-nowrap">
                                                         ₹{lineTotal.toLocaleString('en-IN')}.00
                                                     </span>

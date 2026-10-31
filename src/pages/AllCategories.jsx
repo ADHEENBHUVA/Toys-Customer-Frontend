@@ -1,116 +1,171 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Sparkles, Check, ArrowRight, Star } from 'lucide-react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
+import { ChevronLeft, ChevronRight, Sparkles, Check, ArrowRight, Star, Flame, Zap, Compass, X } from 'lucide-react';
 import ProductCatalogSection from '../components/ProductCatalogSection';
 
-const getCategoryEmoji = (name) => {
-    if (!name) return '🧸';
-    const n = name.toLowerCase();
-    if (n.includes('soft') || n.includes('plush') || n.includes('teddy')) return '🧸';
-    if (n.includes('lego') || n.includes('block') || n.includes('build')) return '🧱';
-    if (n.includes('board') || n.includes('game') || n.includes('puzzle')) return '🎲';
-    if (n.includes('action') || n.includes('figure') || n.includes('hero')) return '🦸';
-    if (n.includes('doll') || n.includes('barbie')) return '🎀';
-    if (n.includes('vehicle') || n.includes('car') || n.includes('train') || n.includes('track')) return '🚗';
-    if (n.includes('art') || n.includes('craft') || n.includes('color') || n.includes('paint')) return '🎨';
-    if (n.includes('edu') || n.includes('learn') || n.includes('stem') || n.includes('science')) return '🔬';
-    if (n.includes('outdoor') || n.includes('sport') || n.includes('ride')) return '⚽';
-    if (n.includes('music') || n.includes('instrument') || n.includes('sound')) return '🎵';
-    if (n.includes('infant') || n.includes('baby') || n.includes('toddler')) return '🍼';
-    return '🧸';
+// Bespoke 3D category world presets with customized personalities, gradients & subtitles
+const CATEGORY_PRESETS = {
+    'soft toys': {
+        emoji: '🧸',
+        sub: 'Cuddly & Huggable',
+        badge: 'Huggable Plush',
+        border: '#F43F5E',
+        candyBg: 'bg-rose-50/70',
+        pillBg: 'bg-rose-100 text-rose-800 border-rose-200',
+        gradient: 'from-pink-500 via-rose-400 to-amber-300',
+        decoRight: '💖',
+        tag: 'Most Loved'
+    },
+    'musical instruments': {
+        emoji: '🎵',
+        sub: 'Rhythm & Melodies',
+        badge: 'Sound & Joy',
+        border: '#0EA5E9',
+        candyBg: 'bg-sky-50/70',
+        pillBg: 'bg-sky-100 text-sky-800 border-sky-200',
+        gradient: 'from-sky-400 via-indigo-500 to-purple-500',
+        decoRight: '🎶',
+        tag: 'Popular'
+    },
+    'outdoor play': {
+        emoji: '⚽',
+        sub: 'Active Garden Fun',
+        badge: 'Run & Explore',
+        border: '#10B981',
+        candyBg: 'bg-emerald-50/70',
+        pillBg: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        gradient: 'from-emerald-400 via-teal-500 to-cyan-500',
+        decoRight: '⚡',
+        tag: 'Active Joy'
+    },
+    'art & craft': {
+        emoji: '🎨',
+        sub: 'Color, Paint & DIY',
+        badge: 'Creative Mind',
+        border: '#8B5CF6',
+        candyBg: 'bg-purple-50/70',
+        pillBg: 'bg-purple-100 text-purple-800 border-purple-200',
+        gradient: 'from-violet-500 via-fuchsia-500 to-rose-400',
+        decoRight: '✨',
+        tag: 'Best Seller'
+    },
+    'building & blocks': {
+        emoji: '🧱',
+        sub: 'STEM & Architecture',
+        badge: 'Master Builder',
+        border: '#F59E0B',
+        candyBg: 'bg-amber-50/70',
+        pillBg: 'bg-amber-100 text-amber-800 border-amber-200',
+        gradient: 'from-amber-400 via-orange-500 to-red-500',
+        decoRight: '⭐',
+        tag: 'Brain Boost'
+    },
+    'vehicles & rc': {
+        emoji: '🏎️',
+        sub: 'Speed, Tracks & RC',
+        badge: 'Turbo Speed',
+        border: '#EF4444',
+        candyBg: 'bg-red-50/70',
+        pillBg: 'bg-red-100 text-red-800 border-red-200',
+        gradient: 'from-red-500 via-rose-500 to-orange-400',
+        decoRight: '🚀',
+        tag: 'Top Rated'
+    },
+    'dolls & accessories': {
+        emoji: '👑',
+        sub: 'Pretend Play & Care',
+        badge: 'Dream Wardrobe',
+        border: '#EC4899',
+        candyBg: 'bg-pink-50/70',
+        pillBg: 'bg-pink-100 text-pink-800 border-pink-200',
+        gradient: 'from-pink-400 via-purple-400 to-indigo-400',
+        decoRight: '👗',
+        tag: 'Trending'
+    },
+    'action figures': {
+        emoji: '🦸',
+        sub: 'Heroes & Legends',
+        badge: 'Epic Battles',
+        border: '#2563EB',
+        candyBg: 'bg-blue-50/70',
+        pillBg: 'bg-blue-100 text-blue-800 border-blue-200',
+        gradient: 'from-blue-600 via-indigo-600 to-purple-600',
+        decoRight: '💥',
+        tag: 'Adventure'
+    },
+    'board games': {
+        emoji: '🎲',
+        sub: 'Family Game Nights',
+        badge: 'Mind & Strategy',
+        border: '#0D9488',
+        candyBg: 'bg-teal-50/70',
+        pillBg: 'bg-teal-100 text-teal-800 border-teal-200',
+        gradient: 'from-teal-400 via-cyan-500 to-blue-500',
+        decoRight: '🏆',
+        tag: 'Family Fun'
+    },
+    'educational': {
+        emoji: '🧠',
+        sub: 'Smart Early Learning',
+        badge: 'Montessori & STEM',
+        border: '#059669',
+        candyBg: 'bg-emerald-50/70',
+        pillBg: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        gradient: 'from-emerald-400 via-yellow-400 to-orange-400',
+        decoRight: '🔬',
+        tag: 'Recommended'
+    }
 };
 
-// 6 Unique Luxury Toy Themes with Vibrant Gradients & Ambient Auras
-const CATEGORY_THEMES = [
+// Fallback pool for any unexpected custom category names
+const FALLBACK_THEMES = [
     {
-        name: 'Sunny Mango',
+        emoji: '🧸',
+        sub: 'Fun & Playtime',
+        badge: 'Popular Toy',
+        border: '#F59E0B',
+        candyBg: 'bg-amber-50/70',
+        pillBg: 'bg-amber-100 text-amber-800 border-amber-200',
         gradient: 'from-amber-400 via-orange-400 to-rose-400',
-        badgeBg: 'bg-amber-500 text-white',
-        cardBg: 'from-amber-500/10 via-orange-50/50 to-white',
-        borderIdle: 'border-amber-200/90',
-        borderHover: 'hover:border-amber-400',
-        tagText: 'text-amber-800 bg-amber-50 border-amber-200/90',
-        aura: 'bg-amber-400/25',
-        btnText: 'group-hover:bg-amber-500 group-hover:text-white',
-        ringGlow: 'group-hover:shadow-[0_0_24px_rgba(245,158,11,0.35)]',
-        rating: '4.9',
+        decoRight: '⭐',
         tag: 'Top Rated'
     },
     {
-        name: 'Bubblegum Pink',
+        emoji: '✨',
+        sub: 'Creative & Bright',
+        badge: 'Trending Pick',
+        border: '#F43F5E',
+        candyBg: 'bg-rose-50/70',
+        pillBg: 'bg-rose-100 text-rose-800 border-rose-200',
         gradient: 'from-rose-400 via-pink-400 to-fuchsia-500',
-        badgeBg: 'bg-rose-500 text-white',
-        cardBg: 'from-rose-500/10 via-pink-50/50 to-white',
-        borderIdle: 'border-rose-200/90',
-        borderHover: 'hover:border-rose-400',
-        tagText: 'text-rose-800 bg-rose-50 border-rose-200/90',
-        aura: 'bg-rose-400/25',
-        btnText: 'group-hover:bg-rose-500 group-hover:text-white',
-        ringGlow: 'group-hover:shadow-[0_0_24px_rgba(244,63,94,0.35)]',
-        rating: '5.0',
+        decoRight: '💖',
         tag: 'Trending'
     },
     {
-        name: 'Electric Cyan',
+        emoji: '🚀',
+        sub: 'Explore & Learn',
+        badge: 'Kids Choice',
+        border: '#0EA5E9',
+        candyBg: 'bg-sky-50/70',
+        pillBg: 'bg-sky-100 text-sky-800 border-sky-200',
         gradient: 'from-cyan-400 via-sky-400 to-blue-500',
-        badgeBg: 'bg-sky-500 text-white',
-        cardBg: 'from-sky-500/10 via-cyan-50/50 to-white',
-        borderIdle: 'border-sky-200/90',
-        borderHover: 'hover:border-sky-400',
-        tagText: 'text-sky-800 bg-sky-50 border-sky-200/90',
-        aura: 'bg-sky-400/25',
-        btnText: 'group-hover:bg-sky-500 group-hover:text-white',
-        ringGlow: 'group-hover:shadow-[0_0_24px_rgba(14,165,233,0.35)]',
-        rating: '4.8',
+        decoRight: '⚡',
         tag: 'Popular'
-    },
-    {
-        name: 'Lime Meadow',
-        gradient: 'from-emerald-400 via-teal-400 to-green-500',
-        badgeBg: 'bg-emerald-500 text-white',
-        cardBg: 'from-emerald-500/10 via-teal-50/50 to-white',
-        borderIdle: 'border-emerald-200/90',
-        borderHover: 'hover:border-emerald-400',
-        tagText: 'text-emerald-800 bg-emerald-50 border-emerald-200/90',
-        aura: 'bg-emerald-400/25',
-        btnText: 'group-hover:bg-emerald-500 group-hover:text-white',
-        ringGlow: 'group-hover:shadow-[0_0_24px_rgba(16,185,129,0.35)]',
-        rating: '4.9',
-        tag: 'Kids Favorite'
-    },
-    {
-        name: 'Cosmic Violet',
-        gradient: 'from-purple-400 via-violet-400 to-indigo-500',
-        badgeBg: 'bg-purple-500 text-white',
-        cardBg: 'from-purple-500/10 via-violet-50/50 to-white',
-        borderIdle: 'border-purple-200/90',
-        borderHover: 'hover:border-purple-400',
-        tagText: 'text-purple-800 bg-purple-50 border-purple-200/90',
-        aura: 'bg-purple-400/25',
-        btnText: 'group-hover:bg-purple-500 group-hover:text-white',
-        ringGlow: 'group-hover:shadow-[0_0_24px_rgba(168,85,247,0.35)]',
-        rating: '5.0',
-        tag: 'Best Seller'
-    },
-    {
-        name: 'Sunset Orange',
-        gradient: 'from-red-400 via-amber-400 to-yellow-400',
-        badgeBg: 'bg-red-500 text-white',
-        cardBg: 'from-red-500/10 via-orange-50/50 to-white',
-        borderIdle: 'border-red-200/90',
-        borderHover: 'hover:border-red-400',
-        tagText: 'text-red-800 bg-red-50 border-red-200/90',
-        aura: 'bg-red-400/25',
-        btnText: 'group-hover:bg-red-500 group-hover:text-white',
-        ringGlow: 'group-hover:shadow-[0_0_24px_rgba(239,68,68,0.35)]',
-        rating: '4.8',
-        tag: 'Must Have'
     }
 ];
+
+const getCategoryTheme = (name, index = 0) => {
+    if (!name) return FALLBACK_THEMES[index % FALLBACK_THEMES.length];
+    const key = name.toLowerCase().trim();
+    if (CATEGORY_PRESETS[key]) return CATEGORY_PRESETS[key];
+
+    for (const [presetKey, theme] of Object.entries(CATEGORY_PRESETS)) {
+        if (key.includes(presetKey) || presetKey.includes(key)) {
+            return theme;
+        }
+    }
+    return FALLBACK_THEMES[index % FALLBACK_THEMES.length];
+};
 
 const AllCategories = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -119,8 +174,6 @@ const AllCategories = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState(catQuery || null);
-
-    const swiperInstanceRef = useRef(null);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -148,15 +201,139 @@ const AllCategories = () => {
         }
     }, [catQuery]);
 
-    // Ensure plenty of slides for seamless loop without boundary jump
-    const categorySlides = useMemo(() => {
+    const CARD_WIDTH = 240;
+    const WAVELENGTH = 400; // Exact wavelength of the stationary snake wave rope
+    const AMPLITUDE = 20; // Exact vertical amplitude (crest at y=22, trough at y=62)
+    const SPEED = 65; // Glides smoothly from Right to Left at 65px/sec
+
+    const containerRef = useRef(null);
+    const cardRefs = useRef([]);
+    const offsetRef = useRef(0);
+    const isHoveredRef = useRef(false);
+    const isDraggingRef = useRef(false);
+    const hasDraggedRef = useRef(false);
+    const dragStartXRef = useRef(0);
+    const dragStartOffsetRef = useRef(0);
+
+    // Ensure item count M satisfies:
+    // 1. M is a multiple of 5 (so M * 240 is an exact integer multiple of the 400px wave period)
+    // 2. M is a multiple of categories.length (so categories repeat cleanly in order)
+    // 3. M >= 25 (so totalWidth >= 6000px, ensuring card wrapping occurs far off-screen)
+    const streamItems = useMemo(() => {
         if (!categories || categories.length === 0) return [];
-        let items = [...categories];
-        while (items.length < 18) {
-            items = [...items, ...categories];
+        const k = categories.length;
+        let m = 5;
+        while (m % k !== 0 || m < 25) {
+            m += 5;
+        }
+        if (m > 60) m = 30; // safety ceiling
+        const items = [];
+        for (let i = 0; i < m; i++) {
+            items.push(categories[i % k]);
         }
         return items;
     }, [categories]);
+
+    // Update every card's transform so the brass carabiner ring is 100% locked to the stationary snake wave rope
+    const updateCardPositions = () => {
+        if (!streamItems || streamItems.length === 0) return;
+        const totalWidth = streamItems.length * CARD_WIDTH;
+        const offset = offsetRef.current;
+        for (let i = 0; i < streamItems.length; i++) {
+            const el = cardRefs.current[i];
+            if (!el) continue;
+            const rawX = offset + i * CARD_WIDTH;
+            let x = ((rawX % totalWidth) + totalWidth) % totalWidth;
+            if (x > totalWidth - CARD_WIDTH) {
+                x -= totalWidth;
+            }
+            // waveX is the exact horizontal center of the brass carabiner ring
+            const waveX = x + 120;
+            // Exact cosine curve formula matching the stationary snake rope SVG:
+            // y_rope = 42 - 20 * cos(2*PI/400 * waveX) -> delta y = 20 - 20 * cos(2*PI/400 * waveX)
+            const y = AMPLITUDE - AMPLITUDE * Math.cos((2 * Math.PI / WAVELENGTH) * waveX);
+            el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        }
+    };
+
+    // 60FPS continuous Right-to-Left loop
+    useEffect(() => {
+        if (streamItems.length === 0) return;
+        const totalWidth = streamItems.length * CARD_WIDTH;
+        let animId;
+        let lastTime = performance.now();
+
+        updateCardPositions();
+
+        const loop = (time) => {
+            const dt = Math.min((time - lastTime) / 1000, 0.1);
+            lastTime = time;
+
+            if (!isHoveredRef.current && !isDraggingRef.current) {
+                // Glide from Right to Left (offset decreases)
+                offsetRef.current = ((offsetRef.current - SPEED * dt) % totalWidth + totalWidth) % totalWidth;
+                updateCardPositions();
+            }
+            animId = requestAnimationFrame(loop);
+        };
+
+        animId = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(animId);
+    }, [streamItems]);
+
+    // Interactive Drag & Hover Handlers (Pause on hover, smooth drag left/right)
+    const handleMouseEnter = () => {
+        isHoveredRef.current = true;
+    };
+
+    const handleMouseLeave = () => {
+        isHoveredRef.current = false;
+        isDraggingRef.current = false;
+    };
+
+    const handleMouseDown = (e) => {
+        isDraggingRef.current = true;
+        hasDraggedRef.current = false;
+        dragStartXRef.current = e.clientX;
+        dragStartOffsetRef.current = offsetRef.current;
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDraggingRef.current) return;
+        const dx = e.clientX - dragStartXRef.current;
+        if (Math.abs(dx) > 4) {
+            hasDraggedRef.current = true;
+        }
+        const totalWidth = streamItems.length * CARD_WIDTH;
+        offsetRef.current = ((dragStartOffsetRef.current + dx) % totalWidth + totalWidth) % totalWidth;
+        updateCardPositions();
+    };
+
+    const handleMouseUp = () => {
+        isDraggingRef.current = false;
+    };
+
+    const handleTouchStart = (e) => {
+        isDraggingRef.current = true;
+        hasDraggedRef.current = false;
+        dragStartXRef.current = e.touches[0].clientX;
+        dragStartOffsetRef.current = offsetRef.current;
+    };
+
+    const handleTouchMove = (e) => {
+        if (!isDraggingRef.current) return;
+        const dx = e.touches[0].clientX - dragStartXRef.current;
+        if (Math.abs(dx) > 4) {
+            hasDraggedRef.current = true;
+        }
+        const totalWidth = streamItems.length * CARD_WIDTH;
+        offsetRef.current = ((dragStartOffsetRef.current + dx) % totalWidth + totalWidth) % totalWidth;
+        updateCardPositions();
+    };
+
+    const handleTouchEnd = () => {
+        isDraggingRef.current = false;
+    };
 
     const handleCategoryClick = (catName) => {
         if (selectedCategory === catName) {
@@ -240,28 +417,116 @@ const AllCategories = () => {
                 </div>
             </div>
 
-            {/* 2. 1-BY-1 RIGHT-TO-LEFT SLIDING SHOWCASE WITH UNIQUE 3D TOY BENTO PODS - FULL SCREEN EDGE-TO-EDGE */}
-            <div className="w-full bg-[#FAF8F5] pt-7 sm:pt-9 pb-8 sm:pb-10 border-b border-slate-200/70 relative overflow-hidden group/section">
+            {/* 2. FIXED SNAKE (NAG) WAVE ROPE & SLIDING GOL ROUND (SWING / HICHKO) CATEGORY SHOWCASE */}
+            <div className="w-full bg-gradient-to-b from-[#FAF8F5] via-[#FFFDF9] to-[#FAF8F5] pt-6 sm:pt-8 pb-10 sm:pb-14 border-b border-slate-200/70 relative overflow-hidden group/section">
                 
-                {/* Header Bar: Title + Controls (Contained for crisp readability) */}
-                <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 mb-5 sm:mb-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                {/* CSS KEYFRAMES FOR HICHKO PENDULUM SWING */}
+                <style>{`
+                    /* 🎠 Gentle Pendulum Swing (Hichko) pivoting from the Carabiner Ring Center (120, 21.5) */
+                    @keyframes hichkoSwing {
+                        0%, 100% {
+                            transform: rotate(-2.6deg);
+                        }
+                        50% {
+                            transform: rotate(2.6deg);
+                        }
+                    }
+
+                    .hichko-swing-disc {
+                        transform-origin: 120px 21.5px;
+                        animation: hichkoSwing 3.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+                        will-change: transform;
+                    }
+                `}</style>
+
+                {/* SHARED SVG DEFINITIONS FOR 3D JUTE ROPE, FIXED SNAKE WAVE PATTERN & POLISHED BRASS CARABINERS */}
+                <svg className="absolute w-0 h-0 overflow-hidden pointer-events-none" aria-hidden="true">
+                    <defs>
+                        {/* 3D Braided Jute Rope Cylinder Gradient */}
+                        <linearGradient id="snakeRopeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#78350F" />
+                            <stop offset="25%" stopColor="#D97706" />
+                            <stop offset="50%" stopColor="#F59E0B" />
+                            <stop offset="75%" stopColor="#B45309" />
+                            <stop offset="100%" stopColor="#451A03" />
+                        </linearGradient>
+
+                        {/* Solid Polished Brass Carabiner Ring Gradient */}
+                        <linearGradient id="snakeBrassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#FEF3C7" />
+                            <stop offset="35%" stopColor="#F59E0B" />
+                            <stop offset="70%" stopColor="#D97706" />
+                            <stop offset="100%" stopColor="#78350F" />
+                        </linearGradient>
+
+                        {/* Stationary Snake Wave Rope Pattern - Wavelength 400px, Amplitude 20px, Centerline 42px */}
+                        <pattern id="fixedSnakeRopePattern" width="400" height="90" patternUnits="userSpaceOnUse">
+                            {/* Rope Drop Shadow */}
+                            <path
+                                d="M 0,25 C 72.8,25 127.2,65 200,65 C 272.8,65 327.2,25 400,25"
+                                fill="none"
+                                stroke="rgba(0,0,0,0.16)"
+                                strokeWidth="7"
+                                strokeLinecap="round"
+                            />
+                            {/* 3D Braided Jute Cable Base */}
+                            <path
+                                d="M 0,22 C 72.8,22 127.2,62 200,62 C 272.8,62 327.2,22 400,22"
+                                fill="none"
+                                stroke="url(#snakeRopeGrad)"
+                                strokeWidth="6"
+                                strokeLinecap="round"
+                            />
+                            {/* Golden Braided Weave Texture */}
+                            <path
+                                d="M 0,22 C 72.8,22 127.2,62 200,62 C 272.8,62 327.2,22 400,22"
+                                fill="none"
+                                stroke="#FDE68A"
+                                strokeWidth="3.4"
+                                strokeDasharray="9 4.5"
+                                strokeLinecap="round"
+                            />
+                            {/* Golden Silk Sheen Highlight */}
+                            <path
+                                d="M 0,21 C 72.8,21 127.2,61 200,61 C 272.8,61 327.2,21 400,21"
+                                fill="none"
+                                stroke="#FFFBEB"
+                                strokeWidth="1.2"
+                                strokeDasharray="3 9"
+                                strokeLinecap="round"
+                            />
+                        </pattern>
+                    </defs>
+                </svg>
+
+                {/* Header Bar: Title + Controls */}
+                <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 mb-5 sm:mb-7">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
                         <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-[#E51A22] text-[11px] font-black uppercase tracking-wider border border-rose-200/80 shadow-2xs">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-[#E51A22]" /> Official Collections
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-rose-50 to-amber-50 text-[#E51A22] text-[11px] font-black uppercase tracking-wider border border-rose-200/80 shadow-2xs">
+                                    <Sparkles className="w-3.5 h-3.5 text-[#E51A22] animate-pulse" /> Curated Play Worlds ({categories.length || '10+'})
                                 </span>
                                 {selectedCategory && (
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1A1A24] text-white text-[11px] font-black uppercase tracking-wider">
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1A1A24] text-white text-[11px] font-black uppercase tracking-wider shadow-xs">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                                         Filtering: {selectedCategory}
+                                        <button 
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); handleClearCategory(); }}
+                                            className="ml-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                                            title="Clear filter"
+                                        >
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
                                     </span>
                                 )}
                             </div>
-                            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#1A1A24] tracking-tight">
+                            <h2 className="text-2xl sm:text-3xl md:text-[32px] font-black text-[#1A1A24] tracking-tight leading-tight">
                                 Select a Toy Category
                             </h2>
                             <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                                Browse curated categories • Click any card to filter products below
+                                Tap any swinging toy world to instantly explore hand-picked toys, games & playsets below
                             </p>
                         </div>
 
@@ -271,160 +536,255 @@ const AllCategories = () => {
                             <button
                                 type="button"
                                 onClick={handleClearCategory}
-                                className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition-all shadow-xs cursor-pointer ${
+                                className={`px-4 sm:px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all shadow-xs cursor-pointer flex items-center gap-1.5 ${
                                     !selectedCategory
-                                        ? 'bg-[#E51A22] text-white shadow-md scale-102'
-                                        : 'bg-white text-slate-700 border border-slate-200 hover:border-[#E51A22] hover:text-[#E51A22]'
+                                        ? 'bg-[#E51A22] text-white shadow-md shadow-rose-500/25 scale-102 ring-2 ring-rose-400/30'
+                                        : 'bg-white text-slate-700 border border-slate-200 hover:border-[#E51A22] hover:text-[#E51A22] hover:bg-rose-50/40'
                                 }`}
                             >
-                                All (Show All)
+                                <Compass className="w-3.5 h-3.5" />
+                                All Toys (Show All)
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {/* SWIPER CAROUSEL WITH ALL FULL BOXES (NO HALF BOXES) AND UNIFORM IDENTICAL SIZES */}
+                {/* CONTINUOUS 60FPS INFINITE STREAM TRACK */}
                 {loading ? (
-                    <div className="py-16 flex flex-col items-center justify-center gap-3">
+                    <div className="py-14 flex flex-col items-center justify-center gap-3">
                         <div className="w-10 h-10 border-4 border-[#E51A22] border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading Categories...</span>
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading Play Worlds...</span>
                     </div>
                 ) : (
-                    <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 md:px-8 relative group/slider">
-                        {/* Floating Navigation Arrows - ONLY VISIBLE ON HOVER */}
-                        <button
-                            type="button"
-                            className="cat-prev-arrow absolute -left-2 sm:left-1 md:left-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_8px_24px_rgba(0,0,0,0.18)] border border-slate-200 text-slate-800 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] flex items-center justify-center cursor-pointer opacity-0 pointer-events-none group-hover/slider:opacity-100 group-hover/slider:pointer-events-auto"
-                            title="Previous Category"
-                        >
-                            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" strokeWidth={2.5} />
-                        </button>
-                        <button
-                            type="button"
-                            className="cat-next-arrow absolute -right-2 sm:right-1 md:right-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_8px_24px_rgba(0,0,0,0.18)] border border-slate-200 text-slate-800 transition-all duration-300 hover:scale-110 hover:bg-[#E51A22] hover:text-white hover:border-[#E51A22] flex items-center justify-center cursor-pointer opacity-0 pointer-events-none group-hover/slider:opacity-100 group-hover/slider:pointer-events-auto"
-                            title="Next Category"
-                        >
-                            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" strokeWidth={2.5} />
-                        </button>
+                    /* 100% Edge-to-Edge Container with Fixed Snake Rope & Gliding Category Rounds (દોરી સાપ જેવી - પોતાની જગ્યાએ ફિક્સ રહે - બંને બાજુ સ્ક્રીનને અડેલી) */
+                    <div
+                        ref={containerRef}
+                        className="w-full relative h-[360px] sm:h-[385px] overflow-hidden select-none cursor-grab active:cursor-grabbing"
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                    >
+                        {/* 1. STATIONARY 3D SNAKE WAVE ROPE - TOUCHES BOTH SCREEN EDGES DIRECTLY (દોરી સાપ જેવા આકારમાં - પોતાની જગ્યાએ ફિક્સ રહે - બંને બાજુ સ્ક્રીનને અડેલી - નો આઇકોન) */}
+                        <div className="w-full absolute top-0 left-0 right-0 h-[90px] pointer-events-none z-10 overflow-hidden">
+                            <svg className="w-full h-[90px] block" preserveAspectRatio="none">
+                                <rect x="0" y="0" width="100%" height="90" fill="url(#fixedSnakeRopePattern)" />
+                            </svg>
+                        </div>
 
-                        <Swiper
-                            modules={[Navigation, Autoplay]}
-                            onSwiper={(swiper) => {
-                                swiperInstanceRef.current = swiper;
-                            }}
-                            loop={true}
-                            centeredSlides={false}
-                            speed={650}
-                            slidesPerGroup={1}
-                            autoplay={{
-                                delay: 2600,
-                                disableOnInteraction: false,
-                                pauseOnMouseEnter: true
-                            }}
-                            navigation={{
-                                prevEl: '.cat-prev-arrow',
-                                nextEl: '.cat-next-arrow'
-                            }}
-                            slidesPerView={2}
-                            spaceBetween={16}
-                            breakpoints={{
-                                480: { slidesPerView: 2, spaceBetween: 14 },
-                                640: { slidesPerView: 3, spaceBetween: 16 },
-                                768: { slidesPerView: 4, spaceBetween: 18 },
-                                1024: { slidesPerView: 5, spaceBetween: 20 },
-                                1280: { slidesPerView: 6, spaceBetween: 20 },
-                                1536: { slidesPerView: 7, spaceBetween: 22 }
-                            }}
-                            className="!py-4 !px-0 select-none w-full"
-                        >
-                            {categorySlides.map((cat, idx) => {
-                                const theme = CATEGORY_THEMES[idx % CATEGORY_THEMES.length];
+                        {/* 2. GLIDING CATEGORY ROUNDS - EACH BRASS CARABINER GLIDES DIRECTLY ON THE SNAKE WAVE ROPE */}
+                        <div className="w-full h-full relative z-20 pointer-events-auto">
+                            {streamItems.map((cat, idx) => {
+                                const theme = getCategoryTheme(cat.name, idx);
                                 const isSelected = selectedCategory === cat.name;
-                                const emoji = (cat.icon && cat.icon.trim()) ? cat.icon : getCategoryEmoji(cat.name);
+                                const emoji = (cat.icon && cat.icon.trim()) ? cat.icon : theme.emoji;
 
                                 return (
-                                    <SwiperSlide key={`${cat._id || cat.name}-${idx}`} className="h-full flex items-stretch">
-                                        {/* UNIQUE HUMAN-CRAFTED TOY POD CARD - EXACT UNIFORM SIZE */}
+                                    <div
+                                        key={`${cat._id || cat.name}-${idx}`}
+                                        ref={(el) => (cardRefs.current[idx] = el)}
+                                        className="absolute top-0 left-0 w-[240px] flex flex-col items-center group/card cursor-pointer select-none will-change-transform"
+                                        onClick={() => {
+                                            if (hasDraggedRef.current) return;
+                                            handleCategoryClick(cat.name);
+                                        }}
+                                        title={`Explore ${cat.name} Toys`}
+                                    >
+                                        {/* 🪢 COMPACT 3D CARABINER RING (REAL THREADING: BACK BEHIND ROPE, FRONT OVER ROPE) & HOOK */}
+                                        <div className="w-full h-[85px] relative shrink-0">
+                                            <svg
+                                                viewBox="0 0 240 85"
+                                                className="w-full h-[85px] block overflow-visible pointer-events-none"
+                                            >
+                                                {/* 1. BACK ARCH OF THE CARABINER RING (PASSES COMPLETELY BEHIND THE ROPE) */}
+                                                <path
+                                                    d="M 128.5,21.5 A 8.5 8.5 0 0 0 111.5,21.5"
+                                                    fill="none"
+                                                    stroke="#451A03"
+                                                    strokeWidth="3.4"
+                                                    strokeLinecap="round"
+                                                />
+                                                <path
+                                                    d="M 128.5,21.5 A 8.5 8.5 0 0 0 111.5,21.5"
+                                                    fill="none"
+                                                    stroke="url(#snakeBrassGrad)"
+                                                    strokeWidth="2.4"
+                                                    strokeLinecap="round"
+                                                />
+                                                {/* Back Top Specular Sheen */}
+                                                <path
+                                                    d="M 124,14.5 C 122,13.5 118,13.5 116,14.5"
+                                                    fill="none"
+                                                    stroke="#FFFFFF"
+                                                    strokeWidth="1"
+                                                    strokeLinecap="round"
+                                                    opacity="0.8"
+                                                />
+
+                                                {/* 2. THE LOCAL ROPE SEGMENT (CROSSES IN FRONT OF THE BACK ARCH OF THE RING) */}
+                                                {/* Ambient Cable Drop Shadow */}
+                                                <line x1="106" y1="23.5" x2="134" y2="23.5" stroke="rgba(0,0,0,0.18)" strokeWidth="6" strokeLinecap="round" />
+                                                {/* Main 3D Braided Jute Cable Base */}
+                                                <line x1="106" y1="21.5" x2="134" y2="21.5" stroke="url(#snakeRopeGrad)" strokeWidth="5.5" strokeLinecap="round" />
+                                                {/* Golden Braided Weave */}
+                                                <line x1="106" y1="21.5" x2="134" y2="21.5" stroke="#FDE68A" strokeWidth="3" strokeDasharray="6 3" strokeLinecap="round" />
+                                                {/* Silk Sheen Highlight */}
+                                                <line x1="106" y1="20.8" x2="134" y2="20.8" stroke="#FFFBEB" strokeWidth="1" strokeDasharray="2 6" strokeLinecap="round" />
+
+                                                {/* 3. FRONT ARCH OF THE CARABINER RING (HOOKS COMPLETELY IN FRONT OF THE ROPE) */}
+                                                {/* Shadow cast by front clamp onto the rope */}
+                                                <path
+                                                    d="M 111.5,21.5 A 8.5 8.5 0 0 0 128.5,21.5"
+                                                    fill="none"
+                                                    stroke="rgba(0,0,0,0.25)"
+                                                    strokeWidth="4"
+                                                    strokeLinecap="round"
+                                                />
+                                                {/* Front Dark Outline */}
+                                                <path
+                                                    d="M 111.5,21.5 A 8.5 8.5 0 0 0 128.5,21.5"
+                                                    fill="none"
+                                                    stroke="#451A03"
+                                                    strokeWidth="3.4"
+                                                    strokeLinecap="round"
+                                                />
+                                                {/* Front Polished Brass Core */}
+                                                <path
+                                                    d="M 111.5,21.5 A 8.5 8.5 0 0 0 128.5,21.5"
+                                                    fill="none"
+                                                    stroke="url(#snakeBrassGrad)"
+                                                    strokeWidth="2.4"
+                                                    strokeLinecap="round"
+                                                />
+
+                                                {/* 🌟 UNIQUE MINI CARABINER DETAILS: */}
+                                                {/* Knurled Brass Screw-Lock Barrel on right side */}
+                                                <rect x="126.2" y="19" width="3.6" height="7" rx="1.2" fill="url(#snakeBrassGrad)" stroke="#451A03" strokeWidth="0.8" />
+                                                <line x1="126.5" y1="21.2" x2="129.5" y2="21.2" stroke="#78350F" strokeWidth="0.6" />
+                                                <line x1="126.5" y1="23.5" x2="129.5" y2="23.5" stroke="#78350F" strokeWidth="0.6" />
+                                                <line x1="127" y1="19.5" x2="127" y2="25.5" stroke="#FFFBEB" strokeWidth="0.5" opacity="0.8" />
+
+                                                {/* Carabiner Hinge Rivet on left side */}
+                                                <circle cx="111.5" cy="21.5" r="1.4" fill="url(#snakeBrassGrad)" stroke="#451A03" strokeWidth="0.7" />
+                                                <circle cx="111.2" cy="21.2" r="0.5" fill="#FFFFFF" />
+
+                                                {/* Bottom Swivel Collar (where cord joins ring) */}
+                                                <circle cx="120" cy="30.5" r="2.5" fill="url(#snakeBrassGrad)" stroke="#451A03" strokeWidth="0.9" />
+                                                <circle cx="119.3" cy="29.8" r="0.6" fill="#FFFFFF" />
+
+                                                {/* Vertical Hanging Rope - Braided Jute Cord (From y=32.5 down to y=69) */}
+                                                <line x1="120.5" y1="32.5" x2="120.5" y2="69" stroke="rgba(0,0,0,0.18)" strokeWidth="3.8" strokeLinecap="round" />
+                                                <line x1="120" y1="32.5" x2="120" y2="69" stroke="url(#snakeRopeGrad)" strokeWidth="3" strokeLinecap="round" />
+                                                <line x1="120" y1="32.5" x2="120" y2="69" stroke="#FDE68A" strokeWidth="1.6" strokeDasharray="4 3" strokeLinecap="round" />
+                                                <line x1="119.5" y1="32.5" x2="119.5" y2="69" stroke="#FFFBEB" strokeWidth="0.8" strokeLinecap="round" />
+
+                                                {/* 🪝 PREMIUM 3D POLISHED BRASS HOOK FIXTURE ("Huk" - Exact Match to User's Uploaded Image) */}
+                                                {/* Hook Eyelet Loop */}
+                                                <circle cx="120" cy="69" r="4.2" fill="none" stroke="url(#snakeBrassGrad)" strokeWidth="2.2" />
+                                                <circle cx="120" cy="69" r="5.2" fill="none" stroke="#451A03" strokeWidth="1" />
+                                                <circle cx="120" cy="69" r="3.2" fill="none" stroke="#451A03" strokeWidth="0.8" />
+
+                                                {/* Hook Saddle Bracket Base (Anchors onto the category round disc) */}
+                                                <path d="M 111,76 C 111,69 129,69 129,76 C 132,80 132,84 132,84 L 108,84 C 108,84 108,80 111,76 Z" fill="rgba(0,0,0,0.22)" />
+                                                <path d="M 112,75 C 112,68.5 128,68.5 128,75 C 131,78.5 131,83 131,83 L 109,83 C 109,83 109,78.5 112,75 Z" fill="url(#snakeBrassGrad)" stroke="#451A03" strokeWidth="1.5" strokeLinejoin="round" />
+                                                <path d="M 114,73 C 116,70.5 124,70.5 126,73" fill="none" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" opacity="0.85" />
+
+                                                {/* Central Hook Rivet Bead / Bolt Head with 3D Specular Highlight */}
+                                                <circle cx="120" cy="76" r="4.2" fill="url(#snakeBrassGrad)" stroke="#451A03" strokeWidth="1.2" />
+                                                <circle cx="120" cy="76" r="2.2" fill="#78350F" opacity="0.6" />
+                                                <circle cx="118.8" cy="74.5" r="1.4" fill="#FFFFFF" />
+                                            </svg>
+                                        </div>
+
+                                        {/* 🎯 GOL ROUND (HICHKO SWING) CATEGORY CARD - MOUNTED DIRECTLY BENEATH THE HOOK */}
                                         <div
-                                            onClick={() => handleCategoryClick(cat.name)}
-                                            className={`group flex flex-col items-center justify-between w-full h-[305px] sm:h-[315px] rounded-[30px] p-4 sm:p-5 transition-all duration-300 relative select-none cursor-pointer overflow-hidden ${
-                                                isSelected
-                                                    ? 'bg-gradient-to-b from-white via-rose-50/60 to-white border-2 border-[#E51A22] ring-4 ring-rose-500/20 shadow-[0_20px_40px_rgba(229,26,34,0.24)] -translate-y-2'
-                                                    : `bg-white/95 backdrop-blur-md border-2 border-slate-200/80 ${theme.borderHover} shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_18px_36px_rgba(0,0,0,0.12)] hover:-translate-y-2`
-                                            }`}
-                                            title={`Filter toys by ${cat.name}`}
+                                            className="hichko-swing-disc -mt-[14px] flex flex-col items-center w-full"
+                                            style={{
+                                                animationDelay: `${-(idx * 0.45) % 3.6}s`
+                                            }}
                                         >
-                                            {/* Ambient Colored Aura Blob */}
-                                            <div className={`absolute -top-12 -right-12 w-32 h-32 rounded-full ${theme.aura} blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity duration-500`} />
-
-                                            {/* Top Row: Active Status & Category Emoji Orb (Numbers Removed) */}
-                                            <div className="w-full flex items-center justify-between min-h-[32px] mb-1 z-10">
-                                                <div>
-                                                    {isSelected && (
-                                                        <span className="text-[10px] font-black uppercase tracking-wider text-[#E51A22] bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200 flex items-center gap-1.5 shadow-2xs">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-[#E51A22] animate-pulse" />
-                                                            Active
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                {/* Floating 3D Emoji Orb */}
-                                                <div className="w-8 h-8 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center text-[15px] transition-transform duration-300 group-hover:scale-115">
-                                                    {emoji}
-                                                </div>
-                                            </div>
-
-                                            {/* 3D Floating Toy Stage with Gradient Rim */}
-                                            <div className="relative w-24 h-24 sm:w-26 sm:h-26 md:w-28 md:h-28 my-auto flex items-center justify-center shrink-0">
-                                                <div className={`w-full h-full rounded-[24px] sm:rounded-[26px] p-[3px] bg-gradient-to-tr ${
-                                                    isSelected ? 'from-[#E51A22] via-amber-400 to-rose-500' : theme.gradient
-                                                } shadow-md ${theme.ringGlow} transition-transform duration-300 group-hover:scale-105 group-hover:rotate-1 flex items-center justify-center`}>
-                                                    <div className="w-full h-full rounded-[22px] sm:rounded-[24px] overflow-hidden bg-white border-2 border-white shadow-inner flex items-center justify-center relative">
-                                                        <img
-                                                            src={getImageUrl(cat.image)}
-                                                            alt={cat.name}
-                                                            draggable="false"
-                                                            loading="lazy"
-                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-115 pointer-events-none"
-                                                        />
+                                            {/* Circular Disc */}
+                                            <div 
+                                                className={`relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full p-1.5 transition-all duration-300 shadow-[0_12px_28px_rgba(0,0,0,0.12)] group-hover/card:shadow-[0_20px_38px_rgba(0,0,0,0.22)] group-hover/card:scale-106 shrink-0 ${
+                                                    isSelected
+                                                        ? 'ring-4 ring-rose-500/30 scale-106 shadow-[0_14px_34px_rgba(229,26,34,0.38)]'
+                                                        : ''
+                                                }`}
+                                                style={{
+                                                    backgroundColor: isSelected ? '#E51A22' : (theme.border || '#FDA4AF'),
+                                                }}
+                                            >
+                                                {/* Top-Left Floating Deco Emoji Badge */}
+                                                <div className="absolute -top-1 -left-1 z-30 pointer-events-none transition-transform duration-300 group-hover/card:scale-125 group-hover/card:-rotate-12">
+                                                    <div 
+                                                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white shadow-md border flex items-center justify-center"
+                                                        style={{ borderColor: `${theme.border}50` }}
+                                                    >
+                                                        <span className="text-sm sm:text-base select-none leading-none">{emoji}</span>
                                                     </div>
                                                 </div>
+
+                                                {/* Top-Right Sparkle or Active Tag */}
+                                                {isSelected && (
+                                                    <div className="absolute -top-1 -right-1 z-30 pointer-events-none animate-bounce">
+                                                        <div className="w-6 h-6 rounded-full bg-[#E51A22] text-white shadow-md border border-white flex items-center justify-center">
+                                                            <Sparkles className="w-3.5 h-3.5" />
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Inner White Circle with Category Photo */}
+                                                <div className="w-full h-full rounded-full overflow-hidden bg-white border-2 border-white flex items-center justify-center relative">
+                                                    <img
+                                                        src={getImageUrl(cat.image)}
+                                                        alt={cat.name}
+                                                        draggable="false"
+                                                        loading="lazy"
+                                                        className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-115 pointer-events-none"
+                                                    />
+
+                                                    {/* Glossy 3D Glass Sphere Reflection */}
+                                                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/40 via-transparent to-transparent pointer-events-none" />
+                                                </div>
                                             </div>
 
-                                            {/* Category Title - EXACT UNIFORM 44px 2-LINE HEIGHT FOR ALL CARDS */}
-                                            <div className="w-full h-11 flex items-center justify-center text-center mt-auto z-10 px-1">
-                                                <span className={`font-black text-[13px] sm:text-[14px] uppercase tracking-wide leading-snug line-clamp-2 transition-colors duration-300 ${
-                                                    isSelected ? 'text-[#E51A22]' : 'text-[#1A1A24] group-hover:text-[#E51A22]'
+                                            {/* Category Name & Badge beneath the circle */}
+                                            <div className="text-center flex flex-col items-center justify-center mt-2.5 px-1 shrink-0 w-full">
+                                                <h3 className={`font-black text-[12px] sm:text-[13px] uppercase tracking-wide leading-tight line-clamp-1 transition-colors duration-200 ${
+                                                    isSelected ? 'text-[#E51A22]' : 'text-slate-900 group-hover/card:text-[#E51A22]'
                                                 }`}>
                                                     {cat.name}
-                                                </span>
-                                            </div>
+                                                </h3>
+                                                <p className="text-[10px] font-bold text-slate-400 group-hover/card:text-slate-600 line-clamp-1 mt-0.5 tracking-tight transition-colors">
+                                                    {theme.sub || 'Curated Toys'}
+                                                </p>
 
-                                            {/* Bottom Bespoke Interaction Bar: Star Rating & Dynamic Theme Tag + Action Arrow */}
-                                            <div className="w-full pt-2.5 mt-1 border-t border-slate-100 group-hover:border-slate-200/90 flex items-center justify-between z-10 px-0.5 transition-colors">
-                                                <div className="flex items-center gap-1.5">
-                                                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 text-[10px] font-black">
-                                                        <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                                                        <span>{theme.rating || '4.9'}</span>
-                                                    </div>
-                                                    <span className="text-[11px] font-black tracking-tight text-slate-500 group-hover:text-slate-800 transition-colors">
-                                                        {isSelected ? '✓ Filter Active' : (theme.tag || 'Popular')}
+                                                <div className="mt-1.5">
+                                                    <span className={`inline-flex items-center gap-1 text-[9.5px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border transition-all duration-200 ${
+                                                        isSelected
+                                                            ? 'bg-[#E51A22] text-white border-[#E51A22] shadow-xs'
+                                                            : `${theme.pillBg || 'bg-slate-100 text-slate-700 border-slate-200'} group-hover/card:border-[#E51A22]`
+                                                    }`}>
+                                                        {isSelected ? (
+                                                            <>
+                                                                <Sparkles className="w-2.5 h-2.5" />
+                                                                Active
+                                                            </>
+                                                        ) : (
+                                                            theme.tag || 'Explore'
+                                                        )}
                                                     </span>
-                                                </div>
-
-                                                <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
-                                                    isSelected
-                                                        ? 'bg-[#E51A22] text-white shadow-xs scale-105'
-                                                        : 'bg-slate-100 text-slate-500 group-hover:bg-[#E51A22] group-hover:text-white group-hover:scale-110 group-hover:translate-x-0.5'
-                                                }`}>
-                                                    <ArrowRight className="w-3.5 h-3.5" />
                                                 </div>
                                             </div>
                                         </div>
-                                    </SwiperSlide>
+                                    </div>
                                 );
                             })}
-                        </Swiper>
+                        </div>
                     </div>
                 )}
             </div>

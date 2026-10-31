@@ -122,16 +122,65 @@ const Products = () => {
             result = result.filter(p => idsList.includes(p._id));
         }
 
-        // Filter by search query
+        // Filter by search query with intelligent token, stemming & synonym matching
         const searchQuery = searchParams.get('search');
         if (searchQuery) {
-            const query = searchQuery.toLowerCase();
+            const query = searchQuery.toLowerCase().trim();
+            const stem = (word) => {
+                if (word.endsWith('ies')) return word.slice(0, -3) + 'y';
+                if (word.endsWith('es') && !word.endsWith('ses')) return word.slice(0, -2);
+                if (word.endsWith('s') && !word.endsWith('ss')) return word.slice(0, -1);
+                return word;
+            };
+            const synonyms = {
+                cars: ['car', 'vehicle', 'rc', 'track', 'train'],
+                car: ['car', 'vehicle', 'rc', 'track', 'train'],
+                vehicles: ['vehicle', 'car', 'rc'],
+                lego: ['block', 'building', 'stem'],
+                legos: ['block', 'building', 'stem'],
+                blocks: ['block', 'building', 'lego'],
+                teddy: ['teddy', 'plush', 'soft', 'bear'],
+                teddies: ['teddy', 'plush', 'soft', 'bear'],
+                plushies: ['plush', 'soft', 'teddy'],
+                games: ['game', 'board'],
+                dolls: ['doll', 'accessories', 'pretend'],
+                toys: ['toy', 'deluxe', 'game', 'play'],
+                science: ['science', 'educational', 'kit', 'stem']
+            };
+            const tokens = query.split(/[\s,+-]+/).filter(Boolean);
             result = result.filter(p => {
-                const matchName = p.name && p.name.toLowerCase().includes(query);
-                const matchCategory = p.category && p.category.toLowerCase().includes(query);
-                const matchSubCategory = p.subCategory && p.subCategory.name && p.subCategory.name.toLowerCase().includes(query);
-                const matchDescription = p.description && p.description.toLowerCase().includes(query);
-                return matchName || matchCategory || matchSubCategory || matchDescription;
+                const pName = (p.name || '').toLowerCase();
+                const pCat = (typeof p.category === 'object' ? p.category?.name : p.category || '').toLowerCase();
+                const pSubCat = (p.subCategory?.name || '').toLowerCase();
+                const pBrand = (typeof p.brand === 'object' ? p.brand?.name : p.brand || '').toLowerCase();
+                const pDesc = (p.description || '').toLowerCase();
+                const combined = [pName, pCat, pSubCat, pBrand, pDesc].join(' ');
+
+                // Exact phrase match
+                if (combined.includes(query)) return true;
+
+                // Token and stem match: if all tokens match or have stems/synonyms
+                const allTokensMatch = tokens.every(t => {
+                    if (combined.includes(t)) return true;
+                    const stemmed = stem(t);
+                    if (stemmed.length >= 3 && combined.includes(stemmed)) return true;
+                    const synList = synonyms[t] || synonyms[stemmed] || [];
+                    return synList.some(s => combined.includes(s));
+                });
+                if (allTokensMatch) return true;
+
+                // If multi-word, at least one meaningful token matches
+                if (tokens.length > 1) {
+                    return tokens.some(t => {
+                        if (t.length > 2 && combined.includes(t)) return true;
+                        const stemmed = stem(t);
+                        if (stemmed.length >= 3 && combined.includes(stemmed)) return true;
+                        const synList = synonyms[t] || synonyms[stemmed] || [];
+                        return synList.some(s => combined.includes(s));
+                    });
+                }
+
+                return false;
             });
         }
 
@@ -291,7 +340,7 @@ const Products = () => {
     let displayTitle = 'All Products';
     const filterParamTitle = searchParams.get('filter');
     const idsParamTitle = searchParams.get('ids');
-    
+
     if (idsParamTitle) {
         displayTitle = 'Selected Products';
     } else if (filterParamTitle === 'sale') {
@@ -316,7 +365,7 @@ const Products = () => {
         const items = [{ label: 'Shop', link: '/products' }];
         const collectionId = searchParams.get('collection');
         const searchQuery = searchParams.get('search');
-        
+
         if (selectedBrands.length === 1) {
             items.push({ label: `Brand: ${selectedBrands[0]}`, link: null });
         } else if (selectedCategories.length === 1) {
@@ -587,9 +636,9 @@ const Products = () => {
 
 
                                                     <Link to={`/product/${product._id}`} className="absolute inset-0 z-10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 ease-out">
-                                                        <ProductCardImageCarousel 
-                                                            images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])} 
-                                                            productName={product.name} 
+                                                        <ProductCardImageCarousel
+                                                            images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])}
+                                                            productName={product.name}
                                                         />
                                                     </Link>
                                                 </div>
@@ -637,7 +686,7 @@ const Products = () => {
                                                             </svg>
                                                         </button>
                                                     </div>
-                                                    
+
                                                     <div className="flex items-center justify-between gap-1 mt-auto pt-2 border-t border-slate-50">
                                                         {product.status === 'Out of Stock' ? (
                                                             <span className="font-bold text-gray-400 text-[12px]">Out of Stock</span>
@@ -713,9 +762,9 @@ const Products = () => {
                                                         )}
                                                     </div>
                                                     <Link to={`/product/${product._id}`} className="block w-full h-full flex items-center justify-center">
-                                                        <ProductCardImageCarousel 
-                                                            images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])} 
-                                                            productName={product.name} 
+                                                        <ProductCardImageCarousel
+                                                            images={product.images?.length > 0 ? product.images : (product.thumbnailImage ? [product.thumbnailImage] : [])}
+                                                            productName={product.name}
                                                         />
                                                     </Link>
                                                 </div>

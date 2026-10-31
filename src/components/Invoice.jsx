@@ -1,8 +1,12 @@
-import React from 'react';
-import { Printer, X, Download } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { 
+    Printer, X, Download, ShieldCheck, CheckCircle2, Clock, 
+    MapPin, Phone, Mail, User, Check, Package, Sparkles
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
+import { BRAND_LOGO_BASE64 } from './brandLogoBase64';
 
 // Helper to format currency
 const formatCurrency = (val) => {
@@ -49,11 +53,24 @@ const numberToWords = (num) => {
     return (res.trim() + ' Rupees Only').replace(/\s+/g, ' ');
 };
 
-import { BRAND_LOGO_BASE64 } from './brandLogoBase64';
-
 const COMPANY_LOGO_URL = BRAND_LOGO_BASE64 || "/brand-logo.png";
 
 const Invoice = ({ order, onClose }) => {
+    // ESC key to close invoice & body overflow lock
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                if (onClose) onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.body.style.overflow = 'unset';
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [onClose]);
+
     const handlePrint = () => {
         window.print();
     };
@@ -71,7 +88,7 @@ const Invoice = ({ order, onClose }) => {
         customerObj.name || 
         `${customerObj.firstName || ''} ${customerObj.lastName || ''}`.trim() || 
         storedUser?.name ||
-        `${storedUser?.firstName || ''} ${storedUser?.lastName || ''}`.trim() ||
+        `${storedUser?.firstName || ''} ${storedUser?.lastName || ''}`.trim() || 
         'Valued Customer';
         
     const customerEmail = customerObj.email || 
@@ -89,11 +106,11 @@ const Invoice = ({ order, onClose }) => {
     // Normalizing address
     const shipAddr = order.shippingAddress || order.billingAddress || {};
     const formattedAddress = [
-        shipAddr.addressLine1 || shipAddr.street || '',
+        shipAddr.addressLine1 || shipAddr.street || shipAddr.streetAddress || '',
         shipAddr.addressLine2 || '',
         [shipAddr.city, shipAddr.state].filter(Boolean).join(', '),
         (shipAddr.postalCode || shipAddr.zipCode) ? `PIN: ${shipAddr.postalCode || shipAddr.zipCode}` : '',
-        shipAddr.country || ''
+        shipAddr.country || 'India'
     ].filter(Boolean);
 
     // Normalizing order items
@@ -131,7 +148,7 @@ const Invoice = ({ order, onClose }) => {
     const isPaid = paymentStatus.toLowerCase() === 'paid';
 
     const handleDownload = async () => {
-        const loadingToast = toast.loading('Generating PDF...');
+        const loadingToast = toast.loading('Generating High-Quality PDF...');
         try {
             const element = document.getElementById('invoice-content');
             if (!element) throw new Error("Invoice content not found");
@@ -162,186 +179,217 @@ const Invoice = ({ order, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-            <div className="min-h-full flex items-start justify-center p-3 sm:p-6 py-8 sm:py-12">
-                <div className="bg-white w-full max-w-[850px] rounded-2xl shadow-2xl overflow-hidden relative border border-slate-200">
-                
+        <div 
+            className="fixed inset-0 z-[100] bg-slate-950/75 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
+            onClick={(e) => {
+                if (e.target === e.currentTarget && onClose) onClose();
+            }}
+        >
+            {/* FLOATING PROMINENT TOP-RIGHT CORNER CLOSE BUTTON ("CHOKDI") */}
+            <button
+                type="button"
+                onClick={onClose}
+                className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[120] w-11 h-11 sm:w-12 sm:h-12 bg-white hover:bg-[#E51A22] text-slate-800 hover:text-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.35)] border-2 border-slate-300 hover:border-[#E51A22] flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-90 group print:hidden"
+                title="Close Invoice (Esc)"
+                aria-label="Close Invoice"
+            >
+                <X className="w-6 h-6 stroke-[2.5] group-hover:rotate-90 transition-transform duration-200" />
+            </button>
+
+            <div className="min-h-full flex items-start justify-center p-3 sm:p-6 py-6 sm:py-10">
+                <div 
+                    className="bg-white w-full max-w-[880px] rounded-3xl shadow-2xl overflow-hidden relative border border-slate-200 my-auto"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {/* Top Decorative Brand Gradient Bar */}
+                    <div className="h-2 w-full bg-gradient-to-r from-[#E51A22] via-[#ff4757] to-[#1c274c]"></div>
+
                     {/* Top Action Toolbar */}
-                    <div className="bg-slate-50 border-b border-slate-200 p-4 flex flex-col sm:flex-row justify-between items-center gap-4 print:hidden">
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Order ID:</span>
-                            <span className="text-sm font-extrabold text-[#1c274c] bg-slate-200/70 px-2.5 py-1 rounded font-mono">
-                                {displayOrderId}
+                    <div className="bg-slate-900 text-white p-4 px-6 flex flex-col sm:flex-row justify-between items-center gap-4 print:hidden">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Tax Invoice:</span>
+                            <span className="text-sm font-extrabold text-white bg-slate-800 px-3 py-1 rounded-lg font-mono border border-slate-700">
+                                {invoiceNumber}
                             </span>
+                            <span className="text-xs text-slate-400">({displayOrderId})</span>
                         </div>
-                        <div className="flex flex-wrap justify-center items-center gap-3">
+
+                        <div className="flex flex-wrap justify-center items-center gap-2.5">
                             <button 
                                 onClick={handleDownload}
-                                className="flex items-center gap-2 px-4 py-2 bg-[#1c274c] text-white rounded-lg font-semibold hover:bg-[#121c3b] transition-colors shadow-sm text-sm"
+                                className="flex items-center gap-2 px-4 py-2 bg-[#E51A22] hover:bg-[#c9141b] text-white rounded-xl font-bold transition-all shadow-md text-xs sm:text-sm active:scale-95 cursor-pointer"
                             >
                                 <Download className="w-4 h-4" /> Download PDF
                             </button>
                             <button 
                                 onClick={handlePrint}
-                                className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-700 font-semibold hover:bg-slate-50 transition-colors shadow-sm text-sm"
+                                className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold transition-all border border-slate-700 text-xs sm:text-sm active:scale-95 cursor-pointer"
                             >
                                 <Printer className="w-4 h-4" /> Print
                             </button>
+                            {/* Inner Close Button */}
                             <button 
                                 onClick={onClose}
-                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Close"
+                                className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-500/20 hover:bg-[#E51A22] text-rose-300 hover:text-white rounded-xl font-bold transition-all border border-rose-500/30 text-xs sm:text-sm active:scale-95 cursor-pointer"
+                                title="Close dialog"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-4 h-4" />
+                                <span>Close</span>
                             </button>
                         </div>
                     </div>
 
-                    {/* Exact Styled Printable Document */}
+                    {/* Clean Executive Tax Invoice Document */}
                     <div 
-                        className="relative overflow-hidden bg-white p-4 sm:p-12 text-[#1c274c] font-sans print:p-0 print:m-0 selection:bg-blue-100" 
+                        className="bg-white p-6 sm:p-12 text-[#1c274c] font-sans print:p-0 print:m-0 selection:bg-rose-100 relative" 
                         id="invoice-content"
                         style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
                     >
-                        {/* Background 5 Columns x 20 Rows Repeating Watermark Grid (Properly Visible Pattern) */}
-                        <div 
-                            className="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none grid grid-cols-5 gap-x-3 sm:gap-x-5 gap-y-6 sm:gap-y-8 p-3 sm:p-5 content-between items-center justify-items-center"
-                            aria-hidden="true"
-                        >
-                            {Array.from({ length: 100 }).map((_, i) => (
-                                <div 
-                                    key={i} 
-                                    className="opacity-[0.11] print:opacity-[0.12] transform -rotate-[22deg] flex items-center justify-center pointer-events-none"
-                                >
+                        {/* 1. Header (Brand Logo, Details, Verified Seal & Invoice Meta) */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-6 border-b-2 border-slate-900 relative">
+                            {/* Brand Details */}
+                            <div className="flex flex-col items-start gap-2.5 max-w-sm">
+                                <div className="flex items-center gap-2">
                                     <img 
                                         src={COMPANY_LOGO_URL} 
-                                        alt="Watermark" 
-                                        className="w-28 sm:w-32 max-w-full h-auto object-contain pointer-events-none" 
+                                        alt="Little Joys - Kids & Baby Store" 
+                                        className="h-12 sm:h-14 w-auto object-contain"
                                     />
                                 </div>
-                            ))}
-                        </div>
-
-                        {/* Content Container (Layered above watermark) */}
-                        <div className="relative z-10">
-                            {/* 1. Header (Brand Logo, Details & Right Slogan) */}
-                            <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-6">
-                                {/* Left Brand Details */}
-                                <div className="flex flex-col items-start gap-3">
-                                    <div className="flex items-center">
-                                        <img 
-                                            src={COMPANY_LOGO_URL} 
-                                            alt="Little Joys - Kids & Baby Store" 
-                                            className="h-12 sm:h-14 w-auto object-contain"
-                                        />
-                                    </div>
-                                    
-                                    <div className="text-[12px] text-neutral-800 space-y-1 pt-1 font-medium">
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-black font-bold">📍</span>
-                                            <span>Tulsi Arcade, Mota Varachha, Surat, Gujarat 394101</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-black font-bold">📞</span>
-                                            <span>Telp. +91 8347640423</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-black font-bold">✉</span>
-                                            <span>Email: adheenbhuva0007@gmail.com</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Right Side Tagline with subtle vertical border */}
-                                <div className="hidden sm:block border-l-2 border-slate-300 pl-4 py-1 text-right self-stretch">
-                                    <p className="text-xs italic text-slate-500 font-medium leading-relaxed">
-                                        Spreading Smiles,<br />
-                                        One Toy at a Time
+                                <div className="text-[12px] text-slate-600 space-y-1 font-medium leading-relaxed">
+                                    <p className="font-extrabold text-slate-900 text-sm">Little Joys Retail Pvt. Ltd.</p>
+                                    <p className="flex items-center gap-1 text-slate-600">
+                                        <MapPin className="w-3.5 h-3.5 text-[#E51A22] shrink-0" />
+                                        <span>Tulsi Arcade, Mota Varachha, Surat, Gujarat 394101</span>
+                                    </p>
+                                    <p className="flex items-center gap-1 text-slate-600">
+                                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                        <span>+91 8347640423 | adheenbhuva0007@gmail.com</span>
+                                    </p>
+                                    <p className="text-[11px] text-slate-500 font-mono pt-0.5">
+                                        GSTIN: <span className="font-bold text-slate-800">24AAACL1234F1Z5</span> • State: 24 (Gujarat)
                                     </p>
                                 </div>
                             </div>
 
-                        {/* Top Thick Navy Divider */}
-                        <div className="h-1 w-full bg-[#1c274c] mb-6"></div>
+                            {/* Right Side: Tax Invoice Badge & Stamp */}
+                            <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
+                                <div className="inline-block bg-[#1c274c] text-white px-4 py-1.5 rounded-lg text-xs font-black tracking-widest uppercase mb-3 shadow-xs">
+                                    ORIGINAL TAX INVOICE
+                                </div>
+                                
+                                <div className="space-y-1 text-left sm:text-right font-mono text-xs">
+                                    <p className="text-slate-500 font-semibold font-sans">Invoice Number:</p>
+                                    <p className="text-base font-black text-[#1c274c] tracking-tight">{invoiceNumber}</p>
+                                    <p className="text-[11px] text-slate-500 font-sans mt-1">
+                                        Date: <span className="font-bold text-slate-900">{dateFormatted}</span>
+                                    </p>
+                                    <p className="text-[11px] text-slate-500 font-sans">
+                                        Order ID: <span className="font-bold text-slate-900">{displayOrderId}</span>
+                                    </p>
+                                </div>
 
-                        {/* 2. INVOICE Title & Invoice Info Box */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                            <div>
-                                <h2 className="text-3xl sm:text-4xl font-black text-[#1c274c] tracking-wider uppercase">
-                                    INVOICE
-                                </h2>
-                            </div>
-
-                            {/* Invoice Meta Table */}
-                            <div className="bg-slate-50/80 border border-slate-200/80 rounded-lg p-3 sm:px-5 sm:py-3 w-full sm:w-auto min-w-[270px]">
-                                <table className="w-full text-xs">
-                                    <tbody>
-                                        <tr>
-                                            <td className="text-slate-500 font-bold pr-3 py-1">Order ID</td>
-                                            <td className="text-slate-400 font-bold px-1">:</td>
-                                            <td className="text-[#1c274c] font-extrabold text-right py-1 tracking-wider font-mono">
-                                                {displayOrderId}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="text-slate-500 font-bold pr-3 py-1">Invoice No.</td>
-                                            <td className="text-slate-400 font-bold px-1">:</td>
-                                            <td className="text-[#1c274c] font-semibold text-right py-1 font-mono">
-                                                {invoiceNumber}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="text-slate-500 font-bold pr-3 py-1">Date</td>
-                                            <td className="text-slate-400 font-bold px-1">:</td>
-                                            <td className="text-[#1c274c] font-semibold text-right py-1">
-                                                {dateFormatted}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                {/* Verified Paid Stamp Graphic */}
+                                <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border-2 border-emerald-500 text-emerald-800 text-[11px] font-black tracking-wider uppercase shadow-xs">
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                    <span>{isPaid ? 'VERIFIED & PAID' : paymentStatus}</span>
+                                </div>
                             </div>
                         </div>
 
-                        {/* 3. Billed To */}
-                        <div className="mb-6 pt-2 pb-5 border-b border-slate-200">
-                            <p className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
-                                Billed To:
-                            </p>
-                            <table className="text-xs text-slate-700">
-                                <tbody>
-                                    <tr>
-                                        <td className="font-semibold text-slate-500 py-1 w-24">Name</td>
-                                        <td className="text-slate-400 font-bold px-2">:</td>
-                                        <td className="font-bold text-slate-900 py-1 text-sm">{customerName}</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="font-semibold text-slate-500 py-1 align-top">Address</td>
-                                        <td className="text-slate-400 font-bold px-2 align-top">:</td>
-                                        <td className="py-1 leading-relaxed text-slate-800">
-                                            {formattedAddress.length > 0 ? formattedAddress.join(', ') : 'Not provided'}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="font-semibold text-slate-500 py-1">Contact</td>
-                                        <td className="text-slate-400 font-bold px-2">:</td>
-                                        <td className="py-1 text-slate-600">
-                                            {[customerPhone, customerEmail].filter(Boolean).join(' | ') || 'Not specified'}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        {/* 2. Customer Billed To & Order Details Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 my-6">
+                            {/* Billed & Shipped To */}
+                            <div className="bg-slate-50/80 border border-slate-200 rounded-2xl p-4 sm:p-5">
+                                <p className="text-[11px] font-black uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
+                                    <User className="w-3.5 h-3.5 text-[#E51A22]" /> Billed &amp; Shipped To:
+                                </p>
+                                <p className="font-black text-slate-900 text-sm mb-1">{customerName}</p>
+                                <p className="text-xs text-slate-600 leading-relaxed mb-3 font-medium">
+                                    {formattedAddress.length > 0 ? formattedAddress.join(', ') : 'Delivery address on record'}
+                                </p>
+                                <div className="text-xs text-slate-600 space-y-1 pt-2 border-t border-slate-200/80">
+                                    {customerPhone && (
+                                        <p className="flex items-center gap-1.5 font-medium">
+                                            <Phone className="w-3 h-3 text-slate-400" />
+                                            <span>+91 {customerPhone}</span>
+                                        </p>
+                                    )}
+                                    {customerEmail && (
+                                        <p className="flex items-center gap-1.5 font-medium">
+                                            <Mail className="w-3 h-3 text-slate-400" />
+                                            <span>{customerEmail}</span>
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Order & Payment Summary Card */}
+                            <div className="bg-slate-50/80 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
+                                <div>
+                                    <p className="text-[11px] font-black uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
+                                        <Package className="w-3.5 h-3.5 text-blue-600" /> Order &amp; Payment Overview:
+                                    </p>
+                                    <div className="space-y-2 text-xs">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-slate-500 font-medium">Payment Mode:</span>
+                                            <span className="font-bold text-slate-900 capitalize bg-white px-2 py-0.5 rounded border border-slate-200">
+                                                {order.paymentMethod || 'Online'}
+                                            </span>
+                                        </div>
+                                        {order.razorpayPaymentId && (
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-500 font-medium">Txn ID:</span>
+                                                <span className="font-mono text-slate-800 font-bold">{order.razorpayPaymentId}</span>
+                                            </div>
+                                        )}
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-slate-500 font-medium">Fulfillment Status:</span>
+                                            <span className="font-black text-[#1c274c] uppercase tracking-wider text-[11px]">
+                                                {order.orderStatus || 'Confirmed'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Barcode Visual for authentic e-commerce feel */}
+                                <div className="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between">
+                                    <div className="space-y-0.5">
+                                        <div className="flex items-center gap-0.5 h-6">
+                                            <span className="w-1 h-6 bg-slate-800"></span>
+                                            <span className="w-0.5 h-6 bg-slate-800"></span>
+                                            <span className="w-2 h-6 bg-slate-800"></span>
+                                            <span className="w-0.5 h-6 bg-slate-800"></span>
+                                            <span className="w-1.5 h-6 bg-slate-800"></span>
+                                            <span className="w-0.5 h-6 bg-slate-800"></span>
+                                            <span className="w-2 h-6 bg-slate-800"></span>
+                                            <span className="w-1 h-6 bg-slate-800"></span>
+                                            <span className="w-0.5 h-6 bg-slate-800"></span>
+                                            <span className="w-1.5 h-6 bg-slate-800"></span>
+                                            <span className="w-2 h-6 bg-slate-800"></span>
+                                            <span className="w-0.5 h-6 bg-slate-800"></span>
+                                            <span className="w-1 h-6 bg-slate-800"></span>
+                                        </div>
+                                        <p className="text-[9px] font-mono text-slate-400">{displayOrderId}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] text-slate-400 font-medium">Place of Supply</p>
+                                        <p className="text-xs font-bold text-slate-800">Gujarat (24)</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* 4. Line Items Table */}
-                        <div className="border border-slate-300 rounded-lg overflow-x-auto mb-6">
-                            <table className="w-full min-w-[500px] text-xs text-left border-collapse">
+                        {/* 3. Items Table */}
+                        <div className="border border-slate-300 rounded-2xl overflow-hidden mb-6 shadow-xs">
+                            <table className="w-full text-xs text-left border-collapse">
                                 <thead>
                                     <tr className="bg-[#1c274c] text-white font-bold text-center">
-                                        <th className="py-3 px-3 w-12 border-r border-slate-600">No.</th>
-                                        <th className="py-3 px-4 text-left border-r border-slate-600">Item Description</th>
-                                        <th className="py-3 px-3 w-20 border-r border-slate-600">Qty</th>
-                                        <th className="py-3 px-4 text-right w-28 border-r border-slate-600">Price (₹)</th>
-                                        <th className="py-3 px-4 text-right w-28">Total (₹)</th>
+                                        <th className="py-3.5 px-3 w-12 border-r border-slate-700">#</th>
+                                        <th className="py-3.5 px-4 text-left border-r border-slate-700">Item Description</th>
+                                        <th className="py-3.5 px-3 w-20 border-r border-slate-700">Qty</th>
+                                        <th className="py-3.5 px-4 text-right w-28 border-r border-slate-700">Unit Price (₹)</th>
+                                        <th className="py-3.5 px-4 text-right w-28">Amount (₹)</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-200">
@@ -352,67 +400,90 @@ const Invoice = ({ order, onClose }) => {
                                         const rowTotal = unitPrice * qty;
 
                                         return (
-                                            <tr key={index} className="text-slate-800 hover:bg-slate-50/50">
-                                                <td className="py-3 px-3 text-center border-r border-slate-200 font-medium text-slate-500">
+                                            <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
+                                                <td className="py-3 px-3 text-center border-r border-slate-200 font-semibold text-slate-400">
                                                     {index + 1}
                                                 </td>
-                                                <td className="py-3 px-4 border-r border-slate-200 font-semibold text-slate-900">
+                                                <td className="py-3 px-4 border-r border-slate-200 font-bold text-slate-900">
                                                     {itemName}
+                                                    {item.variant && (
+                                                        <span className="block text-[11px] font-normal text-slate-500 mt-0.5">
+                                                            Option: {item.variant}
+                                                        </span>
+                                                    )}
                                                 </td>
-                                                <td className="py-3 px-3 text-center border-r border-slate-200 font-medium">
-                                                    {qty} Unit
+                                                <td className="py-3 px-3 text-center border-r border-slate-200 font-semibold text-slate-700">
+                                                    {qty}
                                                 </td>
-                                                <td className="py-3 px-4 text-right border-r border-slate-200 font-medium">
+                                                <td className="py-3 px-4 text-right border-r border-slate-200 font-medium text-slate-700">
                                                     ₹{formatCurrency(unitPrice)}
                                                 </td>
-                                                <td className="py-3 px-4 text-right font-bold text-slate-900">
+                                                <td className="py-3 px-4 text-right font-black text-slate-900">
                                                     ₹{formatCurrency(rowTotal)}
                                                 </td>
                                             </tr>
                                         );
                                     })}
 
-                                    {/* Subtotal, Shipping, Discount & Grand Total block */}
+                                    {/* Sub Total */}
                                     <tr className="border-t-2 border-slate-300">
-                                        <td colSpan="3" className="border-r border-slate-200 bg-slate-50/50"></td>
-                                        <td className="py-2 px-4 text-right font-bold text-slate-700 border-r border-slate-200 bg-slate-50">
+                                        <td colSpan="3" className="border-r border-slate-200 bg-slate-50/40"></td>
+                                        <td className="py-2.5 px-4 text-right font-bold text-slate-600 border-r border-slate-200 bg-slate-50">
                                             Sub Total
                                         </td>
-                                        <td className="py-2 px-4 text-right font-bold text-slate-900 bg-slate-50">
+                                        <td className="py-2.5 px-4 text-right font-bold text-slate-900 bg-slate-50">
                                             ₹{formatCurrency(subTotal)}
                                         </td>
                                     </tr>
 
-                                    {shippingCharge > 0 && (
-                                        <tr>
-                                            <td colSpan="3" className="border-r border-slate-200 bg-slate-50/50"></td>
-                                            <td className="py-2 px-4 text-right font-bold text-slate-700 border-r border-slate-200 bg-slate-50">
-                                                Shipping Fee
-                                            </td>
-                                            <td className="py-2 px-4 text-right font-bold text-slate-900 bg-slate-50">
-                                                ₹{formatCurrency(shippingCharge)}
-                                            </td>
-                                        </tr>
-                                    )}
+                                    {/* Shipping Charges */}
+                                    <tr>
+                                        <td colSpan="3" className="border-r border-slate-200 bg-slate-50/40"></td>
+                                        <td className="py-2.5 px-4 text-right font-bold text-slate-600 border-r border-slate-200 bg-slate-50">
+                                            Shipping Fee
+                                        </td>
+                                        <td className="py-2.5 px-4 text-right font-bold bg-slate-50">
+                                            {shippingCharge > 0 ? (
+                                                `₹${formatCurrency(shippingCharge)}`
+                                            ) : (
+                                                <span className="text-emerald-700 font-black">FREE SHIPPING</span>
+                                            )}
+                                        </td>
+                                    </tr>
 
+                                    {/* Discount if any */}
                                     {discountAmount > 0 && (
                                         <tr>
-                                            <td colSpan="3" className="border-r border-slate-200 bg-slate-50/50"></td>
-                                            <td className="py-2 px-4 text-right font-bold text-emerald-700 border-r border-slate-200 bg-emerald-50/50">
-                                                Discount / Coupon ({order.couponCode || 'Promo'})
+                                            <td colSpan="3" className="border-r border-slate-200 bg-emerald-50/20"></td>
+                                            <td className="py-2.5 px-4 text-right font-bold text-emerald-700 border-r border-slate-200 bg-emerald-50/40">
+                                                Coupon Discount
                                             </td>
-                                            <td className="py-2 px-4 text-right font-bold text-emerald-700 bg-emerald-50/50">
+                                            <td className="py-2.5 px-4 text-right font-black text-emerald-700 bg-emerald-50/40">
                                                 -₹{formatCurrency(discountAmount)}
                                             </td>
                                         </tr>
                                     )}
 
-                                    <tr className="bg-slate-100 font-extrabold text-sm">
-                                        <td colSpan="3" className="border-r border-slate-200"></td>
-                                        <td className="py-3 px-4 text-right text-[#1c274c] border-r border-slate-200">
-                                            Total Amount
+                                    {/* Estimated GST */}
+                                    {taxAmount > 0 && (
+                                        <tr>
+                                            <td colSpan="3" className="border-r border-slate-200 bg-slate-50/40"></td>
+                                            <td className="py-2.5 px-4 text-right font-medium text-slate-500 border-r border-slate-200 bg-slate-50">
+                                                Taxes Included (GST)
+                                            </td>
+                                            <td className="py-2.5 px-4 text-right font-medium text-slate-700 bg-slate-50">
+                                                ₹{formatCurrency(taxAmount)}
+                                            </td>
+                                        </tr>
+                                    )}
+
+                                    {/* Grand Total */}
+                                    <tr className="bg-[#1c274c] text-white font-black text-sm">
+                                        <td colSpan="3" className="border-r border-slate-800"></td>
+                                        <td className="py-3.5 px-4 text-right border-r border-slate-800 uppercase tracking-wider text-xs">
+                                            Grand Total
                                         </td>
-                                        <td className="py-3 px-4 text-right text-[#1c274c]">
+                                        <td className="py-3.5 px-4 text-right text-base text-yellow-300 font-mono">
                                             ₹{formatCurrency(totalAmount)}
                                         </td>
                                     </tr>
@@ -420,109 +491,71 @@ const Invoice = ({ order, onClose }) => {
                             </table>
                         </div>
 
-                        {/* 5. Amount in Words Card */}
-                        <div className="bg-[#eef4ff] rounded-xl p-3.5 mb-6 flex items-center gap-3 border border-[#d6e3fc]">
-                            <div className="w-10 h-10 rounded-full bg-[#1c274c] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                        {/* 4. Amount in Words Box */}
+                        <div className="bg-slate-50 rounded-2xl p-4 mb-6 flex items-center gap-3 border border-slate-200">
+                            <div className="w-9 h-9 rounded-xl bg-[#1c274c] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
                                 ₹
                             </div>
-                            <div>
-                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                                    Amount in Words:
-                                </p>
-                                <p className="text-xs sm:text-sm font-bold text-[#1c274c] italic mt-0.5">
+                            <div className="text-xs">
+                                <span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Total in Words: </span>
+                                <span className="font-black text-[#1c274c] italic ml-1">
                                     {numberToWords(totalAmount)}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* 5. Policy Terms & Authorized Signatory */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-200">
+                            <div className="text-xs text-slate-600 space-y-1.5">
+                                <p className="font-bold text-slate-900 flex items-center gap-1.5">
+                                    <ShieldCheck className="w-4 h-4 text-emerald-600" /> Terms &amp; Return Conditions:
+                                </p>
+                                <p className="text-[11px] text-slate-500 leading-relaxed">
+                                    • Eligible items can be returned or exchanged within 7 days from delivery date.<br />
+                                    • All toys sold are child-safe and quality certified.<br />
+                                    • Customer Support: adheenbhuva0007@gmail.com | +91 8347640423
                                 </p>
                             </div>
-                        </div>
 
-                        {/* 6. Footer Section: Payment Method, Status, Terms & Store Info */}
-                        <div className="pt-2 space-y-6">
-                            {/* Row 1: Payment Method (Left) + Status Badge (Right) */}
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-center text-[#1c274c] shrink-0 mt-0.5">
-                                        <svg className="w-5 h-5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <rect x="2" y="5" width="20" height="14" rx="2" />
-                                            <line x1="2" y1="10" x2="22" y2="10" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-bold text-slate-900">Payment Method</p>
-                                        <p className="text-xs font-semibold text-slate-700 mt-0.5">
-                                            {order.paymentMethod || 'Razorpay'}
-                                        </p>
-                                        {order.razorpayPaymentId && (
-                                            <p className="text-[11px] text-slate-400 font-mono mt-0.5">
-                                                Txn ID: {order.razorpayPaymentId}
-                                            </p>
-                                        )}
-                                    </div>
+                            <div className="text-left sm:text-right flex flex-col justify-between items-start sm:items-end">
+                                <div>
+                                    <p className="text-[11px] text-slate-500">For <span className="font-bold text-slate-800">Little Joys Retail Pvt. Ltd.</span></p>
                                 </div>
-
-                                <div className="flex items-center gap-3 self-end sm:self-center">
-                                    <span className="text-xs font-bold text-slate-700">Status:</span>
-                                    <div className={`px-5 py-1.5 rounded-md font-extrabold text-xs tracking-wider border shadow-sm ${
-                                        isPaid 
-                                            ? 'bg-[#182649] text-white border-[#182649]' 
-                                            : 'bg-amber-100 text-amber-800 border-amber-300'
-                                    }`}>
-                                        {isPaid ? 'PAID' : paymentStatus}
+                                <div className="mt-6 sm:mt-0 pt-3">
+                                    <div className="inline-block border-t border-dashed border-slate-400 pt-1 text-[11px] text-slate-500">
+                                        <p className="font-bold text-slate-800">Authorized Signatory</p>
+                                        <p className="text-[10px] text-slate-400 italic">Computer Generated Invoice • No Physical Signature Required</p>
                                     </div>
-                                </div>
-                            </div>
-
-                            {/* Row 2: Terms & Conditions (Left) + Surat, Date & Store Info (Right) */}
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 pt-1">
-                                <div className="flex items-start gap-3 max-w-xl">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-center text-[#1c274c] shrink-0 mt-0.5">
-                                        <svg className="w-5 h-5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                            <polyline points="14 2 14 8 20 8" />
-                                            <line x1="16" y1="13" x2="8" y2="13" />
-                                            <line x1="16" y1="17" x2="8" y2="17" />
-                                        </svg>
-                                    </div>
-                                    <div className="text-xs text-slate-600 space-y-1.5">
-                                        <p className="font-bold text-slate-900">Terms &amp; Conditions:</p>
-                                        <p className="leading-relaxed text-[11px] text-slate-500">
-                                            • Goods once sold can be returned or exchanged within 7 days as per store policy.<br />
-                                            • Please retain this invoice as official proof of purchase.
-                                        </p>
-                                        <p className="text-[11px] italic font-semibold text-slate-800 pt-0.5">
-                                            Thank you for shopping with Little Joys!
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="text-left sm:text-right shrink-0 self-end">
-                                    <p className="text-[11px] text-slate-500 font-medium">
-                                        Surat, {dateFormatted}
-                                    </p>
-                                    <p className="text-sm font-black text-[#182649] tracking-tight mt-0.5">
-                                        LITTLE JOYS TOYS STORE
-                                    </p>
-                                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                                        Computer Generated Invoice
-                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Subtle watermarked bottom line */}
-                        <div className="border-t border-slate-200 mt-8 pt-3 flex justify-between text-[10px] text-slate-400">
+                        {/* Bottom line */}
+                        <div className="border-t border-slate-100 mt-6 pt-3 flex flex-col sm:flex-row justify-between text-[10px] text-slate-400">
                             <span>Little Joys Online Store • https://littlejoys.com</span>
-                            <span>Invoice Generated: {new Date().toLocaleString()}</span>
+                            <span>Generated: {new Date().toLocaleString('en-IN')}</span>
                         </div>
                     </div>
-                </div>
 
-                    {/* Bottom Toolbar for easy mobile access */}
-                    <div className="bg-slate-50 border-t border-slate-100 p-4 flex flex-col justify-center items-center gap-4 print:hidden">
+                    {/* Bottom Action for Mobile */}
+                    <div className="bg-slate-50 border-t border-slate-200 p-4 flex flex-wrap justify-center items-center gap-3 print:hidden">
                         <button 
                             onClick={handleDownload}
-                            className="flex items-center gap-2 px-8 py-3 bg-[#1c274c] text-white rounded-xl font-bold hover:bg-[#121c3b] transition-colors shadow-lg shadow-blue-900/10 w-full sm:w-auto justify-center text-sm"
+                            className="flex items-center gap-2 px-6 py-2.5 bg-[#E51A22] hover:bg-[#c9141b] text-white rounded-xl font-bold transition-all shadow-md text-xs sm:text-sm active:scale-95 cursor-pointer"
                         >
                             <Download className="w-4 h-4" /> Download Invoice PDF
+                        </button>
+                        <button 
+                            onClick={handlePrint}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-bold transition-all text-xs sm:text-sm active:scale-95 cursor-pointer"
+                        >
+                            <Printer className="w-4 h-4" /> Print
+                        </button>
+                        <button 
+                            onClick={onClose}
+                            className="flex items-center gap-1.5 px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition-all text-xs sm:text-sm active:scale-95 cursor-pointer"
+                        >
+                            <X className="w-4 h-4" /> Close
                         </button>
                     </div>
 

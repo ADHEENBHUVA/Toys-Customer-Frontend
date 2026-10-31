@@ -48,7 +48,8 @@ import { PopupProvider } from './context/PopupContext';
 const Layout = () => {
     const { pathname } = useLocation();
     const { isCartOpen } = useCart();
-    const hideBottomNav = pathname.startsWith('/product/') || pathname === '/cart' || pathname === '/checkout';
+    const isAuthPage = pathname === '/login' || pathname === '/register';
+    const hideBottomNav = isAuthPage || pathname.startsWith('/product/') || pathname === '/cart' || pathname === '/checkout';
 
     useEffect(() => {
         if (isCartOpen) {
@@ -65,28 +66,30 @@ const Layout = () => {
     }, [isCartOpen]);
 
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-800 flex relative overflow-x-clip">
+        <div className={`font-sans text-slate-800 flex relative overflow-x-clip ${isAuthPage ? 'h-screen w-screen overflow-hidden bg-white' : 'min-h-screen bg-white'}`}>
             {/* The Dashboard / Main Page Canvas */}
             <div 
-                className={`min-h-screen w-full flex flex-col relative transition-all duration-300 ease-in-out ${
-                    hideBottomNav ? 'pb-0' : 'pb-16 md:pb-0'
+                className={`w-full flex flex-col relative transition-all duration-300 ease-in-out ${
+                    isAuthPage 
+                        ? 'h-screen overflow-hidden' 
+                        : (hideBottomNav ? 'min-h-screen pb-0' : 'min-h-screen pb-16 md:pb-0')
                 } ${
-                    isCartOpen 
+                    isCartOpen && !isAuthPage
                         ? 'lg:w-[calc(100%-460px)] xl:w-[calc(100%-480px)]' 
                         : 'w-full'
                 }`}
             >
                 <ScrollToTop />
-                <Navbar />
-                <main className="flex-1 relative z-10">
+                {!isAuthPage && <Navbar />}
+                <main className={`relative z-10 flex flex-col ${isAuthPage ? 'h-full flex-1 overflow-hidden' : 'flex-1'}`}>
                     <Outlet />
                 </main>
-                <Footer />
-                <MobileBottomNav />
+                {!isAuthPage && <Footer />}
+                {!isAuthPage && <MobileBottomNav />}
             </div>
 
             {/* Cart Drawer - Docked on the right */}
-            <CartDrawer />
+            {!isAuthPage && <CartDrawer />}
         </div>
     );
 };
