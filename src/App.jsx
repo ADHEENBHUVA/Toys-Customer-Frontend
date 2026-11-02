@@ -5,6 +5,11 @@ import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
+import MobileBottomNav from './components/MobileBottomNav';
+import CartDrawer from './components/CartDrawer';
+import FloatingActions from './components/FloatingActions';
+import { CartProvider, useCart } from './context/CartContext';
+import { PopupProvider } from './context/PopupContext';
 
 import Dashboard from './pages/Dashboard';
 import Cart from './pages/Cart';
@@ -31,19 +36,49 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 
 const ScrollToTop = () => {
-    const { pathname } = useLocation();
+    const location = useLocation();
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [pathname]);
+        // Enforce manual scroll restoration so the browser does not retain/jump back to the footer position
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+
+        const scrollToTopNow = () => {
+            window.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'instant'
+            });
+            if (document.documentElement) {
+                document.documentElement.scrollTop = 0;
+            }
+            if (document.body) {
+                document.body.scrollTop = 0;
+            }
+            const root = document.getElementById('root');
+            if (root) {
+                root.scrollTop = 0;
+            }
+        };
+
+        // Scroll immediately on any route or query change
+        scrollToTopNow();
+
+        // Additional animation frames to ensure top position after DOM/images mount
+        const raf = requestAnimationFrame(scrollToTopNow);
+        const timer1 = setTimeout(scrollToTopNow, 50);
+        const timer2 = setTimeout(scrollToTopNow, 150);
+
+        return () => {
+            cancelAnimationFrame(raf);
+            clearTimeout(timer1);
+            clearTimeout(timer2);
+        };
+    }, [location.pathname, location.search, location.hash, location.key]);
 
     return null;
 };
-
-import MobileBottomNav from './components/MobileBottomNav';
-import CartDrawer from './components/CartDrawer';
-import { CartProvider, useCart } from './context/CartContext';
-import { PopupProvider } from './context/PopupContext';
 
 const Layout = () => {
     const { pathname } = useLocation();
@@ -79,7 +114,6 @@ const Layout = () => {
                         : 'w-full'
                 }`}
             >
-                <ScrollToTop />
                 {!isAuthPage && <Navbar />}
                 <main className={`relative z-10 flex flex-col ${isAuthPage ? 'h-full flex-1 overflow-hidden' : 'flex-1'}`}>
                     <Outlet />
@@ -90,6 +124,9 @@ const Layout = () => {
 
             {/* Cart Drawer - Docked on the right */}
             {!isAuthPage && <CartDrawer />}
+
+            {/* Floating Actions: WhatsApp & Scroll To Top (Animated Floating) - Never shown on Auth/Login pages */}
+            {!isAuthPage && <FloatingActions />}
         </div>
     );
 };
@@ -99,6 +136,7 @@ function App() {
     <PopupProvider>
       <CartProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Toaster
             position="top-center"
             toastOptions={{
@@ -141,10 +179,10 @@ function App() {
                   <Route path="/track-order" element={<TrackOrder />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/terms" element={<Terms />} />
+                  <Route path="/checkout" element={<Checkout />} />
                   
                   {/* Protected Routes */}
                   <Route element={<ProtectedRoute />}>
-                      <Route path="/checkout" element={<Checkout />} />
                       <Route path="/order-success" element={<OrderSuccess />} />
                       <Route path="/orders" element={<Orders />} />
                       <Route path="/profile" element={<Profile />} />

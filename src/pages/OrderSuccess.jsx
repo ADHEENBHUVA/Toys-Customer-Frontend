@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Check, Package, FileText, ArrowRight, Truck, FileOutput } from 'lucide-react';
+import { Check, Package, FileText, ArrowRight, Truck, FileOutput, Copy } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Invoice from '../components/Invoice';
 
 const OrderSuccess = () => {
     const location = useLocation();
     const orderId = location.state?.orderId;
     const [fetchedOrder, setFetchedOrder] = useState(null);
+    const [isCopied, setIsCopied] = useState(false);
 
     const [orderDetails, setOrderDetails] = useState({
         orderNumber: '',
@@ -14,6 +16,39 @@ const OrderSuccess = () => {
         deliveryDate: ''
     });
     const [showInvoice, setShowInvoice] = useState(false);
+
+    const handleCopyOrderNumber = async (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const textToCopy = orderDetails.orderNumber;
+        if (!textToCopy) return;
+
+        try {
+            if (navigator?.clipboard?.writeText) {
+                await navigator.clipboard.writeText(textToCopy);
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = textToCopy;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+            setIsCopied(true);
+            toast.success(`Order number copied: ${textToCopy} 📋`, {
+                id: 'order-copy-toast',
+                duration: 3000
+            });
+            setTimeout(() => setIsCopied(false), 2500);
+        } catch (err) {
+            console.error('Failed to copy order number:', err);
+            toast.error('Could not copy order number');
+        }
+    };
 
     useEffect(() => {
         const fetchOrderData = async () => {
@@ -156,8 +191,39 @@ const OrderSuccess = () => {
                                     </h3>
                                     <div className="space-y-4">
                                         <div>
-                                            <p className="text-slate-500 font-medium text-sm mb-1">Order Number</p>
-                                            <p className="font-black text-[#1A1A24] text-lg">{orderDetails.orderNumber}</p>
+                                            <p className="text-slate-500 font-medium text-sm mb-1.5 flex items-center justify-between">
+                                                <span>Order Number</span>
+                                                <span className="text-[11px] text-slate-400 font-bold hidden sm:inline">Click to copy</span>
+                                            </p>
+                                            <div 
+                                                onClick={handleCopyOrderNumber}
+                                                className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200/90 shadow-2xs hover:border-[#E51A22]/50 hover:shadow-xs transition-all cursor-pointer group active:scale-95"
+                                                title="Click to copy Order Number"
+                                            >
+                                                <span className="font-black text-[#1A1A24] text-lg sm:text-xl tracking-tight select-all font-mono">
+                                                    {orderDetails.orderNumber || '#OD-PROCESSING'}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                                                        isCopied 
+                                                            ? 'bg-emerald-50 text-emerald-600' 
+                                                            : 'bg-slate-100 text-slate-600 group-hover:bg-red-50 group-hover:text-[#E51A22]'
+                                                    }`}
+                                                    aria-label="Copy Order Number"
+                                                >
+                                                    {isCopied ? (
+                                                        <Check className="w-4 h-4 stroke-[3] text-emerald-600" />
+                                                    ) : (
+                                                        <Copy className="w-4 h-4 transition-transform group-hover:scale-110" />
+                                                    )}
+                                                </button>
+                                                {isCopied && (
+                                                    <span className="text-xs font-black text-emerald-600 animate-pulse pr-1">
+                                                        Copied!
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                         <div>
                                             <p className="text-slate-500 font-medium text-sm mb-1">Date Placed</p>

@@ -7,8 +7,35 @@ import {
     User, Mail, Phone, MapPin, Plus, Trash2, Edit3, CheckCircle, 
     ShieldCheck, AlertCircle, Sparkles, Package, Heart, LogOut,
     Home, Building, Check, ArrowRight, Loader2, X, Star, ChevronRight,
-    Award, Clock
+    Award, Clock, Truck
 } from 'lucide-react';
+
+/**
+ * Generates custom customer initials for the profile image slot according to user rule:
+ * - If customer name has 2 words (e.g. "Adheen Bhuva") -> 1st letter of both words -> "AB"
+ * - If customer name has 1 word (e.g. "Adheen") -> First 2 letters of that word -> "AD"
+ * - Fallbacks: 3+ words -> 1st letter of 1st word + 1st letter of 2nd word; 1 char -> 1 char; empty -> "LJ"
+ */
+export const getProfileInitials = (nameStr) => {
+    if (!nameStr || typeof nameStr !== 'string') return 'LJ';
+    const trimmed = nameStr.trim();
+    if (!trimmed) return 'LJ';
+
+    const words = trimmed.split(/\s+/).filter(Boolean);
+
+    if (words.length >= 2) {
+        const firstLetter = words[0].charAt(0);
+        const secondLetter = words[1].charAt(0);
+        return `${firstLetter}${secondLetter}`.toUpperCase();
+    } else if (words.length === 1) {
+        const singleWord = words[0];
+        if (singleWord.length >= 2) {
+            return singleWord.substring(0, 2).toUpperCase();
+        }
+        return singleWord.charAt(0).toUpperCase();
+    }
+    return 'LJ';
+};
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -16,8 +43,10 @@ const Profile = () => {
     const { showSuccess, showError, openConfirm } = usePopup();
 
     const [user, setUser] = useState(null);
+    const [userOrders, setUserOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('addresses'); // 'addresses' | 'personal'
+    const [avatarView, setAvatarView] = useState('monogram'); // 'monogram' | 'photo'
 
     // Personal details state
     const [name, setName] = useState('');
@@ -69,6 +98,19 @@ const Profile = () => {
                 setPhone(data.phone || '');
                 setAddresses(data.addresses || []);
                 localStorage.setItem('user', JSON.stringify(data));
+
+                // Also fetch user orders for live stats & active delivery tracking
+                try {
+                    const ordersRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/orders`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (ordersRes.ok) {
+                        const ordData = await ordersRes.json();
+                        if (Array.isArray(ordData)) setUserOrders(ordData);
+                    }
+                } catch {
+                    // Ignore if orders endpoint error
+                }
             } else {
                 toast.error(data.message || 'Failed to load profile');
             }
@@ -396,12 +438,51 @@ const Profile = () => {
         );
     }
 
-    const initials = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
+    const initials = getProfileInitials(user?.name);
     const addressSlotsRemaining = 5 - (addresses?.length || 0);
+
+    // Active order detection for live tracking banner
+    const activeOrder = userOrders.find(o => 
+        o.orderStatus && !['Delivered', 'Cancelled', 'Returned'].includes(o.orderStatus)
+    );
+    const deliveredOrdersCount = userOrders.filter(o => o.orderStatus === 'Delivered').length;
 
     return (
         <div className="min-h-screen bg-[#FBF9F6] font-sans pb-24 pt-6 sm:pt-10">
             <div className="max-w-5xl mx-auto px-4 sm:px-6">
+
+                {/* 🚚 LIVE PARCEL IN-TRANSIT TRACKING BANNER */}
+                {activeOrder && (
+                    <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/5 border border-amber-300/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fadeIn">
+                        <div className="flex items-center gap-3.5">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#E51A22] to-rose-500 text-white flex items-center justify-center text-2xl shadow-md shadow-rose-500/20 shrink-0">
+                                🚚
+                            </div>
+                            <div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-[#E51A22] bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#E51A22] animate-ping"></span>
+                                        PARCEL IN TRANSIT
+                                    </span>
+                                    <span className="text-xs font-mono font-bold text-slate-700">
+                                        {activeOrder.orderNumber || `#OD-${String(activeOrder._id).slice(-8).toUpperCase()}`}
+                                    </span>
+                                </div>
+                                <p className="text-sm font-black text-[#1c274c] mt-0.5">
+                                    Your Little Joys toy package is currently on the highway!
+                                </p>
+                            </div>
+                        </div>
+
+                        <Link
+                            to={`/track-order?orderId=${activeOrder.orderNumber || activeOrder._id}`}
+                            className="px-5 py-2.5 rounded-2xl bg-[#1c274c] hover:bg-[#E51A22] text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all active:scale-95 shrink-0 cursor-pointer"
+                        >
+                            <Truck className="w-4 h-4" />
+                            <span>Track Live Radar ➔</span>
+                        </Link>
+                    </div>
+                )}
 
                 {/* HERO PROFILE DASHBOARD CARD */}
                 <div className="bg-white border border-slate-200/90 rounded-[2rem] p-6 sm:p-8 mb-8 shadow-sm relative overflow-hidden">
@@ -411,25 +492,53 @@ const Profile = () => {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10 pt-2">
                         {/* User Identity Details */}
                         <div className="flex items-center gap-5">
-                            {user?.picture ? (
-                                <img
-                                    src={user.picture}
-                                    alt={user.name}
-                                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover ring-4 ring-rose-100 shadow-md shrink-0"
-                                />
-                            ) : (
-                                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-[#E51A22] via-[#ff4757] to-rose-400 text-white font-black text-3xl sm:text-4xl flex items-center justify-center shadow-lg ring-4 ring-rose-50 shrink-0">
-                                    {initials}
-                                </div>
-                            )}
+                            {/* Avatar / Monogram Box with 2-word / 1-word initials */}
+                            <div className="relative shrink-0 group">
+                                {avatarView === 'photo' && user?.picture ? (
+                                    <img
+                                        src={user.picture}
+                                        alt={user.name || 'Profile Picture'}
+                                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover ring-4 ring-rose-100 shadow-md shrink-0"
+                                    />
+                                ) : (
+                                    <div 
+                                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-[#E51A22] via-[#ff4757] to-rose-500 text-white font-black text-2xl sm:text-3xl flex items-center justify-center shadow-lg shadow-rose-500/20 ring-4 ring-rose-100/90 shrink-0 select-none transition-transform duration-300 group-hover:scale-105"
+                                        title={`Profile Monogram: ${initials}`}
+                                    >
+                                        <span className="drop-shadow-sm tracking-widest">{initials}</span>
+                                    </div>
+                                )}
+
+                                {/* Toggle between 2-Font Monogram and Google Photo if available */}
+                                {user?.picture && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setAvatarView(avatarView === 'monogram' ? 'photo' : 'monogram')}
+                                        className="absolute -bottom-2 -right-1.5 bg-white hover:bg-rose-50 border border-slate-200 text-[10px] font-black text-slate-700 px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 transition-all cursor-pointer hover:border-rose-300 active:scale-95"
+                                        title={avatarView === 'monogram' ? 'Switch to Google Photo' : 'Switch to 2-Font Monogram'}
+                                    >
+                                        {avatarView === 'monogram' ? (
+                                            <>
+                                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                <span>Photo</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="text-[#E51A22]">✨</span>
+                                                <span>{initials}</span>
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+                            </div>
 
                             <div>
                                 <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                                     <h1 className="text-2xl sm:text-3xl font-black text-[#1c274c] tracking-tight">
                                         {user?.name || 'Customer Account'}
                                     </h1>
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-0.5 rounded-full shadow-2xs">
-                                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Verified Member
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-black text-amber-900 bg-amber-100/80 border border-amber-300 px-3 py-0.5 rounded-full shadow-2xs">
+                                        <Sparkles className="w-3.5 h-3.5 text-amber-600" /> VIP Explorer
                                     </span>
                                 </div>
                                 <p className="text-xs sm:text-sm font-medium text-slate-500 flex items-center gap-2 mb-1.5">
@@ -455,6 +564,13 @@ const Profile = () => {
                                 <span>My Orders</span>
                             </Link>
                             <Link
+                                to="/track-order"
+                                className="px-4 py-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-xs sm:text-sm border border-amber-200 flex items-center gap-2 transition-all shadow-2xs active:scale-95"
+                            >
+                                <Truck className="w-4 h-4 text-amber-600" />
+                                <span>Track Parcel</span>
+                            </Link>
+                            <Link
                                 to="/waitlist"
                                 className="px-4 py-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm border border-slate-200 flex items-center gap-2 transition-all shadow-2xs active:scale-95"
                             >
@@ -469,6 +585,26 @@ const Profile = () => {
                                 <LogOut className="w-4 h-4" />
                                 <span>Logout</span>
                             </button>
+                        </div>
+                    </div>
+
+                    {/* LIVE STATS CAPSULE STRIP */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-slate-100">
+                        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-center">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
+                            <p className="text-xl font-black text-[#1c274c] mt-0.5">{userOrders.length}</p>
+                        </div>
+                        <div className="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-100 text-center">
+                            <p className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">In Transit</p>
+                            <p className="text-xl font-black text-[#E51A22] mt-0.5">{activeOrder ? 1 : 0}</p>
+                        </div>
+                        <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100 text-center">
+                            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Delivered</p>
+                            <p className="text-xl font-black text-emerald-700 mt-0.5">{deliveredOrdersCount}</p>
+                        </div>
+                        <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-100 text-center">
+                            <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Addresses</p>
+                            <p className="text-xl font-black text-amber-900 mt-0.5">{addresses.length} / 5</p>
                         </div>
                     </div>
                 </div>
@@ -657,9 +793,17 @@ const Profile = () => {
 
                         <form onSubmit={handleUpdatePersonal} className="space-y-4">
                             <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                                    Full Name <span className="text-[#E51A22]">* (Mandatory)</span>
-                                </label>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                                        Full Name <span className="text-[#E51A22]">* (Mandatory)</span>
+                                    </label>
+                                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200/80">
+                                        <span>Monogram:</span>
+                                        <span className="text-[#E51A22] font-black tracking-widest bg-white px-1.5 py-0.5 rounded-md shadow-2xs border border-rose-100">
+                                            {getProfileInitials(name || user?.name)}
+                                        </span>
+                                    </div>
+                                </div>
                                 <div className="relative">
                                     <input
                                         type="text"

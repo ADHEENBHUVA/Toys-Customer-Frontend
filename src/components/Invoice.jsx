@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
     Printer, X, Download, ShieldCheck, CheckCircle2, Clock, 
-    MapPin, Phone, Mail, User, Check, Package, Sparkles
+    MapPin, Phone, Mail, User, Check, Package, Sparkles, Copy
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { toPng } from 'html-to-image';
@@ -56,6 +56,8 @@ const numberToWords = (num) => {
 const COMPANY_LOGO_URL = BRAND_LOGO_BASE64 || "/brand-logo.png";
 
 const Invoice = ({ order, onClose }) => {
+    const [copiedInvoice, setCopiedInvoice] = useState(false);
+
     // ESC key to close invoice & body overflow lock
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -72,7 +74,103 @@ const Invoice = ({ order, onClose }) => {
     }, [onClose]);
 
     const handlePrint = () => {
-        window.print();
+        const element = document.getElementById('invoice-content');
+        if (!element) {
+            window.print();
+            return;
+        }
+
+        // Create an isolated print frame so that the background webpage 
+        // does not generate trailing blank pages or layout artifacts.
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.top = '-9999px';
+        iframe.style.left = '-9999px';
+        iframe.style.width = '210mm';
+        iframe.style.height = '297mm';
+        iframe.style.border = 'none';
+        iframe.style.visibility = 'hidden';
+        document.body.appendChild(iframe);
+
+        const frameDoc = iframe.contentWindow?.document || iframe.contentDocument;
+        if (!frameDoc) {
+            window.print();
+            return;
+        }
+
+        // Copy styles (Tailwind, Inter font, custom styles) to iframe
+        let styles = '';
+        document.querySelectorAll('style, link[rel="stylesheet"]').forEach((styleNode) => {
+            styles += styleNode.outerHTML;
+        });
+
+        frameDoc.open();
+        frameDoc.write(`
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Invoice - ${invoiceNumber}</title>
+                    ${styles}
+                    <style>
+                        @page {
+                            size: A4 portrait;
+                            margin: 8mm 10mm;
+                        }
+                        html, body {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            background: #ffffff !important;
+                            color: #1c274c !important;
+                            width: 100% !important;
+                            min-height: 0 !important;
+                            height: auto !important;
+                            overflow: visible !important;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                        #invoice-content {
+                            width: 100% !important;
+                            max-width: 100% !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            border: none !important;
+                            box-shadow: none !important;
+                            border-radius: 0 !important;
+                            page-break-after: avoid;
+                        }
+                        tr {
+                            break-inside: avoid !important;
+                            page-break-inside: avoid !important;
+                        }
+                        table {
+                            page-break-inside: auto;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div id="invoice-content">
+                        ${element.innerHTML}
+                    </div>
+                </body>
+            </html>
+        `);
+        frameDoc.close();
+
+        setTimeout(() => {
+            try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            } catch (err) {
+                console.error("Iframe print error fallback:", err);
+                window.print();
+            } finally {
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 2500);
+            }
+        }, 300);
     };
 
     if (!order) return null;
@@ -153,10 +251,12 @@ const Invoice = ({ order, onClose }) => {
             const element = document.getElementById('invoice-content');
             if (!element) throw new Error("Invoice content not found");
 
+            // pixelRatio: 3 gives ultra-crisp 300+ DPI resolution for printing and archiving
             const dataUrl = await toPng(element, { 
-                quality: 0.98,
-                pixelRatio: 2,
-                backgroundColor: '#ffffff'
+                quality: 1,
+                pixelRatio: 3,
+                backgroundColor: '#ffffff',
+                cacheBust: true
             });
 
             const pdf = new jsPDF({
@@ -165,12 +265,35 @@ const Invoice = ({ order, onClose }) => {
                 format: 'a4'
             });
 
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (element.offsetHeight * pdfWidth) / element.offsetWidth;
+            const pageWidth = pdf.internal.pageSize.getWidth(); // 210mm
+            const pageHeight = pdf.internal.pageSize.getHeight(); // 297mm
 
-            pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            // Executive 8mm printable margins
+            const margin = 8;
+            const printableWidth = pageWidth - (margin * 2);
+            const printableHeight = (element.offsetHeight * printableWidth) / element.offsetWidth;
+            const maxPageUsableHeight = pageHeight - (margin * 2);
+
+            if (printableHeight <= maxPageUsableHeight) {
+                // Standard order fits completely on exactly 1 single page!
+                pdf.addImage(dataUrl, 'PNG', margin, margin, printableWidth, printableHeight, undefined, 'FAST');
+            } else {
+                // Paginate cleanly without empty trailing pages for multi-item orders
+                let heightLeft = printableHeight;
+                let position = margin;
+
+                pdf.addImage(dataUrl, 'PNG', margin, position, printableWidth, printableHeight, undefined, 'FAST');
+                heightLeft -= maxPageUsableHeight;
+
+                while (heightLeft > 5) {
+                    position = -(maxPageUsableHeight * pdf.internal.getNumberOfPages()) + margin;
+                    pdf.addPage();
+                    pdf.addImage(dataUrl, 'PNG', margin, position, printableWidth, printableHeight, undefined, 'FAST');
+                    heightLeft -= maxPageUsableHeight;
+                }
+            }
+
             pdf.save(`Invoice_${invoiceNumber.replace(/[\/\\]/g, '_')}.pdf`);
-            
             toast.success('PDF Downloaded Successfully!', { id: loadingToast });
         } catch (error) {
             console.error("PDF generation failed:", error);
@@ -204,14 +327,26 @@ const Invoice = ({ order, onClose }) => {
                     {/* Top Decorative Brand Gradient Bar */}
                     <div className="h-2 w-full bg-gradient-to-r from-[#E51A22] via-[#ff4757] to-[#1c274c]"></div>
 
-                    {/* Top Action Toolbar */}
-                    <div className="bg-slate-900 text-white p-4 px-6 flex flex-col sm:flex-row justify-between items-center gap-4 print:hidden">
+                    {/* Top Action Toolbar - Light Luxury Theme */}
+                    <div className="bg-gradient-to-r from-[#FFF5F5] via-[#FFF9F2] to-[#FFF0F4] border-b-2 border-rose-200/90 text-slate-800 p-4 px-6 flex flex-col sm:flex-row justify-between items-center gap-4 print:hidden">
                         <div className="flex items-center gap-3">
-                            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Tax Invoice:</span>
-                            <span className="text-sm font-extrabold text-white bg-slate-800 px-3 py-1 rounded-lg font-mono border border-slate-700">
-                                {invoiceNumber}
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Tax Invoice:</span>
+                            <span className="text-sm font-extrabold text-[#E51A22] bg-white px-3 py-1 rounded-xl font-mono border border-rose-200 shadow-2xs flex items-center gap-2">
+                                <span>{invoiceNumber}</span>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(invoiceNumber);
+                                        setCopiedInvoice(true);
+                                        toast.success('Invoice Number copied!');
+                                        setTimeout(() => setCopiedInvoice(false), 2000);
+                                    }}
+                                    className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                                    title="Copy Invoice Number"
+                                >
+                                    {copiedInvoice ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                </button>
                             </span>
-                            <span className="text-xs text-slate-400">({displayOrderId})</span>
+                            <span className="text-xs text-slate-500 font-semibold hidden sm:inline">({displayOrderId})</span>
                         </div>
 
                         <div className="flex flex-wrap justify-center items-center gap-2.5">
@@ -223,14 +358,14 @@ const Invoice = ({ order, onClose }) => {
                             </button>
                             <button 
                                 onClick={handlePrint}
-                                className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold transition-all border border-slate-700 text-xs sm:text-sm active:scale-95 cursor-pointer"
+                                className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-bold transition-all border border-slate-300 text-xs sm:text-sm active:scale-95 shadow-2xs cursor-pointer"
                             >
                                 <Printer className="w-4 h-4" /> Print
                             </button>
                             {/* Inner Close Button */}
                             <button 
                                 onClick={onClose}
-                                className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-500/20 hover:bg-[#E51A22] text-rose-300 hover:text-white rounded-xl font-bold transition-all border border-rose-500/30 text-xs sm:text-sm active:scale-95 cursor-pointer"
+                                className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-100 hover:bg-rose-200 text-[#E51A22] rounded-xl font-bold transition-all border border-rose-200 text-xs sm:text-sm active:scale-95 cursor-pointer"
                                 title="Close dialog"
                             >
                                 <X className="w-4 h-4" />
@@ -241,12 +376,12 @@ const Invoice = ({ order, onClose }) => {
 
                     {/* Clean Executive Tax Invoice Document */}
                     <div 
-                        className="bg-white p-6 sm:p-12 text-[#1c274c] font-sans print:p-0 print:m-0 selection:bg-rose-100 relative" 
+                        className="bg-white p-6 sm:p-9 text-[#1c274c] font-sans print:p-0 print:m-0 selection:bg-rose-100 relative" 
                         id="invoice-content"
                         style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
                     >
                         {/* 1. Header (Brand Logo, Details, Verified Seal & Invoice Meta) */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-6 border-b-2 border-slate-900 relative">
+                        <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-6 border-b-2 border-rose-200/90 relative">
                             {/* Brand Details */}
                             <div className="flex flex-col items-start gap-2.5 max-w-sm">
                                 <div className="flex items-center gap-2">
@@ -272,12 +407,8 @@ const Invoice = ({ order, onClose }) => {
                                 </div>
                             </div>
 
-                            {/* Right Side: Tax Invoice Badge & Stamp */}
+                            {/* Right Side: Invoice Meta & Verified Payment Stamp */}
                             <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
-                                <div className="inline-block bg-[#1c274c] text-white px-4 py-1.5 rounded-lg text-xs font-black tracking-widest uppercase mb-3 shadow-xs">
-                                    ORIGINAL TAX INVOICE
-                                </div>
-                                
                                 <div className="space-y-1 text-left sm:text-right font-mono text-xs">
                                     <p className="text-slate-500 font-semibold font-sans">Invoice Number:</p>
                                     <p className="text-base font-black text-[#1c274c] tracking-tight">{invoiceNumber}</p>
@@ -298,7 +429,7 @@ const Invoice = ({ order, onClose }) => {
                         </div>
 
                         {/* 2. Customer Billed To & Order Details Cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 my-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-5">
                             {/* Billed & Shipped To */}
                             <div className="bg-slate-50/80 border border-slate-200 rounded-2xl p-4 sm:p-5">
                                 <p className="text-[11px] font-black uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
@@ -349,32 +480,10 @@ const Invoice = ({ order, onClose }) => {
                                                 {order.orderStatus || 'Confirmed'}
                                             </span>
                                         </div>
-                                    </div>
-                                </div>
-
-                                {/* Barcode Visual for authentic e-commerce feel */}
-                                <div className="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between">
-                                    <div className="space-y-0.5">
-                                        <div className="flex items-center gap-0.5 h-6">
-                                            <span className="w-1 h-6 bg-slate-800"></span>
-                                            <span className="w-0.5 h-6 bg-slate-800"></span>
-                                            <span className="w-2 h-6 bg-slate-800"></span>
-                                            <span className="w-0.5 h-6 bg-slate-800"></span>
-                                            <span className="w-1.5 h-6 bg-slate-800"></span>
-                                            <span className="w-0.5 h-6 bg-slate-800"></span>
-                                            <span className="w-2 h-6 bg-slate-800"></span>
-                                            <span className="w-1 h-6 bg-slate-800"></span>
-                                            <span className="w-0.5 h-6 bg-slate-800"></span>
-                                            <span className="w-1.5 h-6 bg-slate-800"></span>
-                                            <span className="w-2 h-6 bg-slate-800"></span>
-                                            <span className="w-0.5 h-6 bg-slate-800"></span>
-                                            <span className="w-1 h-6 bg-slate-800"></span>
+                                        <div className="flex justify-between items-center pt-2 border-t border-slate-200/80">
+                                            <span className="text-slate-500 font-medium">Place of Supply:</span>
+                                            <span className="font-bold text-slate-900">Gujarat (24)</span>
                                         </div>
-                                        <p className="text-[9px] font-mono text-slate-400">{displayOrderId}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-[10px] text-slate-400 font-medium">Place of Supply</p>
-                                        <p className="text-xs font-bold text-slate-800">Gujarat (24)</p>
                                     </div>
                                 </div>
                             </div>
@@ -384,17 +493,18 @@ const Invoice = ({ order, onClose }) => {
                         <div className="border border-slate-300 rounded-2xl overflow-hidden mb-6 shadow-xs">
                             <table className="w-full text-xs text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-[#1c274c] text-white font-bold text-center">
-                                        <th className="py-3.5 px-3 w-12 border-r border-slate-700">#</th>
-                                        <th className="py-3.5 px-4 text-left border-r border-slate-700">Item Description</th>
-                                        <th className="py-3.5 px-3 w-20 border-r border-slate-700">Qty</th>
-                                        <th className="py-3.5 px-4 text-right w-28 border-r border-slate-700">Unit Price (₹)</th>
-                                        <th className="py-3.5 px-4 text-right w-28">Amount (₹)</th>
+                                    <tr className="bg-gradient-to-r from-[#FFF0F2] via-[#FFF6ED] to-[#FFF0F2] text-[#881337] font-black text-center border-b-2 border-rose-200">
+                                        <th className="py-3.5 px-3 w-12 border-r border-rose-200 text-[#881337]">#</th>
+                                        <th className="py-3.5 px-4 text-left border-r border-rose-200 text-[#881337]">Item Description</th>
+                                        <th className="py-3.5 px-3 w-20 border-r border-rose-200 text-[#881337]">Qty</th>
+                                        <th className="py-3.5 px-4 text-right w-28 border-r border-rose-200 text-[#881337]">Unit Price (₹)</th>
+                                        <th className="py-3.5 px-4 text-right w-28 text-[#881337]">Amount (₹)</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-200">
                                     {rawItems.map((item, index) => {
                                         const itemName = item.name || item.product?.name || item.title || 'Toy Item';
+                                        const itemImg = item.image || item.product?.image || item.product?.images?.[0] || '';
                                         const qty = Number(item.quantity || 1);
                                         const unitPrice = Number(item.price !== undefined ? item.price : (item.product?.price || 0));
                                         const rowTotal = unitPrice * qty;
@@ -404,13 +514,28 @@ const Invoice = ({ order, onClose }) => {
                                                 <td className="py-3 px-3 text-center border-r border-slate-200 font-semibold text-slate-400">
                                                     {index + 1}
                                                 </td>
-                                                <td className="py-3 px-4 border-r border-slate-200 font-bold text-slate-900">
-                                                    {itemName}
-                                                    {item.variant && (
-                                                        <span className="block text-[11px] font-normal text-slate-500 mt-0.5">
-                                                            Option: {item.variant}
-                                                        </span>
-                                                    )}
+                                                <td className="py-3 px-4 border-r border-slate-200">
+                                                    <div className="flex items-center gap-3">
+                                                        {itemImg ? (
+                                                            <img 
+                                                                src={itemImg} 
+                                                                alt={itemName} 
+                                                                className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0" 
+                                                            />
+                                                        ) : (
+                                                            <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-sm text-[#E51A22] shrink-0 font-black">
+                                                                🧸
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <p className="font-bold text-slate-900 leading-snug">{itemName}</p>
+                                                            {item.variant && (
+                                                                <span className="inline-block text-[10px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded mt-0.5">
+                                                                    Option: {item.variant}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td className="py-3 px-3 text-center border-r border-slate-200 font-semibold text-slate-700">
                                                     {qty}
@@ -477,13 +602,13 @@ const Invoice = ({ order, onClose }) => {
                                         </tr>
                                     )}
 
-                                    {/* Grand Total */}
-                                    <tr className="bg-[#1c274c] text-white font-black text-sm">
-                                        <td colSpan="3" className="border-r border-slate-800"></td>
-                                        <td className="py-3.5 px-4 text-right border-r border-slate-800 uppercase tracking-wider text-xs">
+                                    {/* Grand Total - Light Luxury Theme (NOT plain white!) */}
+                                    <tr className="bg-gradient-to-r from-[#FFF0F2] via-[#FFF8F0] to-[#FFF0F2] border-t-2 border-rose-300 font-black text-sm text-[#1c274c]">
+                                        <td colSpan="3" className="border-r border-rose-200"></td>
+                                        <td className="py-3.5 px-4 text-right border-r border-rose-200 uppercase tracking-wider text-xs font-black text-slate-700">
                                             Grand Total
                                         </td>
-                                        <td className="py-3.5 px-4 text-right text-base text-yellow-300 font-mono">
+                                        <td className="py-3.5 px-4 text-right text-base text-[#E51A22] font-mono font-black">
                                             ₹{formatCurrency(totalAmount)}
                                         </td>
                                     </tr>
@@ -492,8 +617,8 @@ const Invoice = ({ order, onClose }) => {
                         </div>
 
                         {/* 4. Amount in Words Box */}
-                        <div className="bg-slate-50 rounded-2xl p-4 mb-6 flex items-center gap-3 border border-slate-200">
-                            <div className="w-9 h-9 rounded-xl bg-[#1c274c] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                        <div className="bg-gradient-to-r from-rose-50/70 via-amber-50/50 to-orange-50/60 rounded-2xl p-4 mb-6 flex items-center gap-3 border border-rose-200/80">
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#E51A22] to-amber-500 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
                                 ₹
                             </div>
                             <div className="text-xs">
@@ -559,9 +684,47 @@ const Invoice = ({ order, onClose }) => {
                         </button>
                     </div>
 
-                    {/* Print CSS */}
+                    {/* Print CSS for standard browser Ctrl+P */}
                     <style>{`
                         @media print {
+                            @page {
+                                size: A4 portrait;
+                                margin: 8mm 10mm;
+                            }
+                            html, body {
+                                margin: 0 !important;
+                                padding: 0 !important;
+                                background: #ffffff !important;
+                                color: #1c274c !important;
+                                height: auto !important;
+                                min-height: 0 !important;
+                                overflow: visible !important;
+                                -webkit-print-color-adjust: exact !important;
+                                print-color-adjust: exact !important;
+                            }
+                            .print\\:hidden, button, header, footer, nav {
+                                display: none !important;
+                            }
+                            .fixed.inset-0 {
+                                position: static !important;
+                                background: transparent !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                overflow: visible !important;
+                                height: auto !important;
+                                min-height: 0 !important;
+                            }
+                            .min-h-full, .max-w-\\[880px\\] {
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                max-width: 100% !important;
+                                width: 100% !important;
+                                border: none !important;
+                                box-shadow: none !important;
+                                border-radius: 0 !important;
+                                height: auto !important;
+                                min-height: 0 !important;
+                            }
                             body * {
                                 visibility: hidden;
                             }
@@ -569,11 +732,23 @@ const Invoice = ({ order, onClose }) => {
                                 visibility: visible;
                             }
                             #invoice-content {
-                                position: absolute;
-                                left: 0;
-                                top: 0;
-                                width: 100%;
-                                padding: 20px;
+                                position: static !important;
+                                display: block !important;
+                                width: 100% !important;
+                                max-width: 100% !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                                border: none !important;
+                                box-shadow: none !important;
+                                border-radius: 0 !important;
+                                page-break-after: avoid;
+                            }
+                            tr {
+                                break-inside: avoid !important;
+                                page-break-inside: avoid !important;
+                            }
+                            table {
+                                page-break-inside: auto;
                             }
                         }
                     `}</style>

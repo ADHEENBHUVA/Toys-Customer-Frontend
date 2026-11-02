@@ -74,7 +74,7 @@ const Products = () => {
         const fetchData = async () => {
             try {
                 const isNewArrivals = searchParams.get('filter') === 'new-arrivals';
-                const isBestSellers = searchParams.get('filter') === 'best-sellers';
+                const isBestSellers = searchParams.get('filter') === 'best-sellers' || searchParams.get('sort') === 'bestseller';
                 let endpoint = '/products';
                 if (isNewArrivals) endpoint = '/products/new-arrivals';
                 if (isBestSellers) endpoint = '/products/best-sellers';

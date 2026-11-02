@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
  *    - Pure white background, zero green hills/brown ground, no rainbow, no dark mode toggle.
  * 2. PROPER HIGH-VISIBILITY STATION CLOCK:
  *    - 58px vintage clock face with Roman numerals XII, III, VI, IX.
- *    - Super visible, bold hands (Kata / કાંટા):
+ *    - Super visible, bold hands (Clock Hands):
  *      * Thick solid black antique spade Hour Hand (Live Time)
  *      * Long tapered black steel Minute Hand (Live Time)
  *      * High-visibility bright Red Ticking Second Hand (Live Real-Time Ticking)
@@ -664,7 +664,7 @@ const ToyTransitScene = () => {
                                         <text x="21.5" y="18.5" fill="#334155" fontSize="5.5" fontWeight="800" textAnchor="middle" fontFamily="sans-serif">11</text>
 
                                         {/* ============================================================== */}
-                                        {/* THE CLOCK HANDS (કાંટા / KATA): LIVE REAL-TIME CLOCK */}
+                                        {/* THE CLOCK HANDS: LIVE REAL-TIME CLOCK */}
                                         {/* ============================================================== */}
 
                                         {/* 1. LIVE BOLD BLACK HOUR HAND (Rotates with Current Real-Time Hour) */}

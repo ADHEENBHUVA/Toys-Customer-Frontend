@@ -10,6 +10,25 @@ import {
     AlertCircle, Edit3, Loader2
 } from 'lucide-react';
 
+// Helper functions for persistent device-level guest checkout storage
+const loadSavedGuestData = () => {
+    try {
+        const raw = localStorage.getItem('toyjoy_guest_checkout_data');
+        if (raw) return JSON.parse(raw);
+    } catch (e) {
+        console.warn('Could not parse toyjoy_guest_checkout_data:', e);
+    }
+    return null;
+};
+
+const saveGuestDataToDevice = (data) => {
+    try {
+        localStorage.setItem('toyjoy_guest_checkout_data', JSON.stringify(data));
+    } catch (e) {
+        console.warn('Could not save to localStorage:', e);
+    }
+};
+
 const Checkout = () => {
     const { 
         cartItems, 
@@ -36,22 +55,30 @@ const Checkout = () => {
     // Saved addresses from user profile
     const [savedAddresses, setSavedAddresses] = useState([]);
     const [selectedAddressId, setSelectedAddressId] = useState(null);
-    const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
+    const [isAddingNewAddress, setIsAddingNewAddress] = useState(() => {
+        const saved = loadSavedGuestData();
+        if (saved?.isAddingNewAddress !== undefined) return saved.isAddingNewAddress;
+        return true;
+    });
     const [saveToProfile, setSaveToProfile] = useState(true);
     const [fetchingUserData, setFetchingUserData] = useState(true);
     const [userProfile, setUserProfile] = useState(null);
 
-    // Dedicated state for entering new delivery address ("Niche Option")
-    const [newAddressFields, setNewAddressFields] = useState({
-        firstName: '',
-        lastName: '',
-        phone: '',
-        email: '',
-        streetAddress: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        orderNotes: ''
+    // Dedicated state for entering delivery address - auto-restored from device storage
+    const [newAddressFields, setNewAddressFields] = useState(() => {
+        const saved = loadSavedGuestData();
+        const f = saved?.newAddressFields || saved || {};
+        return {
+            firstName: f.firstName || '',
+            lastName: f.lastName || '',
+            phone: f.phone || '',
+            email: f.email || '',
+            streetAddress: f.streetAddress || '',
+            city: f.city || '',
+            state: f.state || '',
+            zipCode: f.zipCode || '',
+            orderNotes: f.orderNotes || ''
+        };
     });
 
     // Check if user came via Buy Now
@@ -120,17 +147,23 @@ const Checkout = () => {
 
     const isLoggedIn = !!localStorage.getItem('token');
 
-    const [address, setAddress] = useState({
-        firstName: '',
-        lastName: '',
-        fullName: '',
-        streetAddress: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        phone: '',
-        email: '',
-        orderNotes: orderNotes || ''
+    const [address, setAddress] = useState(() => {
+        const saved = loadSavedGuestData();
+        const f = saved?.newAddressFields || saved || {};
+        const fName = f.firstName || '';
+        const lName = f.lastName || '';
+        return {
+            firstName: fName,
+            lastName: lName,
+            fullName: `${fName} ${lName}`.trim(),
+            streetAddress: f.streetAddress || '',
+            city: f.city || '',
+            state: f.state || '',
+            zipCode: f.zipCode || '',
+            phone: f.phone || '',
+            email: f.email || '',
+            orderNotes: f.orderNotes || orderNotes || ''
+        };
     });
 
     // Populate active delivery address state
@@ -154,6 +187,17 @@ const Checkout = () => {
         }));
     };
 
+    // Detect returning from Login with pending payment (Auto-resume payment notification)
+    useEffect(() => {
+        if (isLoggedIn && location.search.includes('autoPay=true')) {
+            toast.success('Your details have been restored! Click below to complete your payment 💳✨', {
+                id: 'autopay-resume-toast',
+                duration: 5000
+            });
+            window.history.replaceState({}, '', '/checkout');
+        }
+    }, [isLoggedIn, location.search]);
+
     // Load saved addresses and profile from backend
     useEffect(() => {
         const loadUserData = async () => {
@@ -176,20 +220,33 @@ const Checkout = () => {
                     setSavedAddresses(addrs);
 
                     const parts = (data.name || '').trim().split(' ');
+                    const savedGuest = loadSavedGuestData();
+                    const guestFields = savedGuest?.newAddressFields || {};
+
+                    // If user entered details as guest, preserve those on this device!
                     const initialNew = {
-                        firstName: parts[0] || '',
-                        lastName: parts.slice(1).join(' ') || '',
-                        phone: data.phone || '',
-                        email: data.email || '',
-                        streetAddress: '',
-                        city: '',
-                        state: '',
-                        zipCode: '',
-                        orderNotes: orderNotes || ''
+                        firstName: guestFields.firstName || parts[0] || '',
+                        lastName: guestFields.lastName || parts.slice(1).join(' ') || '',
+                        phone: guestFields.phone || data.phone || '',
+                        email: guestFields.email || data.email || '',
+                        streetAddress: guestFields.streetAddress || '',
+                        city: guestFields.city || '',
+                        state: guestFields.state || '',
+                        zipCode: guestFields.zipCode || '',
+                        orderNotes: guestFields.orderNotes || orderNotes || ''
                     };
                     setNewAddressFields(initialNew);
 
-                    if (addrs.length > 0) {
+                    // If guest entered address, keep it active
+                    if (guestFields.streetAddress) {
+                        setIsAddingNewAddress(true);
+                        setSelectedAddressId(null);
+                        setAddress(prev => ({
+                            ...prev,
+                            ...initialNew,
+                            fullName: `${initialNew.firstName} ${initialNew.lastName}`.trim()
+                        }));
+                    } else if (addrs.length > 0) {
                         // Pick default address or first address
                         const def = addrs.find(a => a.isDefault) || addrs[0];
                         setSelectedAddressId(def._id);
@@ -317,7 +374,18 @@ const Checkout = () => {
 
     const handleInputChange = async (e) => {
         const { name, value } = e.target;
-        setAddress(prev => ({ ...prev, [name]: value }));
+        setAddress(prev => {
+            const updated = { ...prev, [name]: value };
+            saveGuestDataToDevice({
+                newAddressFields: {
+                    ...newAddressFields,
+                    [name]: value
+                },
+                paymentMethod,
+                isAddingNewAddress
+            });
+            return updated;
+        });
 
         if (name === 'orderNotes') {
             setOrderNotes?.(value);
@@ -342,14 +410,20 @@ const Checkout = () => {
         }
     };
 
-    // Dedicated handler for new address form ("Niche Option") with auto mutual exclusivity
+    // Dedicated handler for new address form ("Niche Option") with auto mutual exclusivity & persistent device save
     const handleNewAddressChange = async (e) => {
         const { name, value } = e.target;
         // Automatically switch active selection to new address mode
         setIsAddingNewAddress(true);
         setSelectedAddressId(null);
 
-        setNewAddressFields(prev => ({ ...prev, [name]: value }));
+        const updated = { ...newAddressFields, [name]: value };
+        setNewAddressFields(updated);
+        saveGuestDataToDevice({
+            newAddressFields: updated,
+            paymentMethod,
+            isAddingNewAddress: true
+        });
 
         if (name === 'orderNotes') {
             setOrderNotes?.(value);
@@ -361,11 +435,17 @@ const Checkout = () => {
                 const data = await res.json();
                 if (data && data[0] && data[0].Status === 'Success') {
                     const postOffice = data[0].PostOffice[0];
-                    setNewAddressFields(prev => ({
-                        ...prev,
+                    const withZip = {
+                        ...updated,
                         city: postOffice.District,
                         state: postOffice.State
-                    }));
+                    };
+                    setNewAddressFields(withZip);
+                    saveGuestDataToDevice({
+                        newAddressFields: withZip,
+                        paymentMethod,
+                        isAddingNewAddress: true
+                    });
                     toast.success(`Detected: ${postOffice.District}, ${postOffice.State}`);
                 }
             } catch (error) {
@@ -386,19 +466,13 @@ const Checkout = () => {
     };
 
     const handlePayment = async () => {
-        if (!isLoggedIn) {
-            toast.error('Please login to proceed to payment.');
-            navigate('/login');
-            return;
-        }
-
         if (checkoutItems.length === 0) {
             toast.error('No items to checkout!');
             return;
         }
 
         // Mutual exclusivity: Pick from saved address OR new address form
-        const activeAddress = isAddingNewAddress ? {
+        const activeAddress = (isAddingNewAddress || savedAddresses.length === 0) ? {
             firstName: newAddressFields.firstName,
             lastName: newAddressFields.lastName,
             fullName: `${newAddressFields.firstName || ''} ${newAddressFields.lastName || ''}`.trim(),
@@ -413,8 +487,48 @@ const Checkout = () => {
 
         const finalFullName = (activeAddress.fullName || `${activeAddress.firstName || ''} ${activeAddress.lastName || ''}`).trim();
 
+        // 1. Validate required delivery fields first so guest user doesn't submit blank form
         if (!finalFullName || !activeAddress.streetAddress || !activeAddress.city || !activeAddress.zipCode || !activeAddress.phone || !activeAddress.email) {
-            toast.error('Please fill in all required delivery fields.');
+            toast.error('Please fill in all required delivery address fields.');
+            return;
+        }
+
+        if (activeAddress.phone.replace(/\D/g, '').length < 10) {
+            toast.error('Please enter a valid 10-digit mobile number.');
+            return;
+        }
+
+        // 2. Persist full checkout details locally to this device
+        saveGuestDataToDevice({
+            newAddressFields: {
+                firstName: activeAddress.firstName || newAddressFields.firstName,
+                lastName: activeAddress.lastName || newAddressFields.lastName,
+                phone: activeAddress.phone,
+                email: activeAddress.email,
+                streetAddress: activeAddress.streetAddress,
+                city: activeAddress.city,
+                state: activeAddress.state,
+                zipCode: activeAddress.zipCode,
+                orderNotes: activeAddress.orderNotes
+            },
+            paymentMethod,
+            isAddingNewAddress: true,
+            savedAt: Date.now()
+        });
+
+        // 3. Enforce mandatory login before proceeding to final payment
+        if (!isLoggedIn) {
+            localStorage.setItem('toyjoy_checkout_redirect', '/checkout?autoPay=true');
+            toast.success('All your details are safely saved! Please log in to complete your payment 🔐', {
+                duration: 4500,
+                icon: '💾'
+            });
+            navigate('/login', {
+                state: {
+                    from: '/checkout?autoPay=true',
+                    message: 'Please log in to finalize your payment and place your order.'
+                }
+            });
             return;
         }
 
@@ -509,6 +623,8 @@ const Checkout = () => {
                         const verifyData = await verifyRes.json();
                         if (verifyData.success) {
                             toast.success('Payment successful! Order placed.');
+                            localStorage.removeItem('toyjoy_guest_checkout_data');
+                            localStorage.removeItem('toyjoy_checkout_redirect');
                             if (isBuyNow) {
                                 sessionStorage.removeItem('magic_toys_buynow');
                             } else {
@@ -605,6 +721,42 @@ const Checkout = () => {
                         )}
                     </div>
                 )}
+
+                {/* Guest Checkout Banner / Logged-in Resumed Banner */}
+                {!isLoggedIn ? (
+                    <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-rose-50/80 via-amber-50/70 to-blue-50/80 border border-rose-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm shadow-xs animate-fadeIn">
+                        <div className="flex items-center gap-3 text-slate-800">
+                            <div className="w-10 h-10 rounded-xl bg-white border border-rose-200 text-[#E51A22] flex items-center justify-center font-bold text-lg shrink-0 shadow-2xs">
+                                🛍️
+                            </div>
+                            <div>
+                                <span className="font-black text-[#1A1A24] block text-sm">Guest Checkout Mode</span>
+                                <span className="text-slate-600 text-xs font-medium">
+                                    Fill in your delivery address freely! All your details are safely remembered on this device. Login is only required at the final payment step.
+                                </span>
+                            </div>
+                        </div>
+                        <Link 
+                            to="/login" 
+                            state={{ from: '/checkout' }} 
+                            className="text-xs font-bold text-[#E51A22] hover:bg-rose-100/70 bg-white border border-rose-200 px-3.5 py-2 rounded-xl shrink-0 shadow-2xs transition-all whitespace-nowrap self-start sm:self-center"
+                        >
+                            Already have an account? Login →
+                        </Link>
+                    </div>
+                ) : location.search.includes('autoPay=true') ? (
+                    <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 text-xs sm:text-sm text-emerald-950 shadow-xs animate-fadeIn">
+                        <div className="w-8 h-8 rounded-xl bg-white border border-emerald-300 text-emerald-600 flex items-center justify-center shrink-0">
+                            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                        </div>
+                        <div>
+                            <span className="font-black block text-emerald-950">Welcome Back! Details Restored</span>
+                            <span className="text-emerald-700 text-xs font-medium">
+                                Your saved delivery address and cart items have been restored. Click the payment button below to place your order!
+                            </span>
+                        </div>
+                    </div>
+                ) : null}
 
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
                     
@@ -1130,20 +1282,40 @@ const Checkout = () => {
                             <button 
                                 onClick={handlePayment} 
                                 disabled={loading}
-                                className="w-full mt-6 bg-[#E51A22] hover:bg-[#c9141b] active:scale-[0.99] text-white py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base transition-all shadow-md shadow-red-500/20 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 cursor-pointer"
+                                className={`w-full mt-6 text-white py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base transition-all shadow-md active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 cursor-pointer ${
+                                    !isLoggedIn 
+                                        ? 'bg-[#1A1A24] hover:bg-[#E51A22] shadow-slate-900/15 hover:shadow-red-500/25' 
+                                        : 'bg-[#E51A22] hover:bg-[#c9141b] shadow-red-500/20 hover:shadow-lg'
+                                }`}
                             >
                                 {loading ? (
                                     <span className="flex items-center gap-2">
                                         <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                         Processing Order...
                                     </span>
+                                ) : !isLoggedIn ? (
+                                    <>
+                                        <Lock className="w-4 h-4 text-rose-300" />
+                                        <span>🔐 Login &amp; Pay ₹{totalAmount.toLocaleString('en-IN')}.00</span>
+                                    </>
                                 ) : (
                                     <>
                                         <Lock className="w-4 h-4" />
-                                        Pay & Complete Order (₹{totalAmount.toLocaleString('en-IN')})
+                                        <span>Pay &amp; Complete Order (₹{totalAmount.toLocaleString('en-IN')}.00)</span>
                                     </>
                                 )}
                             </button>
+
+                            {/* Informative Guidance under Button */}
+                            {!isLoggedIn ? (
+                                <p className="text-[11px] text-amber-800 bg-amber-50/90 border border-amber-200/70 rounded-lg p-2.5 mt-2.5 text-center font-medium">
+                                    💾 All your entered details are preserved on this device. You will return here to complete payment right after login.
+                                </p>
+                            ) : (
+                                <p className="text-[11px] text-slate-400 text-center mt-2">
+                                    Instant checkout via Razorpay (UPI, Google Pay, Cards, NetBanking)
+                                </p>
+                            )}
 
                             {/* Trust Guarantees */}
                             <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col gap-2.5 text-[11.5px] text-slate-500 font-medium">

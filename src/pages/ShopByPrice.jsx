@@ -155,19 +155,19 @@ const ShopByPrice = () => {
     return (
         <div className="w-full min-h-screen bg-[#FFFDF9] font-sans">
             
-            {/* 1. COMPACT STYLISH HEADER BANNER STRIP - WARM GOLDEN BUDGET THEME */}
-            <div className="w-full relative overflow-hidden bg-gradient-to-r from-[#FFFBEB] via-[#FEF3C7] to-[#FED7AA] text-slate-800 pt-5 sm:pt-6 pb-9 sm:pb-10">
-                <div className="absolute inset-0 opacity-8 bg-[radial-gradient(#D97706_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none" />
-                <div className="absolute -top-16 -left-16 w-64 h-64 bg-amber-300/25 rounded-full blur-2xl pointer-events-none" />
-                <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-orange-200/35 rounded-full blur-2xl pointer-events-none" />
+            {/* 1. COMPACT STYLISH HEADER BANNER STRIP - THEME-BLENDED LIGHT CORAL PEACH (MATCHING SHOP BY AGE) */}
+            <div className="w-full relative overflow-hidden bg-gradient-to-r from-[#FFF1F2] via-[#FFE4E6] to-[#FEF3C7] text-slate-800 pt-5 sm:pt-6 pb-9 sm:pb-10">
+                <div className="absolute inset-0 opacity-8 bg-[radial-gradient(#E11D48_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none" />
+                <div className="absolute -top-16 -left-16 w-64 h-64 bg-rose-300/25 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-amber-300/30 rounded-full blur-2xl pointer-events-none" />
 
                 <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 text-left">
                     <div>
                         {/* Left-Aligned Breadcrumbs */}
                         <div className="flex items-center gap-2 text-xs font-bold text-slate-500 mb-1 flex-wrap">
-                            <Link to="/" className="text-slate-600 hover:text-[#D97706] transition-colors underline-offset-2 hover:underline">Home</Link>
+                            <Link to="/" className="text-slate-600 hover:text-[#E51A22] transition-colors underline-offset-2 hover:underline">Home</Link>
                             <span className="opacity-40">/</span>
-                            <span className="text-[#B45309] font-extrabold">Shop By Price</span>
+                            <span className="text-[#9F1239] font-extrabold">Shop By Price</span>
                         </div>
 
                         {/* Bold Left-Aligned Title */}
@@ -183,10 +183,10 @@ const ShopByPrice = () => {
 
                     <div className="flex items-center gap-3 self-start md:self-center">
                         {/* Right-Side Milestone / Budget Guide Badge */}
-                        <div className="hidden sm:flex items-center gap-3 bg-white/85 backdrop-blur-md px-4 py-2 rounded-2xl border border-amber-200/80 shadow-xs shrink-0">
+                        <div className="hidden sm:flex items-center gap-3 bg-white/85 backdrop-blur-md px-4 py-2 rounded-2xl border border-rose-200/80 shadow-xs shrink-0">
                             <span className="text-2xl">🏷️</span>
                             <div>
-                                <span className="block text-[10.5px] font-black uppercase tracking-wider text-amber-700">Smart Budget Guide</span>
+                                <span className="block text-[10.5px] font-black uppercase tracking-wider text-rose-600">Smart Budget Guide</span>
                                 <span className="block text-xs text-slate-900 font-black">5 Curated Price Tiers</span>
                             </div>
                         </div>
@@ -220,8 +220,8 @@ const ShopByPrice = () => {
                         <path 
                             d="M0,25 C150,60 300,-10 450,25 C600,60 750,-10 900,25 C1050,60 1150,-5 1200,22" 
                             fill="none" 
-                            stroke="#F59E0B" 
-                            strokeWidth="1.5" 
+                            stroke="#FDA4AF" 
+                            strokeWidth="2.5" 
                             strokeLinecap="round" 
                         />
                     </svg>
@@ -338,7 +338,7 @@ const ShopByPrice = () => {
                 <div className="w-full relative overflow-x-auto overflow-y-hidden pb-8 pt-2 scrollbar-none">
                     <div className="w-full min-w-[1050px] relative h-[410px]">
                         
-                        {/* A. 3D SNAKE WAVE ROPE (સાપ આકારની દોરી) - 100% EDGE-TO-EDGE WITH EXACTLY 5 VALAK */}
+                        {/* A. 3D SNAKE WAVE ROPE - 100% EDGE-TO-EDGE WITH EXACTLY 5 WAVES */}
                         <div className="w-full absolute top-0 left-0 right-0 h-[105px] pointer-events-none z-10">
                             <svg 
                                 viewBox="0 0 1000 105" 

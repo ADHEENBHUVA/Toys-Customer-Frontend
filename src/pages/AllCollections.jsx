@@ -346,20 +346,20 @@ const AllCollections = () => {
     return (
         <div className="w-full min-h-screen bg-[#FFFDF9] font-sans">
 
-            {/* 1. COMPACT STYLISH HEADER BANNER STRIP ("patto") - THEME-BLENDED LIGHT BLOSSOM ROSE */}
-            <div className="w-full relative overflow-hidden bg-gradient-to-r from-[#FDF2F8] via-[#FCE7F3] to-[#F3E8FF] text-slate-800 pt-5 sm:pt-6 pb-9 sm:pb-10">
+            {/* 1. COMPACT STYLISH HEADER BANNER STRIP ("patto") - THEME-BLENDED LIGHT CORAL PEACH (MATCHING SHOP BY AGE) */}
+            <div className="w-full relative overflow-hidden bg-gradient-to-r from-[#FFF1F2] via-[#FFE4E6] to-[#FEF3C7] text-slate-800 pt-5 sm:pt-6 pb-9 sm:pb-10">
                 {/* Decorative background playful patterns & soft pastel glow */}
-                <div className="absolute inset-0 opacity-8 bg-[radial-gradient(#DB2777_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none" />
-                <div className="absolute -top-16 -left-16 w-64 h-64 bg-pink-300/25 rounded-full blur-2xl pointer-events-none" />
-                <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-purple-200/35 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute inset-0 opacity-8 bg-[radial-gradient(#E11D48_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none" />
+                <div className="absolute -top-16 -left-16 w-64 h-64 bg-rose-300/25 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-amber-300/30 rounded-full blur-2xl pointer-events-none" />
 
                 <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 text-left">
                     <div>
                         {/* Left-Aligned Breadcrumbs */}
                         <div className="flex items-center gap-2 text-xs font-bold text-slate-500 mb-1 flex-wrap">
-                            <Link to="/" className="text-slate-600 hover:text-[#DB2777] transition-colors underline-offset-2 hover:underline">Home</Link>
+                            <Link to="/" className="text-slate-600 hover:text-[#E51A22] transition-colors underline-offset-2 hover:underline">Home</Link>
                             <span className="opacity-40">/</span>
-                            <span className="text-[#9D174D] font-extrabold">Toy Collections</span>
+                            <span className="text-[#9F1239] font-extrabold">Toy Collections</span>
                         </div>
 
                         {/* Bold Left-Aligned Title */}
@@ -374,10 +374,10 @@ const AllCollections = () => {
                     </div>
 
                     {/* Right-Side Collections Badge */}
-                    <div className="hidden sm:flex items-center gap-3 bg-white/85 backdrop-blur-md px-4 py-2 rounded-2xl border border-pink-200/80 shadow-xs shrink-0 self-start md:self-center">
+                    <div className="hidden sm:flex items-center gap-3 bg-white/85 backdrop-blur-md px-4 py-2 rounded-2xl border border-rose-200/80 shadow-xs shrink-0 self-start md:self-center">
                         <span className="text-2xl">✨</span>
                         <div>
-                            <span className="block text-[10.5px] font-black uppercase tracking-wider text-pink-600">Exclusive Sets</span>
+                            <span className="block text-[10.5px] font-black uppercase tracking-wider text-rose-600">Exclusive Sets</span>
                             <span className="block text-xs text-slate-900 font-black">Curated Themes</span>
                         </div>
                     </div>
@@ -399,7 +399,7 @@ const AllCollections = () => {
                         <path
                             d="M0,26 Q150,8 300,26 T600,26 T900,26 T1200,26"
                             fill="none"
-                            stroke="#F472B6"
+                            stroke="#FDA4AF"
                             strokeWidth="2.5"
                             strokeLinecap="round"
                         />

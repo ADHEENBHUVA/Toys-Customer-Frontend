@@ -374,19 +374,19 @@ const AllCategories = () => {
     return (
         <div className="w-full min-h-screen bg-[#FFFDF9] font-sans">
             
-            {/* 1. HEADER BANNER STRIP */}
-            <div className="w-full relative overflow-hidden bg-gradient-to-r from-[#EFF6FF] via-[#DBEAFE] to-[#E0F2FE] text-slate-800 pt-5 sm:pt-6 pb-9 sm:pb-10">
-                <div className="absolute inset-0 opacity-8 bg-[radial-gradient(#2563EB_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none" />
-                <div className="absolute -top-16 -left-16 w-64 h-64 bg-blue-300/25 rounded-full blur-2xl pointer-events-none" />
-                <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-cyan-200/35 rounded-full blur-2xl pointer-events-none" />
+            {/* 1. HEADER BANNER STRIP - THEME-BLENDED LIGHT CORAL PEACH (MATCHING SHOP BY AGE) */}
+            <div className="w-full relative overflow-hidden bg-gradient-to-r from-[#FFF1F2] via-[#FFE4E6] to-[#FEF3C7] text-slate-800 pt-5 sm:pt-6 pb-9 sm:pb-10">
+                <div className="absolute inset-0 opacity-8 bg-[radial-gradient(#E11D48_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none" />
+                <div className="absolute -top-16 -left-16 w-64 h-64 bg-rose-300/25 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-amber-300/30 rounded-full blur-2xl pointer-events-none" />
 
                 <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 text-left">
                     <div>
                         {/* Left-Aligned Breadcrumbs */}
                         <div className="flex items-center gap-2 text-xs font-bold text-slate-500 mb-1 flex-wrap">
-                            <Link to="/" className="text-slate-600 hover:text-[#2563EB] transition-colors underline-offset-2 hover:underline">Home</Link>
+                            <Link to="/" className="text-slate-600 hover:text-[#E51A22] transition-colors underline-offset-2 hover:underline">Home</Link>
                             <span className="opacity-40">/</span>
-                            <span className="text-[#1D4ED8] font-extrabold">Toy Categories</span>
+                            <span className="text-[#9F1239] font-extrabold">Toy Categories</span>
                         </div>
 
                         {/* Bold Left-Aligned Title */}
@@ -399,10 +399,10 @@ const AllCategories = () => {
                         </p>
                     </div>
 
-                    <div className="hidden sm:flex items-center gap-3 bg-white/85 backdrop-blur-md px-4 py-2 rounded-2xl border border-blue-200/80 shadow-xs shrink-0 self-start md:self-center">
+                    <div className="hidden sm:flex items-center gap-3 bg-white/85 backdrop-blur-md px-4 py-2 rounded-2xl border border-rose-200/80 shadow-xs shrink-0 self-start md:self-center">
                         <span className="text-2xl">🎲</span>
                         <div>
-                            <span className="block text-[10.5px] font-black uppercase tracking-wider text-blue-600">Toy Finder</span>
+                            <span className="block text-[10.5px] font-black uppercase tracking-wider text-rose-600">Toy Finder</span>
                             <span className="block text-xs text-slate-900 font-black">Explore By Interest</span>
                         </div>
                     </div>
@@ -412,7 +412,7 @@ const AllCategories = () => {
                 <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none z-20">
                     <svg viewBox="0 0 1200 60" preserveAspectRatio="none" className="w-full h-5 sm:h-7 md:h-8 block">
                         <path d="M0,22 C250,56 450,-4 700,28 C920,56 1080,4 1200,22 L1200,60 L0,60 Z" fill="#FAF8F5" />
-                        <path d="M0,22 C250,56 450,-4 700,28 C920,56 1080,4 1200,22" fill="none" stroke="#93C5FD" strokeWidth="2.5" strokeLinecap="round" />
+                        <path d="M0,22 C250,56 450,-4 700,28 C920,56 1080,4 1200,22" fill="none" stroke="#FDA4AF" strokeWidth="2.5" strokeLinecap="round" />
                     </svg>
                 </div>
             </div>
@@ -556,7 +556,7 @@ const AllCategories = () => {
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading Play Worlds...</span>
                     </div>
                 ) : (
-                    /* 100% Edge-to-Edge Container with Fixed Snake Rope & Gliding Category Rounds (દોરી સાપ જેવી - પોતાની જગ્યાએ ફિક્સ રહે - બંને બાજુ સ્ક્રીનને અડેલી) */
+                    /* 100% Edge-to-Edge Container with Fixed Snake Rope & Gliding Category Rounds */
                     <div
                         ref={containerRef}
                         className="w-full relative h-[360px] sm:h-[385px] overflow-hidden select-none cursor-grab active:cursor-grabbing"
@@ -569,7 +569,7 @@ const AllCategories = () => {
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
                     >
-                        {/* 1. STATIONARY 3D SNAKE WAVE ROPE - TOUCHES BOTH SCREEN EDGES DIRECTLY (દોરી સાપ જેવા આકારમાં - પોતાની જગ્યાએ ફિક્સ રહે - બંને બાજુ સ્ક્રીનને અડેલી - નો આઇકોન) */}
+                        {/* 1. STATIONARY 3D SNAKE WAVE ROPE - TOUCHES BOTH SCREEN EDGES DIRECTLY */}
                         <div className="w-full absolute top-0 left-0 right-0 h-[90px] pointer-events-none z-10 overflow-hidden">
                             <svg className="w-full h-[90px] block" preserveAspectRatio="none">
                                 <rect x="0" y="0" width="100%" height="90" fill="url(#fixedSnakeRopePattern)" />

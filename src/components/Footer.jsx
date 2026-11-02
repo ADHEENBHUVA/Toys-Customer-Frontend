@@ -73,6 +73,14 @@ const Footer = () => {
         }
     };
 
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+        const root = document.getElementById('root');
+        if (root) root.scrollTop = 0;
+    };
+
     return (
         <footer className="w-full relative font-sans text-slate-800 bg-[#FFF5F5] overflow-hidden flex flex-col border-t border-red-100">
             {/* Animated Toy Train & Road Transit Scene (Between Reviews & Footer) */}
@@ -129,15 +137,15 @@ const Footer = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.4fr_0.9fr_1fr_1.1fr_1fr_1.4fr] gap-x-6 sm:gap-x-7 lg:gap-x-8 gap-y-7 sm:gap-y-8">
                         {/* Brand Col */}
                         <div className="col-span-2 sm:col-span-2 md:col-span-3 lg:col-span-1">
-                            <div className="flex items-center gap-3 mb-3.5 sm:mb-4">
-                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border-[3px] border-[#E51A22] flex items-center justify-center text-[#E51A22] bg-white shadow-xs">
+                            <Link to="/" onClick={scrollToTop} className="flex items-center gap-3 mb-3.5 sm:mb-4 group inline-flex">
+                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border-[3px] border-[#E51A22] flex items-center justify-center text-[#E51A22] bg-white shadow-xs group-hover:scale-105 transition-transform">
                                     <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>
                                 </div>
                                 <div className="flex flex-col leading-none">
                                     <span className="text-[23px] sm:text-[25px] font-black text-[#1c274c]">Little Joys</span>
                                     <span className="text-[10px] sm:text-[11px] font-extrabold text-[#E51A22] tracking-widest mt-1">KIDS &amp; BABY STORE</span>
                                 </div>
-                            </div>
+                            </Link>
                             <p className="text-[13px] sm:text-[14px] text-slate-600 font-medium leading-relaxed mb-4 pr-1">
                                 Thoughtfully chosen baby and kids products for every little adventure.
                             </p>
@@ -161,10 +169,10 @@ const Footer = () => {
                         <div className="col-span-1">
                             <h4 className="font-extrabold text-[#1c274c] text-[15.5px] sm:text-[17px] mb-3 sm:mb-4 tracking-wide">Shop</h4>
                             <ul className="space-y-2.5 sm:space-y-3.5 text-[13.5px] sm:text-[14.5px] text-slate-700 font-bold">
-                                <li><Link to="/products" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">All Products</Link></li>
-                                <li><Link to="/products?filter=new-arrivals" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">New Arrivals</Link></li>
-                                <li><Link to="/products?filter=best-sellers" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Best Sellers</Link></li>
-                                <li><Link to="/products?filter=sale" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Sale</Link></li>
+                                <li><Link to="/products" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">All Products</Link></li>
+                                <li><Link to="/products?filter=new-arrivals" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">New Arrivals</Link></li>
+                                <li><Link to="/products?filter=best-sellers" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Best Sellers</Link></li>
+                                <li><Link to="/products?filter=sale" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Sale</Link></li>
                             </ul>
                         </div>
 
@@ -175,17 +183,17 @@ const Footer = () => {
                                 {topCategories.length > 0 ? (
                                     topCategories.map((category) => (
                                         <li key={category._id}>
-                                            <Link to={`/products?category=${encodeURIComponent(category.name)}`} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">
+                                            <Link to={`/products?category=${encodeURIComponent(category.name)}`} onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">
                                                 {category.name}
                                             </Link>
                                         </li>
                                     ))
                                 ) : (
                                     <>
-                                        <li><Link to="/products" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Nursery</Link></li>
-                                        <li><Link to="/products" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Toys &amp; Games</Link></li>
-                                        <li><Link to="/products" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Feeding</Link></li>
-                                        <li><Link to="/products" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Clothing</Link></li>
+                                        <li><Link to="/products" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Nursery</Link></li>
+                                        <li><Link to="/products" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Toys &amp; Games</Link></li>
+                                        <li><Link to="/products" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Feeding</Link></li>
+                                        <li><Link to="/products" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Clothing</Link></li>
                                     </>
                                 )}
                             </ul>
@@ -195,10 +203,10 @@ const Footer = () => {
                         <div className="col-span-1">
                             <h4 className="font-extrabold text-[#1c274c] text-[15.5px] sm:text-[17px] mb-3 sm:mb-4 tracking-wide">Customer Care</h4>
                             <ul className="space-y-2.5 sm:space-y-3.5 text-[13.5px] sm:text-[14.5px] text-slate-700 font-bold">
-                                <li><Link to="/shipping" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Shipping &amp; Delivery</Link></li>
-                                <li><Link to="/returns" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Returns &amp; Exchanges</Link></li>
-                                <li><Link to="/faq" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">FAQ</Link></li>
-                                <li><Link to="/contact" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Contact Us</Link></li>
+                                <li><Link to="/shipping" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Shipping &amp; Delivery</Link></li>
+                                <li><Link to="/returns" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Returns &amp; Exchanges</Link></li>
+                                <li><Link to="/faq" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">FAQ</Link></li>
+                                <li><Link to="/contact" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Contact Us</Link></li>
                             </ul>
                         </div>
 
@@ -206,9 +214,9 @@ const Footer = () => {
                         <div className="col-span-1">
                             <h4 className="font-extrabold text-[#1c274c] text-[15.5px] sm:text-[17px] mb-3 sm:mb-4 tracking-wide">Policies</h4>
                             <ul className="space-y-2.5 sm:space-y-3.5 text-[13.5px] sm:text-[14.5px] text-slate-700 font-bold">
-                                <li><Link to="/privacy" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Privacy Policy</Link></li>
-                                <li><Link to="/terms" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Terms of Service</Link></li>
-                                <li><Link to="/refund" className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Refund Policy</Link></li>
+                                <li><Link to="/privacy" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Privacy Policy</Link></li>
+                                <li><Link to="/terms" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Terms of Service</Link></li>
+                                <li><Link to="/refund" onClick={scrollToTop} className="hover:text-[#E51A22] hover:translate-x-1 transition-all inline-block">Refund Policy</Link></li>
                             </ul>
                         </div>
 

@@ -11,7 +11,7 @@ const Waitlist = () => {
             <h1 className="text-3xl font-black text-[#2e4053] mb-8">My Waitlist</h1>
 
             {(!waitlistItems || waitlistItems.length === 0) ? (
-                <div className="text-center py-16 bg-slate-50 rounded-2xl">
+                <div className="text-center py-16">
                     <div className="w-24 h-24 mx-auto bg-slate-200 rounded-full flex items-center justify-center mb-6">
                         <svg width="40" height="40" fill="none" stroke="#94a3b8" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>

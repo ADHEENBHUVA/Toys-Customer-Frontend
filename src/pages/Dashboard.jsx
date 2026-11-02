@@ -1027,12 +1027,12 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Best Selling Picks - Ranked with Most Selling First */}
+            {/* Best Selling Picks - 3 Clean Rows on Grid */}
             <div className="w-full bg-[#F8FAFC] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
                     <div className="flex flex-col items-center justify-center text-center mb-4 sm:mb-5">
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-amber-200/80 shadow-2xs">
-                            🏆 TOP-RANKED FAVORITES
+                            🏆 BEST SELLERS
                         </span>
                         <h2 className="text-[28px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-1.5">
                             Best Selling Picks
@@ -1040,18 +1040,21 @@ const Dashboard = () => {
                         <p className="text-[#666] text-[14.5px] md:text-[16px] font-medium">Top-rated toys loved by parents and kids alike</p>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 sm:px-2 md:px-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 sm:px-2 md:px-0">
                         {((trendingProducts && trendingProducts.length > 0)
                             ? [...trendingProducts]
                             : [...allProducts].sort((a, b) => (b.totalSold || 0) - (a.totalSold || 0) || (b.reviewCount || 0) - (a.reviewCount || 0))
                         )
                             .filter(product => product.status !== 'Out of Stock')
-                            .slice(0, 8)
-                            .map((product, idx) => (
+                            .slice(0, 12)
+                            .map((product) => (
                                 <div key={product._id} className="flex flex-col group cursor-pointer relative bg-white rounded-2xl sm:rounded-3xl border border-slate-100 hover:border-red-50 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(229,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden">
                                     <div className="relative w-full aspect-square overflow-hidden bg-[#F8F9FA]">
-                                        {/* Discount Badge */}
+                                        {/* Badges: Best Seller & Discount */}
                                         <div className="absolute top-2 left-2 z-30 pointer-events-none flex flex-col gap-1 items-start">
+                                            <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2 py-0.5 rounded-full text-[8.5px] sm:text-[9.5px] font-black tracking-wide shadow-sm flex items-center gap-1">
+                                                <span>🏆 Best Seller</span>
+                                            </span>
                                             {product.originalPrice > product.price && (
                                                 <span className="bg-[#E51A22] text-white px-1.5 py-0.5 rounded-full text-[8.5px] sm:text-[9.5px] font-bold tracking-wider shadow-xs flex items-center">
                                                     {`${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% Off`}
@@ -1187,7 +1190,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className="flex justify-center items-center mt-5 sm:mt-6 px-4 md:px-0">
-                        <Link to="/products?sort=bestseller" className="group bg-[#E51A22] text-white shadow-[0_4px_16px_rgba(229,26,34,0.25)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.35)] hover:bg-[#c9141b] active:scale-95 px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm cursor-pointer">
+                        <Link to="/products?filter=best-sellers" className="group bg-[#E51A22] text-white shadow-[0_4px_16px_rgba(229,26,34,0.25)] hover:shadow-[0_6px_22px_rgba(229,26,34,0.35)] hover:bg-[#c9141b] active:scale-95 px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 w-full sm:w-auto justify-center text-sm cursor-pointer">
                             View All Best Sellers
                             <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
                         </Link>
