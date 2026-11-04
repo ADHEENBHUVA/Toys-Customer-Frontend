@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Heart, Search, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, CheckCircle2, Shield, Leaf, Heart as HeartIcon, Bell, Sparkles, Zap, Star, Quote, MapPin, MessageCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ProductCardImageCarousel from '../components/ProductCardImageCarousel';
+import InstagramFeedSection from '../components/InstagramFeedSection';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -27,46 +28,92 @@ const avatarColors = [
 
 const CATEGORY_STYLE_THEMES = [
     {
-        ringGradient: 'from-rose-300 via-pink-200 to-rose-100',
-        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(244,63,94,0.3)]',
-        badgeBorder: 'border-rose-100',
-        pillBg: 'bg-rose-50 text-rose-950 border-rose-200/90',
-        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+        // 1. Building & Blocks (Coral Rose)
+        ringGradient: 'from-rose-400 via-pink-300 to-rose-200',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(244,63,94,0.35)]',
+        badgeBorder: 'border-rose-200',
+        pillBg: 'bg-gradient-to-b from-[#FFF5F6] via-white to-[#FFE4E8]',
+        pillBorder: 'border-rose-200/90',
+        textColor: 'text-[#9F1239]',
+        dotColor: 'bg-[#F43F5E]',
+        glowShadow: 'shadow-[0_4px_12px_rgba(244,63,94,0.12),inset_0_1.5px_0_rgba(255,255,255,0.95)]'
     },
     {
-        ringGradient: 'from-amber-300 via-yellow-200 to-amber-100',
-        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(245,158,11,0.3)]',
-        badgeBorder: 'border-amber-100',
-        pillBg: 'bg-amber-50 text-amber-950 border-amber-200/90',
-        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+        // 2. Vehicles & RC (Ruby Red)
+        ringGradient: 'from-red-400 via-rose-300 to-orange-200',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(229,26,34,0.35)]',
+        badgeBorder: 'border-red-200',
+        pillBg: 'bg-gradient-to-b from-[#FFF5F5] via-white to-[#FEE2E2]',
+        pillBorder: 'border-red-200/90',
+        textColor: 'text-[#991B1B]',
+        dotColor: 'bg-[#E51A22]',
+        glowShadow: 'shadow-[0_4px_12px_rgba(229,26,34,0.12),inset_0_1.5px_0_rgba(255,255,255,0.95)]'
     },
     {
-        ringGradient: 'from-sky-300 via-cyan-200 to-blue-100',
-        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(14,165,233,0.3)]',
-        badgeBorder: 'border-sky-100',
-        pillBg: 'bg-sky-50 text-sky-950 border-sky-200/90',
-        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+        // 3. Dolls & Accessories (Sunny Amber)
+        ringGradient: 'from-amber-400 via-yellow-300 to-amber-200',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(245,158,11,0.35)]',
+        badgeBorder: 'border-amber-200',
+        pillBg: 'bg-gradient-to-b from-[#FFFDF2] via-white to-[#FEF3C7]',
+        pillBorder: 'border-amber-200/90',
+        textColor: 'text-[#92400E]',
+        dotColor: 'bg-[#F59E0B]',
+        glowShadow: 'shadow-[0_4px_12px_rgba(245,158,11,0.12),inset_0_1.5px_0_rgba(255,255,255,0.95)]'
     },
     {
-        ringGradient: 'from-emerald-300 via-teal-200 to-emerald-100',
-        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(16,185,129,0.3)]',
-        badgeBorder: 'border-emerald-100',
-        pillBg: 'bg-emerald-50 text-emerald-950 border-emerald-200/90',
-        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+        // 4. Action Figures (Ocean Cyan)
+        ringGradient: 'from-sky-400 via-cyan-300 to-blue-200',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(14,165,233,0.35)]',
+        badgeBorder: 'border-sky-200',
+        pillBg: 'bg-gradient-to-b from-[#F0F9FF] via-white to-[#E0F2FE]',
+        pillBorder: 'border-sky-200/90',
+        textColor: 'text-[#075985]',
+        dotColor: 'bg-[#0EA5E9]',
+        glowShadow: 'shadow-[0_4px_12px_rgba(14,165,233,0.12),inset_0_1.5px_0_rgba(255,255,255,0.95)]'
     },
     {
-        ringGradient: 'from-purple-300 via-violet-200 to-indigo-100',
-        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(168,85,247,0.3)]',
-        badgeBorder: 'border-purple-100',
-        pillBg: 'bg-purple-50 text-purple-950 border-purple-200/90',
-        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+        // 5. Educational (Mint Emerald)
+        ringGradient: 'from-emerald-400 via-teal-300 to-emerald-200',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(16,185,129,0.35)]',
+        badgeBorder: 'border-emerald-200',
+        pillBg: 'bg-gradient-to-b from-[#F0FDF4] via-white to-[#DCFCE7]',
+        pillBorder: 'border-emerald-200/90',
+        textColor: 'text-[#166534]',
+        dotColor: 'bg-[#10B981]',
+        glowShadow: 'shadow-[0_4px_12px_rgba(16,185,129,0.12),inset_0_1.5px_0_rgba(255,255,255,0.95)]'
     },
     {
-        ringGradient: 'from-orange-300 via-amber-200 to-orange-100',
-        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(249,115,22,0.3)]',
-        badgeBorder: 'border-orange-100',
-        pillBg: 'bg-orange-50 text-orange-950 border-orange-200/90',
-        pillHover: 'group-hover:bg-[#E51A22] group-hover:text-white group-hover:border-[#E51A22]'
+        // 6. Board Games (Royal Violet)
+        ringGradient: 'from-purple-400 via-violet-300 to-indigo-200',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(168,85,247,0.35)]',
+        badgeBorder: 'border-purple-200',
+        pillBg: 'bg-gradient-to-b from-[#FAF5FF] via-white to-[#F3E8FF]',
+        pillBorder: 'border-purple-200/90',
+        textColor: 'text-[#6B21A8]',
+        dotColor: 'bg-[#A855F7]',
+        glowShadow: 'shadow-[0_4px_12px_rgba(168,85,247,0.12),inset_0_1.5px_0_rgba(255,255,255,0.95)]'
+    },
+    {
+        // 7. Soft Toys (Tangerine Orange)
+        ringGradient: 'from-orange-400 via-amber-300 to-orange-200',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(249,115,22,0.35)]',
+        badgeBorder: 'border-orange-200',
+        pillBg: 'bg-gradient-to-b from-[#FFF7ED] via-white to-[#FFEDD5]',
+        pillBorder: 'border-orange-200/90',
+        textColor: 'text-[#9A3412]',
+        dotColor: 'bg-[#F97316]',
+        glowShadow: 'shadow-[0_4px_12px_rgba(249,115,22,0.12),inset_0_1.5px_0_rgba(255,255,255,0.95)]'
+    },
+    {
+        // 8. Musical Instruments (Bubblegum Pink)
+        ringGradient: 'from-pink-400 via-rose-300 to-pink-200',
+        ringGlow: 'group-hover:shadow-[0_12px_28px_rgba(236,72,153,0.35)]',
+        badgeBorder: 'border-pink-200',
+        pillBg: 'bg-gradient-to-b from-[#FDF2F8] via-white to-[#FCE7F3]',
+        pillBorder: 'border-pink-200/90',
+        textColor: 'text-[#9D174D]',
+        dotColor: 'bg-[#EC4899]',
+        glowShadow: 'shadow-[0_4px_12px_rgba(236,72,153,0.12),inset_0_1.5px_0_rgba(255,255,255,0.95)]'
     }
 ];
 
@@ -926,9 +973,11 @@ const Dashboard = () => {
                 className="w-full pt-7 sm:pt-9 md:pt-10 pb-7 sm:pb-9 text-center bg-gradient-to-b from-white via-rose-50/20 to-white border-b border-slate-200/90 relative overflow-hidden group/categories"
             >
                 <div className="w-full mx-auto px-4 md:px-6 relative z-10 mb-4 sm:mb-6">
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 text-[#E51A22] text-[12px] font-black uppercase tracking-[0.22em] mb-2 border border-rose-200/70 shadow-2xs">
-                        ✨ EXPLORE BY INTEREST ✨
-                    </span>
+                    <div className="flex items-center justify-center mb-2 sm:mb-2.5">
+                        <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 text-[#E51A22] text-[11.5px] sm:text-[12px] font-black uppercase tracking-[0.22em] border border-rose-200/80 shadow-2xs">
+                            — EXPLORE BY INTEREST —
+                        </span>
+                    </div>
                     <h2 className="text-[26px] md:text-[38px] font-black text-[#111] mb-1 tracking-tight uppercase">Toy Categories</h2>
                     <p className="text-[#666] text-[13.5px] md:text-[15px] font-semibold uppercase tracking-wider">Everything your little one needs to learn, imagine & play</p>
                 </div>
@@ -1010,12 +1059,18 @@ const Dashboard = () => {
                                         </span>
                                     </div>
 
-                                    {/* Stylish Capsule Title - Uniform 2-Line Height with Perfect Vertical Centering for 1-Line Titles */}
-                                    <div className="w-full text-center px-1 flex items-center justify-center">
+                                    {/* Unique 3D Toy Capsule Title - Curved Pill with Gloss, Sparkle Accent & Shimmer */}
+                                    <div className="w-full text-center px-0.5 sm:px-1 flex items-center justify-center">
                                         <div
-                                            className={`w-full max-w-[130px] sm:max-w-[145px] md:max-w-[155px] min-h-[42px] sm:min-h-[46px] h-[42px] sm:h-[46px] px-2.5 sm:px-3 py-1 rounded-2xl ${theme.pillBg} border ${theme.pillHover} flex items-center justify-center transition-all duration-300 shadow-2xs`}
+                                            className={`w-full max-w-[134px] sm:max-w-[148px] md:max-w-[158px] min-h-[44px] sm:min-h-[48px] h-[44px] sm:h-[48px] px-2.5 sm:px-3 py-1 rounded-full ${theme.pillBg} ${theme.textColor} border ${theme.pillBorder} ${theme.glowShadow} flex items-center justify-center gap-1.5 transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-1 group-hover:bg-gradient-to-r group-hover:from-[#E51A22] group-hover:via-[#ff3849] group-hover:to-[#ff5e62] group-hover:text-white group-hover:border-transparent group-hover:shadow-[0_8px_22px_rgba(229,26,34,0.35)] relative overflow-hidden`}
                                         >
-                                            <span className="text-[11px] sm:text-[12px] md:text-[12.5px] font-black uppercase tracking-wider leading-[1.22] text-center line-clamp-2 select-none">
+                                            {/* Shimmer light-beam on hover */}
+                                            <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-[300%] transition-transform duration-700 ease-in-out pointer-events-none"></span>
+
+                                            {/* Playful mini accent sparkle dot */}
+                                            <span className={`w-1.5 h-1.5 rounded-full ${theme.dotColor} shrink-0 group-hover:bg-white group-hover:scale-125 transition-all shadow-xs`}></span>
+
+                                            <span className="text-[10.5px] sm:text-[11.5px] md:text-[12px] font-black uppercase tracking-wider leading-[1.25] text-center line-clamp-2 select-none relative z-10 drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] group-hover:drop-shadow-none">
                                                 {cat.name}
                                             </span>
                                         </div>
@@ -1031,9 +1086,11 @@ const Dashboard = () => {
             <div className="w-full bg-[#F8FAFC] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-slate-200/90 relative">
                 <div className="w-full mx-auto px-4 md:px-6">
                     <div className="flex flex-col items-center justify-center text-center mb-4 sm:mb-5">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-amber-200/80 shadow-2xs">
-                            🏆 BEST SELLERS
-                        </span>
+                        <div className="flex items-center justify-center mb-2 sm:mb-2.5">
+                            <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 text-[#E51A22] text-[11.5px] sm:text-[12px] font-black uppercase tracking-[0.22em] border border-rose-200/80 shadow-2xs">
+                                — BEST SELLERS —
+                            </span>
+                        </div>
                         <h2 className="text-[28px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-1.5">
                             Best Selling Picks
                         </h2>
@@ -1258,9 +1315,11 @@ const Dashboard = () => {
                 <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
                     {/* Header */}
                     <div className="flex flex-col items-center justify-center text-center mb-8 sm:mb-10 md:mb-12">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-orange-50 text-orange-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2.5 border border-orange-200/80 shadow-2xs">
-                            🌱 DEVELOPMENT MILESTONES
-                        </span>
+                        <div className="flex items-center justify-center mb-2.5">
+                            <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 text-[#E51A22] text-[11.5px] sm:text-[12px] font-black uppercase tracking-[0.22em] border border-rose-200/80 shadow-2xs">
+                                — DEVELOPMENT MILESTONES —
+                            </span>
+                        </div>
                         <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-2.5">
                             Shop By Age
                         </h2>
@@ -1451,9 +1510,11 @@ const Dashboard = () => {
                 <div className="w-full bg-[#F4F7FC] pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 border-b border-indigo-200/70 relative">
                     <div className="w-full mx-auto px-4 md:px-8">
                         <div className="flex flex-col items-center justify-center text-center mb-4 sm:mb-6">
-                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2 border border-blue-200/80 shadow-2xs">
-                                ✨ EXCLUSIVE DROPS
-                            </span>
+                            <div className="flex items-center justify-center mb-2">
+                                <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 text-[#E51A22] text-[11.5px] sm:text-[12px] font-black uppercase tracking-[0.22em] border border-rose-200/80 shadow-2xs">
+                                    — EXCLUSIVE DROPS —
+                                </span>
+                            </div>
                             <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-black text-[#1A1A24] leading-tight mb-1.5">
                                 Limited-edition playtime drops
                             </h2>
@@ -1544,13 +1605,12 @@ const Dashboard = () => {
                     className="w-full pt-6 sm:pt-7 md:pt-8 pb-6 sm:pb-7 md:pb-8 overflow-hidden bg-[#FFFDF9] font-sans border-b border-slate-200/90 relative group/brandSection"
                 >
                     <div className="text-center mb-3 sm:mb-4 px-4 relative z-10">
-                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-300 to-transparent -z-10"></div>
-                        <div className="inline-block bg-[#FFFDF9] px-6">
-                            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-50 text-purple-700 text-[12px] font-black uppercase tracking-[0.2em] mb-2 border border-purple-200/80 shadow-2xs">
-                                ⭐ OFFICIAL PARTNERS
+                        <div className="flex items-center justify-center mb-2">
+                            <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 text-[#E51A22] text-[11.5px] sm:text-[12px] font-black uppercase tracking-[0.22em] border border-rose-200/80 shadow-2xs">
+                                — OFFICIAL PARTNERS —
                             </span>
-                            <h2 className="text-[28px] md:text-[36px] font-black text-[#1A1A24] block mt-1">Brands We Trust</h2>
                         </div>
+                        <h2 className="text-[28px] md:text-[36px] font-black text-[#1A1A24] block mt-1">Brands We Trust</h2>
                     </div>
 
                     <div className="relative w-full max-w-[1600px] mx-auto px-2 sm:px-4">
@@ -1680,10 +1740,11 @@ const Dashboard = () => {
 
                     {/* Header: Clean, Trustworthy & Beautiful */}
                     <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-8 px-4 max-w-2xl mx-auto">
-                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-50 text-[#E51A22] text-[11.5px] font-black uppercase tracking-wider mb-2.5 border border-rose-200/80 shadow-2xs">
-                            <Heart className="w-3.5 h-3.5 fill-[#E51A22]" />
-                            Real Parent Experiences
-                        </span>
+                        <div className="flex items-center justify-center mb-2.5">
+                            <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 text-[#E51A22] text-[11.5px] sm:text-[12px] font-black uppercase tracking-[0.22em] border border-rose-200/80 shadow-2xs">
+                                — REAL PARENT EXPERIENCES —
+                            </span>
+                        </div>
                         <h2 className="text-[26px] sm:text-[34px] md:text-[38px] font-black text-[#1A1A24] leading-tight mb-2 tracking-tight">
                             Loved by Families Across India
                         </h2>
@@ -1857,6 +1918,10 @@ const Dashboard = () => {
 
                 </div>
             </div>
+
+            {/* 📸 Instagram Reels & Posts Live Feed Section (Directly Above Footer) */}
+            <InstagramFeedSection />
+
         </div>
     );
 };

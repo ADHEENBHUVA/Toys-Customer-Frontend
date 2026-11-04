@@ -463,27 +463,26 @@ const ShopByPrice = () => {
                                         <div 
                                             className={`w-full relative transition-all duration-300 ${
                                                 isSelected 
-                                                    ? 'scale-104 shadow-[0_20px_42px_rgba(229,26,34,0.28)] ring-4 ring-rose-500/30 rounded-b-3xl' 
-                                                    : 'group-hover/box:scale-103 group-hover/box:shadow-[0_16px_34px_rgba(0,0,0,0.12)]'
+                                                    ? 'scale-104' 
+                                                    : 'group-hover/box:scale-103'
                                             }`}
                                             style={{
-                                                filter: isSelected ? 'drop-shadow(0 14px 28px rgba(229,26,34,0.22))' : 'drop-shadow(0 12px 24px rgba(0,0,0,0.08))'
+                                                filter: isSelected ? 'drop-shadow(0 14px 28px rgba(229,26,34,0.25))' : 'drop-shadow(0 10px 20px rgba(0,0,0,0.08))'
                                             }}
                                         >
-                                            {/* Vector Background: Apex Triangle + Square Box + Shared Line (PURE WHITE, NO CLIPPING/IMAGE EFFECT) */}
+                                            {/* Vector Background: Apex Triangle (Transparent Hanger) + Square Box (White Card) */}
                                             <svg 
                                                 viewBox="0 0 204 262" 
                                                 className="w-full h-[262px] block overflow-visible pointer-events-none"
                                             >
-                                                {/* Unified Crisp White Card Background */}
+                                                {/* Lower Square Card Body - Crisp White Background */}
                                                 <path
-                                                    d="M 102,3 
+                                                    d="M 2,52 
                                                        L 202,52 
                                                        L 202,246 
                                                        A 16 16 0 0 1 186,262 
                                                        L 18,262 
                                                        A 16 16 0 0 1 2,246 
-                                                       L 2,52 
                                                        Z"
                                                     fill={isSelected ? '#FFF8F8' : '#FFFFFF'}
                                                     stroke={isSelected ? '#E51A22' : range.borderColor}
@@ -491,17 +490,16 @@ const ShopByPrice = () => {
                                                     strokeLinejoin="round"
                                                 />
 
-                                                {/* ------------------------------------------------------------------- */}
-                                                {/* ⭐️ THE SHARED LINE (Trikon ni Niche ni line & Square ni Upper ni line) */}
-                                                {/* ------------------------------------------------------------------- */}
-                                                <line
-                                                    x1="2"
-                                                    y1="52"
-                                                    x2="202"
-                                                    y2="52"
+                                                {/* Upper Triangle Hanger Arms - 100% Transparent (No White Background) */}
+                                                <path
+                                                    d="M 2,52 
+                                                       L 102,3 
+                                                       L 202,52"
+                                                    fill="none"
                                                     stroke={isSelected ? '#E51A22' : range.borderColor}
-                                                    strokeWidth={isSelected ? '2.4' : '1.8'}
-                                                    strokeDasharray="none"
+                                                    strokeWidth={isSelected ? '2.8' : '2.2'}
+                                                    strokeLinejoin="round"
+                                                    strokeLinecap="round"
                                                 />
 
                                                 {/* Top Apex Contact Rivet Bead touching the rope */}

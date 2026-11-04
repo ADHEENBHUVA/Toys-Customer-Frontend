@@ -124,13 +124,26 @@ const Navbar = () => {
         return null;
     }, [location.pathname, location.search]);
 
-    // Active pill styling: ONLY the currently open tab is RED with white text
+    // Active navigation item styling: RED font, 100% transparent background
     const getNavButtonClass = (tabKey) => {
         const isActive = activeTab === tabKey;
         if (isActive) {
-            return 'bg-[#E51A22] text-white font-black shadow-sm ring-1 ring-[#E51A22]';
+            return 'text-[#E51A22] font-black bg-transparent';
         }
-        return 'text-slate-700 hover:text-[#E51A22] hover:bg-rose-50/80 font-bold';
+        return 'text-slate-700 hover:text-[#E51A22] bg-transparent font-bold';
+    };
+
+    // Clean Underline below active nav item (zero background)
+    const renderNavUnderline = (tabKey) => {
+        const isActive = activeTab === tabKey;
+        return (
+            <span
+                className={`absolute -bottom-1 left-2 right-2 h-[2.5px] rounded-full pointer-events-none transition-all duration-200 ${isActive
+                        ? 'bg-[#E51A22] opacity-100 scale-x-100'
+                        : 'bg-[#E51A22]/40 opacity-0 group-hover:opacity-100 group-hover/navLink:opacity-100 scale-x-75 group-hover:scale-x-100 group-hover/navLink:scale-x-100'
+                    }`}
+            />
+        );
     };
 
     // Helper to get image URL
@@ -340,8 +353,8 @@ const Navbar = () => {
                             type="button"
                             onClick={() => setSearchCategoryFilter('ALL')}
                             className={`px-2.5 py-1 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer ${searchCategoryFilter === 'ALL'
-                                    ? 'bg-[#E51A22] text-white shadow-xs scale-102'
-                                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                ? 'bg-[#E51A22] text-white shadow-xs scale-102'
+                                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
                                 }`}
                         >
                             All ({matchingProducts.length})
@@ -355,8 +368,8 @@ const Navbar = () => {
                                     type="button"
                                     onClick={() => setSearchCategoryFilter(isSelected ? 'ALL' : name)}
                                     className={`px-2.5 py-1 rounded-full text-xs font-black transition-all shrink-0 flex items-center gap-1 cursor-pointer border ${isSelected
-                                            ? 'bg-[#E51A22] text-white border-[#E51A22] shadow-xs scale-102'
-                                            : `${badge.bg}`
+                                        ? 'bg-[#E51A22] text-white border-[#E51A22] shadow-xs scale-102'
+                                        : `${badge.bg}`
                                         }`}
                                 >
                                     <span>{badge.icon}</span>
@@ -540,8 +553,8 @@ const Navbar = () => {
                                                     setIsCategoryPickerOpen(false);
                                                 }}
                                                 className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors ${searchCategoryFilter === 'ALL'
-                                                        ? 'bg-rose-50 text-[#E51A22] font-black'
-                                                        : 'text-slate-700 hover:bg-slate-50'
+                                                    ? 'bg-rose-50 text-[#E51A22] font-black'
+                                                    : 'text-slate-700 hover:bg-slate-50'
                                                     }`}
                                             >
                                                 <span>🧸</span>
@@ -559,8 +572,8 @@ const Navbar = () => {
                                                             setIsCategoryPickerOpen(false);
                                                         }}
                                                         className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors ${searchCategoryFilter === cat.name
-                                                                ? 'bg-rose-50 text-[#E51A22] font-black'
-                                                                : 'text-slate-700 hover:bg-slate-50'
+                                                            ? 'bg-rose-50 text-[#E51A22] font-black'
+                                                            : 'text-slate-700 hover:bg-slate-50'
                                                             }`}
                                                     >
                                                         <span>{badge.icon}</span>
@@ -747,10 +760,11 @@ const Navbar = () => {
                             {/* Home */}
                             <Link
                                 to="/"
-                                className={`relative transition-colors duration-150 text-[13px] xl:text-[13.5px] px-3.5 py-1.5 rounded-full outline-none flex items-center gap-1.5 select-none ${getNavButtonClass('home')}`}
+                                className={`relative group/navLink transition-colors duration-150 text-[13px] xl:text-[13.5px] px-3.5 py-1.5 rounded-full outline-none flex items-center gap-1.5 select-none ${getNavButtonClass('home')}`}
                             >
                                 <span>🏠</span>
                                 <span>Home</span>
+                                {renderNavUnderline('home')}
                             </Link>
 
                             {/* 1. Shop By Age Dropdown - Pure CSS Hover */}
@@ -761,7 +775,8 @@ const Navbar = () => {
                                 >
                                     <span>🎈</span>
                                     <span>Shop By Age</span>
-                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180 ${activeTab === 'age' ? 'text-white' : 'text-slate-400 group-hover:text-[#E51A22]'}`} />
+                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180 ${activeTab === 'age' ? 'text-[#E51A22]' : 'text-slate-400 group-hover:text-[#E51A22]'}`} />
+                                    {renderNavUnderline('age')}
                                 </Link>
                                 <div className="absolute top-full left-0 pt-1.5 w-60 opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto transition-all duration-150 z-50">
                                     <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-2 overflow-hidden text-slate-800">
@@ -793,7 +808,8 @@ const Navbar = () => {
                                 >
                                     <span>🧸</span>
                                     <span>Toy Categories</span>
-                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180 ${activeTab === 'categories' ? 'text-white' : 'text-slate-400 group-hover:text-[#E51A22]'}`} />
+                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180 ${activeTab === 'categories' ? 'text-[#E51A22]' : 'text-slate-400 group-hover:text-[#E51A22]'}`} />
+                                    {renderNavUnderline('categories')}
                                 </Link>
                                 <div className="absolute top-full left-0 pt-1.5 w-64 opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto transition-all duration-150 z-50">
                                     <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-2 overflow-hidden text-slate-800">
@@ -834,7 +850,8 @@ const Navbar = () => {
                                 >
                                     <span>✨</span>
                                     <span>Collections</span>
-                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180 ${activeTab === 'collections' ? 'text-white' : 'text-slate-400 group-hover:text-[#E51A22]'}`} />
+                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180 ${activeTab === 'collections' ? 'text-[#E51A22]' : 'text-slate-400 group-hover:text-[#E51A22]'}`} />
+                                    {renderNavUnderline('collections')}
                                 </Link>
                                 <div className="absolute top-full left-0 pt-1.5 w-60 opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto transition-all duration-150 z-50">
                                     <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-2 overflow-hidden text-slate-800">
@@ -872,7 +889,8 @@ const Navbar = () => {
                                 >
                                     <span>🏷️</span>
                                     <span>Shop By Price</span>
-                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180 ${activeTab === 'price' ? 'text-white' : 'text-slate-400 group-hover:text-[#E51A22]'}`} />
+                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180 ${activeTab === 'price' ? 'text-[#E51A22]' : 'text-slate-400 group-hover:text-[#E51A22]'}`} />
+                                    {renderNavUnderline('price')}
                                 </Link>
                                 <div className="absolute top-full left-0 pt-1.5 w-56 opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto transition-all duration-150 z-50">
                                     <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-2 overflow-hidden text-slate-800">
@@ -899,28 +917,31 @@ const Navbar = () => {
                             {/* Boys */}
                             <Link
                                 to="/products?gender=Boys"
-                                className={`relative transition-colors duration-150 text-[13px] xl:text-[13.5px] px-3.5 py-1.5 rounded-full outline-none flex items-center gap-1.5 select-none ${getNavButtonClass('boys')}`}
+                                className={`relative group/navLink transition-colors duration-150 text-[13px] xl:text-[13.5px] px-3.5 py-1.5 rounded-full outline-none flex items-center gap-1.5 select-none ${getNavButtonClass('boys')}`}
                             >
                                 <span>🏎️</span>
                                 <span>Boys</span>
+                                {renderNavUnderline('boys')}
                             </Link>
 
                             {/* Girls */}
                             <Link
                                 to="/products?gender=Girls"
-                                className={`relative transition-colors duration-150 text-[13px] xl:text-[13.5px] px-3.5 py-1.5 rounded-full outline-none flex items-center gap-1.5 select-none ${getNavButtonClass('girls')}`}
+                                className={`relative group/navLink transition-colors duration-150 text-[13px] xl:text-[13.5px] px-3.5 py-1.5 rounded-full outline-none flex items-center gap-1.5 select-none ${getNavButtonClass('girls')}`}
                             >
                                 <span>🎀</span>
                                 <span>Girls</span>
+                                {renderNavUnderline('girls')}
                             </Link>
 
                             {/* Best Sellers */}
                             <Link
                                 to="/products?filter=best-sellers"
-                                className={`relative transition-colors duration-150 text-[13px] xl:text-[13.5px] px-3.5 py-1.5 rounded-full outline-none flex items-center gap-1.5 select-none ${getNavButtonClass('best-sellers')}`}
+                                className={`relative group/navLink transition-colors duration-150 text-[13px] xl:text-[13.5px] px-3.5 py-1.5 rounded-full outline-none flex items-center gap-1.5 select-none ${getNavButtonClass('best-sellers')}`}
                             >
-                                <Flame className={`w-3.5 h-3.5 ${activeTab === 'best-sellers' ? 'text-white fill-white' : 'text-amber-500 fill-amber-500'}`} />
+                                <Flame className={`w-3.5 h-3.5 ${activeTab === 'best-sellers' ? 'text-[#E51A22] fill-[#E51A22]' : 'text-amber-500 fill-amber-500'}`} />
                                 <span>Best Sellers</span>
+                                {renderNavUnderline('best-sellers')}
                             </Link>
                         </nav>
 
@@ -929,11 +950,11 @@ const Navbar = () => {
                             <Link
                                 to="/track-order"
                                 className={`px-4 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 border select-none ${activeTab === 'track-order'
-                                        ? 'bg-[#E51A22] text-white border-[#E51A22] shadow-sm'
-                                        : 'bg-slate-50 hover:bg-rose-50 hover:text-[#E51A22] hover:border-rose-200 text-slate-700 border-slate-200/90'
+                                    ? 'bg-rose-50 text-[#E51A22] border-rose-300 shadow-2xs'
+                                    : 'bg-slate-50 hover:bg-rose-50 hover:text-[#E51A22] hover:border-rose-200 text-slate-700 border-slate-200/90'
                                     }`}
                             >
-                                <Package className={`w-3.5 h-3.5 ${activeTab === 'track-order' ? 'text-white' : 'text-[#E51A22]'}`} />
+                                <Package className="w-3.5 h-3.5 text-[#E51A22]" />
                                 <span>Track Order</span>
                             </Link>
                         </div>
